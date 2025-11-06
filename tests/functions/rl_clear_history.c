@@ -1,3 +1,4 @@
+/* minishell/tests/functions/rl_clear_history.c */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
