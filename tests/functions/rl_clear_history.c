@@ -17,7 +17,6 @@ int	main(void)
 	while (1)
 	{
 		rline_buf = readline(prompt);
-		rl_on_new_line(); // do we really need it here?
 		printf("rline_buf = %p\n", rline_buf);
 		if (strlen(rline_buf) == 0)
 		{

@@ -1,26 +1,57 @@
 /* minishell/tests/functions/rl_replace_line.c */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
-#include <string.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
-int	main(void)
-{
-	char	prompt[] = "dchernik@c3r3s6:~$ ";
-	char	*rline_buf = NULL;
+#define EXIT_CMD "exit"
 
-	rline_buf = readline(prompt);
-	printf("You entered: %s\n", rline_buf);
-	printf("rl_line_buffer: %s\n", rl_line_buffer);
-	free(rline_buf);
-	rl_replace_line("New line", 0);
-	rl_redisplay();
-	rline_buf = readline(prompt);
-	printf("You entered: %s\n", rline_buf);
-	printf("rl_line_buffer: %s\n", rl_line_buffer);
-	free(rline_buf);
-	return 0;
+static void	sigint_handler(int signo)
+{
+    char *str = "ya pi";
+    char temp[2] = "";
+    for (int i = 0; i < strlen(str); ++i)
+    {
+        temp[0] = str[i];
+        rl_replace_line(temp, 0);
+        rl_redisplay();
+        sleep(1);
+    }
+}
+
+int main(void)
+{
+	char prompt[] = "dchernik@c3r3s6:~$ ";
+	char *rline_buf = NULL;
+
+	if (signal(SIGINT, sigint_handler) == SIG_ERR)
+	{
+		fprintf(stderr, "Cannot handle SIGINT\n");
+		exit(EXIT_FAILURE);
+	}
+
+	while (1)
+	{
+		rline_buf = readline(prompt);
+		printf("rline_buf = %p\n", rline_buf);
+		if (strlen(rline_buf) == 0)
+		{
+			printf("rline_buf is NULL!\n");
+			free(rline_buf);
+			rline_buf = NULL;
+			continue;
+		}
+		add_history(rline_buf);
+		if (!strncmp(rline_buf, EXIT_CMD, strlen(EXIT_CMD)))
+		{
+			free(rline_buf);
+			rline_buf = NULL;
+			break;
+		}
+		free(rline_buf);
+		rline_buf = NULL;
+	}
+    return 0;
 }
