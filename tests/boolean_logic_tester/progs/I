@@ -1,4 +1,5 @@
 #!/bin/bash
 echo "${0: -1}"
+echo "PID=$$" > ../logs/"${0: -1}"
+echo "PPID=$PPID" >> ../logs/"${0: -1}"
 exit 1
-echo $$ > ../logs/"${0: -1}"
