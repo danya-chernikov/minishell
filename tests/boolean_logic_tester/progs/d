@@ -1,5 +1,8 @@
 #!/bin/bash
-echo "${0: -1}"
-echo "PID=$$" > ../logs/"${0: -1}"
-echo "PPID=$PPID" >> ../logs/"${0: -1}"
+
+prog_name=${0: -1}
+echo "$prog_name"
+echo "PID=$$" > ../logs/"$prog_name"
+echo "PPID=$PPID" >> ../logs/"$prog_name"
+
 exit 0

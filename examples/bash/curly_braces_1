@@ -1,0 +1,4 @@
+#!/bin/bash
+name=danya
+echo "Hello, ${name}123"
+exit 0

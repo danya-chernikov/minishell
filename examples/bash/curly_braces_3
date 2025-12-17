@@ -1,0 +1,4 @@
+#!/bin/bash
+username=
+echo "Hello, ${username:=Guest}"
+exit 0

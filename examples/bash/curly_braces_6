@@ -1,0 +1,4 @@
+#!/bin/bash
+str="just a string"
+echo "${str:0:6}"
+exit 0

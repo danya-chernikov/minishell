@@ -1,0 +1,4 @@
+#!/bin/bash
+str="just a string"
+echo "${#str}"
+exit 0
