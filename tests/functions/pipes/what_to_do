@@ -1,0 +1,31 @@
+/*
+ * This pipe behaviour is described here:
+ * https://www.idc-online.com/technical_references/pdfs/information_technology/
+ * How_Linux_pipes_work_under_the_hood.pdf
+ *
+ * I will try to simulate/recreate all this seven situations:
+ *
+ * 1. Fill in the pipe completely without setting O_NONBLOCK flag
+ *	  (when we attempt to write into the pipe using write(2), this call
+ *	  should be blocked);
+ *
+ * 2. Fill in the pipe completely without setting O_NONBLOCK flag
+ *	  (on attempt to write into the pipe, write(2) should just fail);
+ *
+ * 3. Attempt to read from empty pipe (read(2) should be blocked
+ *	  until data is available in the pipe);
+ *
+ * 4. Close all file descriptors pointing to the write end of the pipe
+ *	  and then attempt to read from this pipe (read(2) should return EOF);
+ *
+ * 5. Attempt to write to a full pipe (write(2) will block until enough
+ *	  data will be read from the pipe to allow the entire call to succeed);
+ *
+ * 6. Close all file descriptors pointing to the read end of the pipe and
+ *	  try to write to this pipe (the SIGPIPE signal should be raised). Try
+ *	  to catch this signal;
+ *
+ * 7. Close all file descriptors pointing to the read end of the pipe and
+ *	  try to write to this pipe (the SIGPIPE signal should be raised).
+ *	  Ignore this signal (write(2) should fail with EPIPE in this case).
+ * */
