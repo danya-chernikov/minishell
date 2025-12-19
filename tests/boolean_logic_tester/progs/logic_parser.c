@@ -14,7 +14,22 @@
 #define EXIT_CMD "exit"
 
 /* Common algorithm:
- *
+ * If we encounter with a logical operators they run consequently
+ * because shell must know the return code of previously executed
+ * command to deside if run the next one or not.
+ * For example: a && b
+ *     First run a (get its return code)
+ *     Then run b (get its return code)
+ * 
+ * If we encounter with pipe, it works differently. All commands
+ * inside the pipe are run concurrently. It means, first we should
+ * determine where this pipe will be end (what is the last program
+ * belonging to this pipe. Now we have to create pipes. The thing
+ * is we can create pipes only when we run our programs (cause STDIN_FILENO
+ * and STDOUT_FILENO are inner resources of each executable) so now when
+ * we reached the end of the current pipeline, we go backwards doing
+ * fork(), then creating a pipe for the current command being traversed
+ * connecting in such a way its read-end with the write-end  for each pipe operand, 
  * */
 int	main(void)
 {
