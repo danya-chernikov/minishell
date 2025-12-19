@@ -1,13 +1,9 @@
-/* pipe_example_1.c
+/* pipe_example_3_progs.c
  *
- * Example from
- * https://www.idc-online.com/technical_references/pdfs/information_technology/
- * How_Linux_pipes_work_under_the_hood.pdf
- *
- * In this guy's example this program implements this shell
- * command 'ls -l argv[1] | grep argv[2]'
+ * In this example the program implements this shell
+ * command 'ls -l argv[1] | tr _ $ | grep argv[2]'
  * when run passing to it two arguments:
- * ./pipe_example dir_to_ls string_to_search_for
+ * ./pipe_example_3_progs dir_to_ls string_to_search_for
  *
  * First the rightmost command (grep) is launched! We go from right to left
  * */
