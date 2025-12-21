@@ -19,8 +19,8 @@
 
 int	main(int argc, char *argv[])
 {
-	int	pid_ls, pid_grep;
-	int	pipefd[2];
+	int	pid_ls, pid_tr, pid_grep;
+	int	pipes[2][2];
 
 	if (argc < 3)
 	{
@@ -30,14 +30,11 @@ int	main(int argc, char *argv[])
 	}
 	fprintf(stdout, "Parent: Grepping %s for %s\n", argv[1], argv[2]);
 
-	// Create an unnamed pipe
-	if (pipe(pipefd) == -1)	
+	if ((pipe(pipes[0]) == -1) || (pipe(pipes[1]) == -1))
 	{
 		fprintf(stderr, "Parent: Failed to create pipe\n");
 		return -1;
 	}
-
-	// Fork a process to run grep	
 	pid_grep = fork();
 	if (pid_grep == -1)
 	{
@@ -46,41 +43,54 @@ int	main(int argc, char *argv[])
 	}
 	else if (pid_grep == 0)
 	{
-		// Here we're already in another process (our copy)!
-		
 		fprintf(stdout, "Child: grep child will now run\n");
-
-		// Set fd[0] (stdin) to the read end of the pipe
-		if (dup2(pipefd[READ_END], STDIN_FILENO) == -1)
+		if (dup2(pipes[1][READ_END], STDIN_FILENO) == -1)
 		{
 			fprintf(stderr, "Child: grep dup2() failed\n");
 			return -1;
 		}
-
-		// We have inherited all our parent's variables!
-		// Close the pipe now that we've duplicated it
-		close(pipefd[READ_END]);
-		close(pipefd[WRITE_END]);
-
-		// Setup the arguments/environment to call
+		close(pipes[0][READ_END]);
+		close(pipes[0][WRITE_END]);
+		close(pipes[1][READ_END]);
+		close(pipes[1][WRITE_END]);
 		char *new_argv[] = { "/usr/bin/grep", argv[2], 0 };
-
 		char *envp[] = { "HOME=/home/dchernik",
 						 "PATH=/bin:/usr/bin",
 						 "USER=dchernik", 0 };
-
-		// Call execve(2) which will replace the executable image of this process
 		execve(new_argv[0], &new_argv[0], envp);
-
-		// Executing will never continue in this process unless execve() returns
-		// because of an error
 		fprintf(stderr, "Child: Oops, grep failed\n");
 		return -1;
 	} // else if (pid_grep == 0)
 	
-	// Fork a process to run ls	
-	pid_ls = fork();
+	pid_tr = fork();
+	if (pid_tr == -1)
+	{
+		fprintf(stderr, "Parent: Could not fork process to run tr\n");
+		return -1;
+	}
+	else if (pid_tr == 0)
+	{
+		fprintf(stdout, "Child: tr child will now run\n");
+		if ((dup2(pipes[1][WRITE_END], STDOUT_FILENO) == -1) ||
+			(dup2(pipes[0][READ_END], STDIN_FILENO) == -1))
+		{
+			fprintf(stderr, "Child: tr dup2() failed\n");
+			return -1;
+		}
+		close(pipes[0][READ_END]);
+		close(pipes[0][WRITE_END]);
+		close(pipes[1][READ_END]);
+		close(pipes[1][WRITE_END]);
+		char *new_argv[] = { "/usr/bin/tr", "_", "$", 0 };
+		char *envp[] = { "HOME=/home/dchernik",
+						 "PATH=/bin:/usr/bin",
+						 "USER=dchernik", 0 };
+		execve(new_argv[0], &new_argv[0], envp);
+		fprintf(stderr, "Child: Oops, tr failed\n");
+		return -1;
+	} // else if (pid_tr == 0)
 
+	pid_ls = fork();
 	if (pid_ls == -1)
 	{
 		fprintf(stderr, "Parent: Could not fork process to run ls\n");
@@ -88,49 +98,36 @@ int	main(int argc, char *argv[])
 	}
 	else if (pid_ls == 0)
 	{
-		// Here we're already in another process (our copy)!
-		
 		fprintf(stdout, "Child: ls child will now run\n");
-		
-		// Set fd[1] (stdout) to the write end of the pipe
-		if (dup2(pipefd[WRITE_END], STDOUT_FILENO) == -1)
+		if (dup2(pipes[0][WRITE_END], STDOUT_FILENO) == -1)
 		{
 			fprintf(stderr, "ls dup2() failed\n");
 			return -1;
 		}
-
-		// We have inherited all our parent's variables!
-		// Close the pipe now that we've duplicated it
-		close(pipefd[READ_END]);
-		close(pipefd[WRITE_END]);
-		
-		// Setup the arguments/environment to call
+		close(pipes[0][READ_END]);
+		close(pipes[0][WRITE_END]);
+		close(pipes[1][READ_END]);
+		close(pipes[1][WRITE_END]);
 		char *new_argv[] = { "/bin/ls", "-la", argv[1], 0 };
-
 		char *envp[] = { "HOME=/home/dchernik",
 						 "PATH=/bin:/usr/bin",
 						 "USER=dchernik", 0 };
-
-		// Call execve(2) which will replace the executable image of this process
 		execve(new_argv[0], &new_argv[0], envp);
-
-		// Execution will never continue in this process unless execve returns
-		// because of an error
 		fprintf(stderr, "Child: Oops, ls failed\n");
 		return -1;
 
 	} // else if (pid_ls == 0)
 
 	// Parent doesn't need the pipes
-	close(pipefd[READ_END]);
-	close(pipefd[WRITE_END]);
+	close(pipes[0][READ_END]);
+	close(pipes[0][WRITE_END]);
+	close(pipes[1][READ_END]);
+	close(pipes[1][WRITE_END]);
 
 	fprintf(stdout, "Parent: Parent will now wait for children to finish execution\n");
-	// Wait for all children to finish
 	while (wait(NULL) > 0)
 	{
 		fprintf(stdout, "Parent: Chidren have finished the execution, parent is done\n");
 	}
-
 	return 0;
 }
