@@ -19,8 +19,8 @@
 
 int	main(int argc, char *argv[])
 {
-	int	pid_ls, pid_tr, pid_grep;
-	int	pipes[2][2];
+	pid_t   pid_ls, pid_tr, pid_grep;
+	int     pipes[2][2];
 
 	if (argc < 3)
 	{

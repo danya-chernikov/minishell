@@ -1,2 +1,5 @@
 #!/bin/bash
-rm -rf logs/*
+rm -rf logs
+mkdir logs
+touch logs/stub
+exit 0

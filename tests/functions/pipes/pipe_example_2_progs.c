@@ -23,8 +23,8 @@
 
 int	main(int argc, char *argv[])
 {
-	int	pid_ls, pid_grep;
-	int	pipefd[2];
+	pid_t   pid_ls, pid_grep;
+	int     pipefd[2];
 
 	if (argc < 3)
 	{

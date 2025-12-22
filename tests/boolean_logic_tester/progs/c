@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sleep 2
 prog_name=${0: -1}
 echo "$prog_name"
 echo "PID=$$" > ../logs/"$prog_name"
