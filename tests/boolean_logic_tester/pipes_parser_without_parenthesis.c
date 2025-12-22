@@ -66,13 +66,14 @@ int	main(void)
 		char		*prompt;
 
 		size_t		pipe_cnt;
-		int			pipes[MAX_PIPES_NUM];
+		int			pipes[MAX_PIPES_NUM][2];
 
 		size_t		op_cnt;	// Operand counter
 		t_operand	ops[MAX_OPS_NUM]; // operands (programs to launch)
 
 		prompt = rline_buf;
 		prompt_len = strlen(prompt);
+        pi = 0;
 		op_cnt = 0;
 		pipe_cnt = 0;
 		while (pi < prompt_len)
@@ -81,50 +82,85 @@ int	main(void)
 				++pi;
 			if (pi == prompt_len)
 				break;
-			if ((prompt[pi] >= 'a' && prompt[pi] <= 'z')
-			 || (prompt[pi] >= 'A' && prompt[pi] <= 'Z'))
+			if (isalpha(prompt[pi]))
 			{
-				ops[op_cnt].name[0] = prompt[i];
+				ops[op_cnt].name[0] = prompt[pi];
 				ops[op_cnt].name[1] = '\0';
-					++pi;
-					while (prompt[pi] == ' ' && pi < prompt_len)
-						++pi;
-					if (pi == prompt_len) // Pipe is at the end of the prompt
-					{
-						fprintf(stderr, "Parsing error. What is '%c' ?\n", prompt[i]);
-						break;
-					}
-					if (prompt[pi] == '|') // If further goes pipe
-					{
-						// Let's create a pipe
-						if (pipe(pipes[pipe_cnt]) == -1)
-						{
-							fprintf(stderr, "Can't create pipe\n");
-							break;
-						}
+                ++pi;
+                // Let's see what's goes next
+                while (prompt[pi] == ' ' && pi < prompt_len)
+                    ++pi;
+                if (pi == prompt_len) // It means nothing is on the rights (just spaces)
+                {
+                    printf("Nothing is on the right\n");
+                    if (pipe_cnt > 0)
+                    {
+                        ops[op_cnt].read_end = pipes[pipe_cnt][0];
+                        ops[op_cnt].write_end = 0;
+                    }
+                    ++op_cnt;
+                    break;
+                }
 
-						if (op_cnt == 0) // If it's the first operand found
-						{
-							ops[op_cnt]
-						}
-						else // It's not the first operand
-						{
+                if (prompt[pi] == '|') // If further goes pipe
+                {
+                    // Let's create a pipe
+                    if (pipe(&pipes[pipe_cnt][0]) == -1)
+                    {
+                        fprintf(stderr, "Can't create pipe\n");
+                        break;
+                    }
 
-						}
-					}
-					else
-					{
-						fprintf(stderr, "Parsing error. What is '%c' ?\n", prompt[i]);
-						break;
-					}
-			}
-			else
-			{
-				fprintf(stderr, "Parsing error. What is '%c' ?\n", prompt[i]);
+                    if (pipe_cnt == 0) // If it's the first operand found
+                        ops[op_cnt].read_end = 0;
+                    else // It's not the first operand
+                        ops[op_cnt].read_end = pipes[pipe_cnt - 1][0];
+                    ops[op_cnt].write_end = pipes[pipe_cnt][1];
+                    ++pipe_cnt;
+                }
+                else // if (prompt[pi] != '|')
+                {
+                    if (isalpha(prompt[pi]))
+                    {
+                        fprintf(stderr, "Parsing error: "
+                            "After operand cannot go another operand\n");
+                    }
+                    else
+                    {
+				        fprintf(stderr, "Parsing error. What is '%c' ?\n",
+                            prompt[pi]);
+                    }
+                    break;
+                }
+
+                ++op_cnt;
+
+			} // if ((prompt[pi] >= 'a' && prompt[pi] <= 'z')
+            else
+            {
+				fprintf(stderr, "Parsing error. What is '%c' ?\n", prompt[pi]);
 				break;
-			}
+            }
 			++pi;
-		}
+		} // while (pi < prompt_len)
+
+        // Let's output the pipes we found
+        i = 0; 
+        while (i < pipe_cnt)
+        {
+            printf("%lu: [%d] [%d]\n", i + 1, pipes[i][0], pipes[i][1]);
+            ++i;
+        }
+        printf("\n");
+
+        // Let's output the operators we found
+        i = 0; 
+        while (i < op_cnt)
+        {
+            printf("%lu: %s\n", i + 1, ops[i].name);
+            ++i;
+        }
+        printf("\n");
 
 		free(rline_buf);
 		rline_buf = NULL;
