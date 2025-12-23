@@ -1,0 +1,80 @@
+DEFINICIONES:
+Invitación de entrada - la cadena como "dchernik@c4r2s6: " después de que damos los comandos al shell
+
+Prompt - petición del ususrio (uns secuencia de simbolos que entrsmos después de la invitación de entrsda
+
+Operando - un programa que ejecuta nuestro shell. En esta étapa son operandos-letras como a, b, c, ...
+
+Operador - uno de los operadores lógicos &&, || o también un símbolo de pipe |
+
+ALGORITMO (BORRADOR):
+...
+
+Imprimimos ls invitsción de ls entrada
+Recibimos el prompt del usuario a través de la función readline
+
+...
+
+1. Miramos al primer símbolo del prompt
+
+2. SI este símbolo es (
+	2.1. Lanzamos el subshell, pasando a él todo el contenido que está dentro de los paréntesis
+	2.2. Recibimos el valor devuelto del subshell y lo recordamos (el código de la última operación executado dentro de los paréntesis)
+	2.3. Saltamos todo lo que está dentro de los paréntesis
+
+3. SI este es un operando Y el siguiente operador NO es |
+	3.1. Ejecutamos el operando
+	3.2. Recordamos el valor devuelto
+	3.3. Miramos que operador va después
+	3.4. SI este operador es &&
+
+		3.4.1. SI el valor devuelto anterior es ERROR
+
+			3.4.1.1. SI luego va (
+				3.4.1.1.1. Saltamos todo lo que va desde ( hasta )
+				3.4.1.1.1. JUMP 3.3 (vamos adelante)
+
+			3.4.1.1. SI luego va algún operando
+				3.4.1.1.1. Saltamos este operando
+				3.4.1.1.2. JUMP 3.3 (vamos adelante)
+
+		3.4.2. SI el valor devuelto anterior es ÉXITO
+
+			3.4.2.1. SI luego va (
+				3.4.2.1.1. Lanzamos el subshell pasando a el todo el contenido que está dentro de los paréntesis
+				3.4.2.1.2. Recibimos el vslor devuelto del subshell y lo recordamos
+				3.4.2.1.3. Saltamos todo lo que está dentro de los paréntesis
+				3.4.2.1.4. JUMP 3.3 (vamos adelante)
+
+			3.4.2.2. SI luego va algún operando
+				3.4.2.2.1. Ejecutamos este operando
+				3.4.2.2.2. Recordamos su valor devuelto
+				3.4.2.2.3. JUMP 3.3 (vamos adelante)
+
+	3.5. SI este operador es ||
+
+		3.5.1. SI el valor devuelto anterior es ERROR
+
+			3.5.1.1. SI luego va (
+				3.5.1.1.1. Lanzamos el subshell pasando a el todo el contenido que está dentro de los paréntesis
+				3.5.1.1.2. Recibimos el vslor devuelto del subshell y lo recordamos
+				3.5.1.1.3. Saltamos todo lo que está dentro de los paréntesis
+				3.5.1.1.4. JUMP 3.3 (vamos adelante)
+
+			3.5.1.2. SI luego va algún operando
+				3.5.1.2.1. Ejecutsmos este operando
+				3.5.1.2.2. Recordamos su valor devuelto
+				3.5.1.2.3. JUMP 3.3 (vamos adelante)
+
+		3.5.2. SI el valor devuelto anterior es ÉXITO
+
+			3.5.2.1. SI luego va (
+				3.5.2.1.1. Ssltamos todo lo que va desde ( hasta )
+				3.5.2.1.1. JUMP 3.3 (vamos adelante)
+
+			3.5.2.2. SI luego vs algún operando
+				3.5.2.2.1. Saltamos este operando
+				3.5.2.2.2. JUMP 3.3 (vamos adelante)
+
+	3.6. SI este es un operando Y el siguiente operador es |
+		3.6.1. Añadimos este operando al array 
