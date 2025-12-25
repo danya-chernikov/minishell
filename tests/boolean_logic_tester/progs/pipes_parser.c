@@ -4,6 +4,15 @@
  * Each program is named with a single letter of the English
  * alphabet. Lowercase-letter programs always return 0 (success),
  * while uppercase-letter programs always return 1 (failure) */
+
+/*
+ * The question is: should we consider sequences like
+ * () in bash it leads error
+ * (()) in bash this is okay
+ * ((())) error
+ * (((()))) error
+ * as erroneous?
+ * */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,32 +30,40 @@
 #define EXIT_CMD		"exit"
 #define MAX_PIPES_NUM	128
 #define MAX_OPS_NUM		128
+#define MAX_PAR_NUM		128 // Maximum parentheses number
 #define READ_END		0
 #define WRITE_END		1
 #define DEFAULT_FD      -1
+#define NONE_INDEX		-1
 
 /* STDIN_FILENO always must be bonded with read-end;
  * STDOUT_FILENO always must be bonded with write-end */
 typedef struct s_operand
 {
-	char	name[2]; // path to program
-	int		read_end; // stdin
-	int		write_end; // stdout
+	char	name[2];	// path to program
+	int		read_end;	// stdin
+	int		write_end;	// stdout
 }	t_operand;
 
 typedef struct s_engine_data
 {
 	char		*prompt;
-	size_t		pi; // Prompt index
+	size_t		pi;							// Prompt index
 	size_t		pipe_cnt;
 	int			pipes[MAX_PIPES_NUM][2];
-	size_t		op_cnt;	// Operand counter
-	t_operand	ops[MAX_OPS_NUM]; // Operands (programs to launch)
-	size_t		p_cnt; // Parentheses counter
+	size_t		op_cnt;						// Operand counter
+	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
+	int			opar_cnt;					// Opening-parentheses counter (must be int)
+	int			open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
+	int			cpar_cnt;					// Closing-parentheses counter
+	int			close_par[MAX_PAR_NUM];		// Closing-rarentheses indexes found
 	
 }	t_engine_data;
 
 void	init_ops(t_operand *ops);
+void	init_open_par(int *par);
+void	init_close_par(char *prompt, int *par, int *cpar_cnt);
+int		later_goes_open_par(char *str, size_t ind);
 
 int	main(void)
 {
@@ -79,12 +96,16 @@ int	main(void)
 		eng_data->pi		= 0;
 		eng_data->op_cnt	= 0;
 		eng_data->pipe_cnt	= 0;
-		eng_data->p_cnt		= 0;
+		eng_data->opar_cnt	= 0;
+		eng_data->cpar_cnt	= 0;
 		eng_data->prompt	= rline_buf;
 
-		init_ops(eng_data->ops);
+		init_ops(eng_data->ops); // Initialize operators
+		init_open_par(eng_data->open_par);
+		init_close_par(prompt, eng_data->close_par, &eng_data->cpar_cnt);
 
-		parser_engine(&eng_data);
+		if (!parser_engine(&eng_data)) // If we got non-critical parser error
+			continue; // Just prompt user to enter another command(s)
 
         // Close all pipes of this prompt
         i = 0;
@@ -128,7 +149,7 @@ int	parser_engine(t_engine_data *d)
 			while (d->prompt[d->pi] == ' ' && d->pi < prompt_len)
 				++(d->pi);
 			// It means nothing is on the right (just spaces)
-			if (d->pi == prompt_len)
+			if (d->pi == prompt_len) // We reached the end of the prompt
 			{
 				if (d->pipe_cnt > 0)
 				{
@@ -157,9 +178,27 @@ int	parser_engine(t_engine_data *d)
 				d->ops[d->op_cnt].write_end = d->pipe_cnt;
 
 				// If after pipe goes (
-				if (later_goes_open_par(d->prompt, d->pi))
+				int	opar_ind = later_goes_open_par(d->prompt, d->pi);
+				if (opar_ind != -1)
 				{
+					d->par[d->p_cnt] = opar_ind;
 					++(d->p_cnt);
+					d->pi = opar_ind + 1;
+
+					// Let's find the corresponding closing ')' pair for this '('
+					
+
+					// ALSO WE MUST FIND AND REMEMBER THE CORRESPONDING ')' FOR
+					// THIS '(' SO LATER WE KNOW WHICH PART OF THE PROMPT TO SKIP
+
+					// When prompt like this "a | b | (" for example
+					if (d->pi == prompt_len)
+					{
+						f_err = true;
+						fprintf(stderr, "Parsing error: "
+							"prompt terminates with '('\n"); // reword this
+						break;
+					}
 
 					// Run a subshell
 					pid_t subsh_pid = fork();
@@ -171,26 +210,48 @@ int	parser_engine(t_engine_data *d)
 					else if (subsh_pid == 0)
 					{
 						// We're in our copy, in another process
-
+						parser_engine(eng_data);
 					}
-				}
+					// This is where we'll end up when we encounter a ')'
+					// somewhere inside our child that has `subsh_pid` PID
+					/* We have to omit all
+					 * symbols between this ')' and the last found '('.
+					 * Furthermore, we must remove the index of the last
+					 * found '(' in `d->par` and decrement `d->p_cnt` */
+					
+				} // opar_ind != -1
 
 				++(d->pipe_cnt);
-			}
+			} // d->prompt[pi] == '|'
+			
 			else // if (prompt[pi] != '|')
 			{
-				f_err = true;
-				if (isalpha(d->prompt[d->pi]))
+				// If after the letter goes closing parenthesis
+				if (d->prompt[d->pi] == ')')
 				{
-					fprintf(stderr, "Parsing error: "
-						"After operand cannot go another operand\n");
+					/* Now if we're gonna exit the current subshell,
+					 * `d->pi` will be at the position of the last found
+					 * '(' plus one. This means we have to omit all
+					 * symbols between this ')' and the last found '('.
+					 * Furthermore, we must remove the index of the last
+					 * found '(' in `d->par` and decrement `d->p_cnt` */
+					exit(EXIT_SUCCESS);
 				}
-				else
+				else // If after the letter goes neither '|' nor ')'
 				{
-					fprintf(stderr, "Parsing error. What is '%c' ?\n",
-						d->prompt[d->pi]);
+					f_err = true;
+					if (isalpha(d->prompt[d->pi]))
+					{
+						fprintf(stderr, "Parsing error: "
+							"After operand cannot go another operand\n");
+					}
+					else
+					{
+						fprintf(stderr, "Parsing error. What is '%c' ?\n",
+							d->prompt[d->pi]);
+					}
+					break;
 				}
-				break;
 			}
 
 			++(d->op_cnt);
@@ -200,9 +261,22 @@ int	parser_engine(t_engine_data *d)
 		else // If it's not a letter
 		{
 			// In case the first symbol going after omitted spaces is '('
+			// Or in other words
+			// If the user command(s) starts with an opening parenthesis
 			if (d->prompt[d->pi] == '(') // For example: (a | b) | c
 			{
+				d->par[d->p_cnt] = d->pi;
 				++(d->p_cnt);
+				++(d->pi);
+
+				// When prompt like is "(" for example
+				if (d->pi == prompt_len)
+				{
+					f_err = true;
+					fprintf(stderr, "Parsing error: "
+						"prompt starts with a single '('\n"); // reword this
+					break;
+				}
 
 				// Run a subshell
 				pid_t subsh_pid = fork();
@@ -213,12 +287,12 @@ int	parser_engine(t_engine_data *d)
 				}
 				else if (subsh_pid == 0)
 				{
-
+					// We're in our copy, in another process
+					parser_engine(eng_data);
 				}
 			}
 			else // It's not '('
-			{
-			
+			{	
 				f_err = true;
 				fprintf(stderr, "Parsing error. What is '%c' ?\n", d->prompt[d->pi]);
 				break;
@@ -228,7 +302,7 @@ int	parser_engine(t_engine_data *d)
 	} // while (pi < prompt_len)
 
 	if (f_err) // In case of non-critical parsing error
-		continue;
+		return f_err; // Just prompt user to enter another command(s)
 
 	// Let's output the pipes we found
 	i = 0; 
@@ -249,10 +323,10 @@ int	parser_engine(t_engine_data *d)
 		++i;
 	}
 	printf("\n");
-
+	
 	// Now we have to launch all operand-programs
-	pid_t   progs[MAX_OPS_NUM]; // Program PIDs
-	int     op_i; // Operand index
+	pid_t   progs[MAX_OPS_NUM];	// Program PIDs
+	int     op_i;				// Operand index
 
 	// Go from right to left operand
 	op_i = (int)(d->op_cnt) - 1;
@@ -310,7 +384,7 @@ int	parser_engine(t_engine_data *d)
 			"the execution, parent is done\n");*/
 	}
 
-	return 0;
+	return f_err;
 } // parser_engine() function
 
 /* Assign the default value to
@@ -328,13 +402,42 @@ void	init_ops(t_operand *ops)
 	}
 }
 
+/* Assign the default index value to each
+ * element of the parentheses' index array */
+void	init_open_par(int *par)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < MAX_PAR_NUM)
+	{
+		par[i] = NONE_INDEX;
+		++i;
+	}
+}
+
+// Counts all closing parentheses and remember their indexes
+void	init_close_par(char *prompt, int *par, int *cpar_cnt)
+{
+	i = 0;
+	while (i < strlen(prompt))
+	{
+		if (prompt[i] == ')')
+		{
+			par[*cpar_cnt] = i;
+			++(*cpar_cnt);
+		}
+		++i;
+	}
+}
+
 /* Checks whether there is an opening parenthesis
  * later to the right, starting from index ind,
  * ignoring only spaces. If it finds '(' while
  * moving to the right and skipping all spaces,
- * it returns 1. Otherwise, it returns 0. If it
- * encounters any symbol other than a space before
- * finding '(', it also returns 0 */
+ * it returns its index. Otherwise, it returns -1.
+ * If it encounters any symbol other than a space
+ * before finding '(', it also returns -1 */
 int	later_goes_open_par(char *str, size_t ind)
 {
 	size_t	slen;
@@ -344,11 +447,11 @@ int	later_goes_open_par(char *str, size_t ind)
 	while (ind < slen)
 	{
 		if (str[ind] == '(')
-			return 1;
+			return ind;
 		if (str[ind] == ' ')
 			++ind;
 		else
-			return 0;
+			return -1;
 	}
-	return 0;
+	return -1;
 }
