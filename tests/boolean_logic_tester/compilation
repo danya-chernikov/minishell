@@ -1,1 +1,2 @@
 gcc pipes_parser_without_parenthesis.c -Wall -lreadline -g3 -O0 -o pipes_parser_without_parenthesis
+gcc pipes_parser.c -Wall -lreadline -g3 -O0 -o pipes_parser

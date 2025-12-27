@@ -9,8 +9,8 @@
  * The question is: should we consider sequences like
  * () in bash it leads error
  * (()) in bash this is okay
- * ((())) error
- * (((()))) error
+ * (((  ))) error
+ * (((( )))) error
  * as erroneous?
  * Answer: Yes! All such sequences we're gonna consider as an error
  * */
@@ -49,6 +49,14 @@ typedef struct s_operand
 	int		write_end;	// stdout
 }	t_operand;
 
+typedef enum e_token
+{
+    OPERAND,
+    PIPE,
+    OPEN_PAR,
+    CLOSE_PAR
+}   t_token;
+
 typedef struct s_engine_data
 {
 	char		*prompt;
@@ -61,6 +69,7 @@ typedef struct s_engine_data
 	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
 	int			cpar_cnt;					// Closing-parentheses counter
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-rarentheses indexes found and their flags
+    t_token     priv_token;
 	
 }	t_engine_data;
 
@@ -119,8 +128,6 @@ int	main(void)
 				"Empty parentheses are not permitted\n");
 			continue;
 		}
-
-
 
 		if (!parser_engine(&eng_data)) // If we got non-critical parser error
 			continue; // Just prompt user to enter another command(s)
@@ -233,7 +240,7 @@ int	parser_engine(t_engine_data *d)
 					}
 					else
 					{
-						// Now if we're gonna exit the current subshell,
+						// Now if we're gonna exit the current subshell
 						exit(EXIT_SUCCESS);
 					}
 				}
@@ -540,7 +547,10 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_err)
 	 * symbols between this ')' and the last found '('. Furthermore,
 	 * we must remove the index of the last found '(' from `d->opar`
 	 * snd decrement `d->op_cnt` */
-		
+	
+    // Let's say we're here!    
+    printf("Child process was completed\n");
+    
 	// If the closing-parentheses array is empty
 	if (d->cpar_cnt == 0)
 	{
