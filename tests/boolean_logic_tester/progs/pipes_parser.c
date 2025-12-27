@@ -458,7 +458,7 @@ void	init_open_par(int *par)
 	}
 }
 
-// Counts all closing parentheses and remember their indexes
+/* Counts all closing parentheses and remembers their indexes */
 void	init_close_par(char *prompt, int **par, int *cpar_cnt)
 {
 	i = 0;
