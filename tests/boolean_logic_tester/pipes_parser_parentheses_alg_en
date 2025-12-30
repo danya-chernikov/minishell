@@ -7,86 +7,81 @@ User enters prompt
 
 parser_engine()
 
-1. Going through the prompt string
+1. Traverse the prompt string character by character
 
-2. IF we encounter with a letter-operand (excluding spaces)
-    2.1. Add this letter in the `ops` array (array of operands)
-    2.2. Check what symbol goes next after the letter (excluding spaces)
+2. IF we encounter a letter-operand (excluding spaces)
+    2.1. Add this letter to the `ops` array (array of operands)
+    2.2. Check what symbol follows the letter (excluding spaces)
 
-        2.2.1. IF after letter goes pipe symbol '|'
+        2.2.1. IF the symbol following the letter is a pipe '|'
             2.2.2. Create a pipe
-            2.2.3. Add this pipe in the array of all pipes
-            2.2.4. IF the operand going before this pipe was the first operand found
-                2.2.4.1. Set the read-end (stdin) of this operand value of -1 (no-pipe value)
-            2.2.5. ELSE (no the first operand)
-                2.2.5.1 Set the read-end (stdin) of this operand the index of the previous pipe found
-            2.2.6. Set the write-end (stdout) of this operand the index of the current pipe (that was just created)
+            2.2.3. Add this pipe to the array of all pipes
+            2.2.4. IF the operand before this pipe is the first operand found
+                2.2.4.1. Set the read-end (stdin) of this operand to -1 (no-pipe value)
+            2.2.5. ELSE (this is not the first operand)
+                2.2.5.1 Set the read-end (stdin) of this operand to the index of the previous pipe
+            2.2.6. Set the write-end (stdout) of this operand the index of the newly created pipe
+            2.2.7. IF an opening-parenthesis '(' appears after the pipe
 
-            2.2.7. IF later after the pipe goes opening-parenthesis '('
+                2.2.7.1. Add the prompt index of this parenthesis to the array of all opening-parentheses
+                2.2.7.2. Increment the opening-parentheses counter
+                2.2.7.3. Move the prompt index `pi` to the first symbol after '('
+                2.2.7.4. Call parser_engine()
+                2.2.7.5. IF the array of closing-parentheses is empty
+                    2.2.7.5.1. Parsing error
+                2.2.7.6. ELSE (the array is not empty)
+                    2.2.7.6.1. Find in the closing-parentheses array the nearest unmarked ')' corresponding to the last opening-parenthesis '('
+                    2.2.7.6.2. Move the prompt index `pi` to the index of this ')' plus 1
+                    2.2.7.6.3. Mark this ')' as closed
+                    2.2.7.6.4. Decrement the opening-parentheses counter (remove the last element from the opening-parentheses array)
+                    2.2.7.6.5. Retrieve the exit code of the last executed letter-operand
+                    2.2.7.6.6. JUMP to step 1 (continue traversing the prompt)
 
-                2.2.7.1. Add the prompt index of this parenthesis in the array of all opening-parentheses
-                2.2.7.2. Increment the counter of found opening-parentheses
-                2.2.7.3. Move prompt index `pi` on the first symbol going after '('
-                2.2.7.4. Launch a subshell
-                2.2.7.5. Call parser_engine() in the subshell
-                # If we are here the child subshell has finished its execution
-                2.2.7.6. IF the array of closing-parentheses is empty
-                    2.2.7.6.1. Parsing error
-                2.2.7.7. ELSE (the array is not empty)
-                    2.2.7.7.1. Find in the array of closing-parentheses the nearest but NOT yet marked ')' to the last opening-parenthesis '(' found
-                    2.2.7.7.2. Move prompt index `pi` on the index of this nearest ')' + 1
-                    2.2.7.7.3. Mark the nearest ')' as closed
-                    2.2.7.7.4. Decrement the counter of found opening-parentheses (to remove the last element from the array of all opening-parentheses)
-                    2.2.7.7.5. Get the exit code of the last executed letter-operand in the last subshell worked off
-                    2.2.7.7.6. JUMP 1 (continue traversing the prompt string)
-
-        2.2.2. IF after the letter goes closing-parenthesis ')'
-            2.2.2.1. IF the array of opening-parentheses is empty
+        2.2.2. IF the symbol following the letter is a closing-parenthesis ')'
+            2.2.2.1. IF the opening-parentheses array is empty
                 2.2.2.1.1. Parsing error
-            2.2.2.2. ELSE (the array is not empty)
-                2.2.2.2.1. Exit out of the current subshell
+            2.2.2.2. ELSE
+                2.2.2.2.1. JUMP to step 1
                 
-3. IF we encounter with NOT a letter-operand (excluding spaces)
+3. IF we encounter a non-letter symbol (excluding spaces)
 
-    3.1. IF this symbol we encountered is opening-parenthesis '('
+    3.1. IF this symbol is an opening-parenthesis '('
 
-		3.1.1 Add the prompt index of this parenthesis in the array of all opening-parentheses
-		3.1.2. Increment the counter of found opening-parentheses
-		3.1.3. Move prompt index `pi` on the first symbol going after '('
-		3.1.4. Launch a subshell
-		3.1.5. Call parser_engine() in the subshell
-		# If we are here the child subshell has finished its execution
-		3.1.6. IF the array of closing-parentheses is empty
-			3.1.6.1. Parsing error
-		3.1.7. ELSE (the array is not empty)
-			3.1.7.1. Find in the array of closing-parentheses the nearest but NOT yet marked ')' to the last opening-parenthesis '(' found
-			3.1.7.2. Move prompt index `pi` on the index of this nearest ')' + 1
-			3.1.7.3. Mark the nearest ')' as closed
-			3.1.7.4. Decrement the counter of found opening-parentheses (remove the last element from the array of all opening-parentheses)
-			3.1.7.5. Get the exit code of the last executed letter-operand in the last subshell worked off
-			3.1.7.6. JUMP 1 (continue traversing the prompt string)
+		3.1.1 Add the prompt index of this parenthesis to the opening-parentheses array
+		3.1.2. Increment the opening-parentheses counter
+		3.1.3. Move the prompt index `pi` to the first symbol after '('
+		3.1.4. Call parser_engine()
+		3.1.5. IF the closing-parentheses array is empty
+			3.1.5.1. Parsing error
+		3.1.6. ELSE
+			3.1.6.1. Find the nearest unmarked closing-parenthesis ')' corresponding to the last opening-parenthesis 
+			3.1.6.2. Move the prompt index `pi` on the index of this ')' + plus one
+			3.1.6.3. Mark this ')' as closed
+			3.1.6.4. Decrement the opening-parentheses counter (remove the last element from the opening-parentheses array)
+			3.1.6.5. Retrieve the exit code of the last executed letter-operand
+			3.1.6.6. JUMP to step 1 (continue traversing the prompt)
 
     3.2. IF this symbol we encountered is closing-parenthesis ')'
 
-		3.2.1. IF the array of opening-parentheses is empty
+		3.2.1. IF the opening-parentheses array is empty
 			3.2.1.1. Parsing error
-		3.2.2. ELSE (the array is not empty)
-			3.2.2.1. Exit out of the current subshell
+		3.2.2. ELSE
+			3.2.2.1. JUMP to step 1
 
-	3.3. IF this symbol we encountered is pipe '|'
+	3.3. IF the symbol is a pipe '|'
 		
-		3.3.1. IF the array of operands is empty
+		3.3.1. IF the operands array is empty
 			3.3.1.1. Parsing error
-		3.3.2. ELSE (pipe is at the beginning of the prompt)
+		3.3.2. ELSE
 			3.3.2.1. Create a pipe
-			3.3.2.2. Add this pipe in the array of all pipes
-			3.3.2.3. Assign to the read-end (stdin) of the last element in the array of operators the index of the previous pipe
-			3.3.2.4. Assign to the write-end (stdout) of the last element in the array of operators the index of this pipe
-			3.3.2.5. Increment pipe index
-			3.3.2.6. Increment operand index
-			3.3.2.7. JUMP 1 (continue traversing the prompt string)
+			3.3.2.2. Add this pipe to pipes array
+			3.3.2.3. Assign the read-end (stdin) of the last operand to the index of the previous pipe
+			3.3.2.4. Assign the write-end (stdout) of the last operand the index of the current pipe
+			3.3.2.5. Increment the pipe index
+			3.3.2.6. Increment the operand index
+			3.3.2.7. JUMP to step 1 (continue traversal)
 
-	3.4. ELSE (the symbol is not pipe)
+	3.4. ELSE (any other symbol)
 		3.4.1. Parsing error
 
 end of parser_engine()
