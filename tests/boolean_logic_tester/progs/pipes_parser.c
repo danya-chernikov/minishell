@@ -28,18 +28,18 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#define EXIT_CMD		"exit"
-#define PROMPT_INV_LEN	64 // Maximum length of user's prompt invitation string
-#define MAX_PIPES_NUM	128
-#define MAX_OPS_NUM		128
-#define MAX_PAR_NUM		128	// Maximum parentheses number
-#define READ_END		0
-#define WRITE_END		1
-#define DEFAULT_FD      -1
-#define NONE_INDEX		-1
-#define NONE_PIPE		-1
-#define NOT_CLOSED_PAR	0	// This parenthesis wasn't closed yet (We didn't pass it)
-#define CLOSED_PAR		1	// Thie parenthesis was already closed
+# define EXIT_CMD		"exit"
+# define PROMPT_INV_LEN	64 // Maximum length of user's prompt invitation string
+# define MAX_PIPES_NUM	128
+# define MAX_OPS_NUM	128
+# define MAX_PAR_NUM	128	// Maximum parentheses number
+# define READ_END		0
+# define WRITE_END		1
+# define DEFAULT_FD		-1
+# define NONE_INDEX		-1
+# define NONE_PIPE		-1
+# define NOT_CLOSED_PAR	0	// This parenthesis wasn't closed yet (We didn't pass it)
+# define CLOSED_PAR		1	// Thie parenthesis was already closed
 
 /* STDIN_FILENO always must be bonded with read-end;
  * STDOUT_FILENO always must be bonded with write-end */
@@ -80,8 +80,10 @@ bool	check_empty_par(char *prompt);
 void	print_parsed_data(t_engine_data *d);
 
 int		parser_init(t_engine_data *d, char *rline_buf);
+
 bool	parser_engine(t_engine_data *d);
 void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
+
 int		later_goes_open_par(char *str, size_t ind);
 t_token	find_priv_token(char *prompt, size_t pi);
 void	skip_spaces(char *prompt, size_t *pi);
@@ -350,7 +352,17 @@ bool parser_engine(t_engine_data *d)
 					if (!f_noerr)
 						break;
 					else
+					{
+						// If we are here it means ')' was found	
+						priv_token = find_priv_token(d->prompt, d->pi);
+						if (priv_token == CLOSE_PAR && d->pi == prompt_len)
+						{
+							if (d->pipe_cnt > 0)
+								d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
+							++d->op_cnt;
+						}
 						continue; // Go further by prompt
+					}
 				}
 				else {} // Nothing
 
@@ -434,7 +446,17 @@ bool parser_engine(t_engine_data *d)
 				if (!f_noerr)
 					break;
 				else
+				{
+					// If we are here it means ')' was found
+					priv_token = find_priv_token(d->prompt, d->pi);
+					if (priv_token == CLOSE_PAR && d->pi == prompt_len)
+					{
+						if (d->pipe_cnt > 0)
+							d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
+						++d->op_cnt;
+					}
 					continue; // Go further by prompt
+				}
 			}
 			else if (d->prompt[d->pi] == ')') // If it's closing-parenthesis
 			{
@@ -633,7 +655,7 @@ t_token	find_priv_token(char *prompt, size_t pi)
 	i = (int)pi;
 	token = NONE;
 	--i;
-	if (i <= 0)
+	if (i < 0) // Think about when will this happen! Maybe it's not necessary
 		return(token);
 	while (prompt[i] == ' ' && i >= 0)
 		--i;
