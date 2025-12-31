@@ -129,8 +129,8 @@ int	main(void)
 
 		print_parsed_data(&eng_data);
 
-		/*if (!exec_ops(&eng_data))
-			exit(EXIT_FAILURE);*/
+		if (!exec_ops(&eng_data))
+			exit(EXIT_FAILURE);
 
         // Close all pipes of this prompt
 		if (!close_pipes(&eng_data))
@@ -502,35 +502,25 @@ bool parser_engine(t_engine_data *d)
 					break;
 				}
 
-				// Most probably this pipe goes after closing-parenthesis
-				if (d->op_cnt == 0) // If the array of operands is empty
+				// Let's create a pipe
+				if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
 				{
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"A '|' cannot go before any operand\n"); // Reword
-					break;
+					fprintf(stderr, "Can't create pipe: %s\n", strerror(errno));
+					exit(EXIT_FAILURE);
 				}
-				else
-				{
-					// Let's create a pipe
-					if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
-					{
-						fprintf(stderr, "Can't create pipe: %s\n", strerror(errno));
-						exit(EXIT_FAILURE);
-					}
 
-					// Assign to its stdin the previous pipe index
-					d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
+				// Assign to its stdin the previous pipe index
+				d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
 
-					// Assign to its stdout the current pipe index
-					d->ops[d->op_cnt].write_end = d->pipe_cnt;
+				// Assign to its stdout the current pipe index
+				d->ops[d->op_cnt].write_end = d->pipe_cnt;
 
-					++d->op_cnt; // Increment operand index
+				++d->op_cnt; // Increment operand index
 
-					++d->pipe_cnt; // Increment pipe index
-				
-					// Go further by prompt
-				}
+				++d->pipe_cnt; // Increment pipe index
+			
+				// Go further by prompt
+
 			} // else if (d->prompt[d->pi] == '|') // If it's pipe 
 			else
 			{
