@@ -14,25 +14,27 @@
  * as erroneous?
  * Answer: Yes! All such sequences we're gonna consider as an error
  * */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdbool.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <errno.h>
+# include <stdbool.h>
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/wait.h>
 
-#include <readline/readline.h>
-#include <readline/history.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
 # define EXIT_CMD		"exit"
 # define PROMPT_INV_LEN	64 // Maximum length of user's prompt invitation string
 # define MAX_PIPES_NUM	128
 # define MAX_OPS_NUM	128
 # define MAX_PAR_NUM	128	// Maximum parentheses number
+# define MAX_TOKENS_NUM	128 // Maximum number of tokens
+# define MAX_TOKEN_LEN	128 // Maximum length of each token
 # define READ_END		0
 # define WRITE_END		1
 # define DEFAULT_FD		-1
@@ -45,9 +47,10 @@
  * STDOUT_FILENO always must be bonded with write-end */
 typedef struct s_operand
 {
-	char	name[2];	// path to program
+	char	name[2];	// Path to program
 	int		read_end;	// stdin
 	int		write_end;	// stdout
+	pid_t	pid;
 }	t_operand;
 
 typedef enum e_token
@@ -56,6 +59,8 @@ typedef enum e_token
     PIPE,
     OPEN_PAR,
     CLOSE_PAR,
+	AND,
+	OR,
 	NONE // No tokens were found yet
 }   t_token;
 
@@ -71,7 +76,8 @@ typedef struct s_engine_data
 	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
 	int			cpar_cnt;					// Closing-parentheses counter
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-rarentheses indexes found and their flags
-	
+	size_t		token_cnt;					// Token counter
+	char		tokens[MAX_TOKENS_NUM][MAX_TOKEN_LEN]; // Here we store all tokens we found during parsing
 }	t_engine_data;
 
 void	init_ops(t_operand *ops);
@@ -232,6 +238,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->pipe_cnt		= 0;
 	d->opar_cnt		= 0;
 	d->cpar_cnt		= 0;
+	d->token_cnt	= 0;
 	d->prompt		= rline_buf;
 
 	init_ops(d->ops); // Initialize operators array
@@ -364,7 +371,6 @@ bool parser_engine(t_engine_data *d)
 						continue; // Go further by prompt
 					}
 				}
-				else {} // Nothing
 
 			} // d->prompt[pi] == '|' // After the letter goes pipe
 			
