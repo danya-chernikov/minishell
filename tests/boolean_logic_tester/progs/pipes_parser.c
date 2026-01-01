@@ -5,15 +5,6 @@
  * alphabet. Lowercase-letter programs always return 0 (success),
  * while uppercase-letter programs always return 1 (failure) */
 
-/*
- * The question is: should we consider sequences like
- * () in bash it leads error
- * (()) in bash this is okay
- * (((  ))) error
- * (((( )))) error
- * as erroneous?
- * Answer: Yes! All such sequences we're gonna consider as an error
- * */
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -109,7 +100,6 @@ bool			check_empty_par(char *prompt);
 bool			parser_engine(t_engine_data *d);
 void			handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
 int				later_goes_open_par(char *str, size_t ind);
-t_token_type	find_priv_token(char *prompt, size_t pi);
 void			skip_spaces(char *prompt, size_t *pi);
 
 /* Execution flow */
@@ -181,7 +171,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->pipe_cnt		= 0;
 	d->opar_cnt		= 0;
 	d->cpar_cnt		= 0;
-	d->token_cnt	= 0;
+	d->token_cnt	= 1; // The first token is always NONE
 	d->prompt		= rline_buf;
 
 	init_ops(d->ops); // Initialize operators array
@@ -240,6 +230,7 @@ void	init_tokens(t_token *tokens)
 		tokens[i].op = NULL;
 		++i; 
 	}
+	tokens[0].type = NONE;
 }
 
 /* Checks for existance of empty parentheses.
@@ -274,7 +265,6 @@ bool parser_engine(t_engine_data *d)
 	size_t			prompt_len;
 	bool			f_noerr;	// Parsing error flag
 	int				opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
-	t_token_type	priv_token;
 	
 	f_noerr = true; // Let's assume there are no errors at first
 	prompt_len = strlen(d->prompt);
@@ -293,10 +283,9 @@ bool parser_engine(t_engine_data *d)
 			// Letter-operand can go only after
 			// pipe or be the first token or
 			// go after '('
-			priv_token = find_priv_token(d->prompt, d->pi);
-			if (priv_token != NONE &&
-				priv_token != PIPE &&
-				priv_token != OPEN_PAR)
+			if (d->tokens[d->token_cnt - 1].type != NONE &&
+				d->tokens[d->token_cnt - 1].type != PIPE &&
+				d->tokens[d->token_cnt - 1].type != OPEN_PAR)
 			{
 				// Situations like:
 				// "a | (b | c) d"
@@ -308,16 +297,16 @@ bool parser_engine(t_engine_data *d)
 				break ;
 			}
 
-			// Add this letter in the operators array
-			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
-			d->ops[d->op_cnt].name[1] = '\0';
-
 			// Add this operand into the tokens array
 			d->tokens[d->token_cnt].type = OPERAND;
 			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
 			++d->token_cnt;
-			
-			++d->pi;
+
+			// Add this letter in the operators array
+			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
+			d->ops[d->op_cnt].name[1] = '\0';	
+
+			++d->pi; // Move one symbol forward in prompt
 
 			// Let's see what goes next
 			skip_spaces(d->prompt, &d->pi);
@@ -339,8 +328,8 @@ bool parser_engine(t_engine_data *d)
 			if (d->prompt[d->pi] == '|') // If further goes pipe
 			{
 				// A pipe can go only after an operand or after a ')'
-				priv_token = find_priv_token(d->prompt, d->pi);
-				if (priv_token != OPERAND && priv_token != CLOSE_PAR)
+				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
 					// Situations like:
 					// "a ( | b"
@@ -384,8 +373,8 @@ bool parser_engine(t_engine_data *d)
 					else
 					{
 						// If we are here it means ')' was found
-						priv_token = find_priv_token(d->prompt, d->pi);
-						if (priv_token == CLOSE_PAR && d->pi == prompt_len)
+						if (d->tokens[d->token_cnt - 1].type == CLOSE_PAR &&
+							d->pi == prompt_len)
 						{
 							if (d->pipe_cnt > 0)
 								d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
@@ -403,8 +392,8 @@ bool parser_engine(t_engine_data *d)
 				if (d->prompt[d->pi] == ')')
 				{
 					// A ')' can go only after an operand or after another ')'
-					priv_token = find_priv_token(d->prompt, d->pi);
-					if (priv_token != OPERAND && priv_token != CLOSE_PAR)
+					if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+						d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 					{
 						// Situations like:
 						// "a (b | )"
@@ -459,10 +448,9 @@ bool parser_engine(t_engine_data *d)
 			{
 				// A '(' can go only after a pipe or another '('
 				// or also be the first token found
-				priv_token = find_priv_token(d->prompt, d->pi);
-				if (priv_token != NONE &&
-					priv_token != PIPE &&
-					priv_token != OPEN_PAR) // ~(A + B) = ~A * ~B
+				if (d->tokens[d->token_cnt - 1].type != NONE &&
+					d->tokens[d->token_cnt - 1].type != PIPE &&
+					d->tokens[d->token_cnt - 1].type != OPEN_PAR) // ~(A + B) = ~A * ~B
 				{
 					// Situations like:
 					// "a | (b | c)(d | e)"
@@ -479,8 +467,8 @@ bool parser_engine(t_engine_data *d)
 				else
 				{
 					// If we are here it means ')' was found
-					priv_token = find_priv_token(d->prompt, d->pi);
-					if (priv_token == CLOSE_PAR && d->pi == prompt_len)
+					if (d->tokens[d->token_cnt - 1].type == CLOSE_PAR &&
+						d->pi == prompt_len)
 					{
 						if (d->pipe_cnt > 0)
 							d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
@@ -492,8 +480,8 @@ bool parser_engine(t_engine_data *d)
 			else if (d->prompt[d->pi] == ')') // If it's closing-parenthesis
 			{
 				// A ')' can go only after an operand or another ')'
-				priv_token = find_priv_token(d->prompt, d->pi);
-				if (priv_token != OPERAND && priv_token != CLOSE_PAR)
+				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
 					// Situations like:
 					// "a | (b | c | )"
@@ -523,8 +511,8 @@ bool parser_engine(t_engine_data *d)
 			else if (d->prompt[d->pi] == '|') // If it's pipe 
 			{
 				// Pipe can go only after a ')' or after an operand
-				priv_token = find_priv_token(d->prompt, d->pi);
-				if (priv_token != CLOSE_PAR && priv_token != OPERAND)
+				if (d->tokens[d->token_cnt - 1].type != CLOSE_PAR &&
+					d->tokens[d->token_cnt - 1].type != OPERAND)
 				{
 					// Situations like:
 					// "a | (b | c)( | d"
@@ -682,30 +670,6 @@ int	later_goes_open_par(char *str, size_t ind)
 			return -1;
 	}
 	return -1;
-}
-
-/* Just go back and find the previous token */
-t_token_type	find_priv_token(char *prompt, size_t pi)
-{
-	t_token_type	token;
-	int				i;
-
-	i = (int)pi;
-	token = NONE;
-	--i;
-	if (i < 0) // Think about when will this happen! Maybe it's not necessary
-		return(token);
-	while (prompt[i] == ' ' && i >= 0)
-		--i;
-	if (isalpha(prompt[i]))
-		token = OPERAND;
-	else if (prompt[i] == '|')
-		token = PIPE;
-	if (prompt[i] == '(')
-		token = OPEN_PAR;
-	else if (prompt[i] == ')')
-		token = CLOSE_PAR;
-	return (token);
 }
 
 void	skip_spaces(char *prompt, size_t *pi)
