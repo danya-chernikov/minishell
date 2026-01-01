@@ -28,20 +28,29 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-# define EXIT_CMD		"exit"
-# define PROMPT_INV_LEN	64 // Maximum length of user's prompt invitation string
-# define MAX_PIPES_NUM	128
-# define MAX_OPS_NUM	128
-# define MAX_PAR_NUM	128	// Maximum parentheses number
-# define MAX_TOKENS_NUM	128 // Maximum number of tokens
-# define MAX_TOKEN_LEN	128 // Maximum length of each token
-# define READ_END		0
-# define WRITE_END		1
-# define DEFAULT_FD		-1
-# define NONE_INDEX		-1
-# define NONE_PIPE		-1
-# define NOT_CLOSED_PAR	0	// This parenthesis wasn't closed yet (We didn't pass it)
-# define CLOSED_PAR		1	// Thie parenthesis was already closed
+# define EXIT_CMD			"exit"
+
+# define MAX_FORMAT_STR_LEN	64
+# define PROMPT_INV_LEN		64	// Maximum length of user's prompt invitation string
+# define MAX_PIPES_NUM		128
+# define MAX_OPS_NUM		128
+# define MAX_PAR_NUM		128	// Maximum parentheses number
+# define MAX_TOKENS_NUM		128 // Maximum number of tokens
+# define MAX_TOKEN_LEN		128 // Maximum length of each token
+
+# define READ_END			0
+# define WRITE_END			1
+# define DEFAULT_FD			-1
+# define NONE_INDEX			-1
+# define NONE_PIPE			-1
+# define NOT_CLOSED_PAR		0	// This parenthesis wasn't closed yet (We didn't pass it)
+# define CLOSED_PAR			1	// Thie parenthesis was already closed
+
+# define TOKEN_PIPE			"|"
+# define TOKEN_OPEN_PAR		"("
+# define TOKEN_CLOSE_PAR	")"
+# define TOKEN_AND			"&&"
+# define TOKEN_OR			"||"
 
 /* STDIN_FILENO always must be bonded with read-end;
  * STDOUT_FILENO always must be bonded with write-end */
@@ -53,7 +62,7 @@ typedef struct s_operand
 	pid_t	pid;
 }	t_operand;
 
-typedef enum e_token
+typedef enum e_token_type
 {
     OPERAND,
     PIPE,
@@ -62,7 +71,16 @@ typedef enum e_token
 	AND,
 	OR,
 	NONE // No tokens were found yet
-}   t_token;
+}   t_token_type;
+
+/* If this token's type is OPERAND
+ * we store the pointer to the
+ * corresponding operand */
+typedef struct s_token
+{
+	t_token_type	type;
+	t_operand		*op;
+}	t_token;
 
 typedef struct s_engine_data
 {
@@ -77,24 +95,30 @@ typedef struct s_engine_data
 	int			cpar_cnt;					// Closing-parentheses counter
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-rarentheses indexes found and their flags
 	size_t		token_cnt;					// Token counter
-	char		tokens[MAX_TOKENS_NUM][MAX_TOKEN_LEN]; // Here we store all tokens we found during parsing
+	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
 }	t_engine_data;
 
-void	init_ops(t_operand *ops);
-void	init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
-bool	check_empty_par(char *prompt);
-void	print_parsed_data(t_engine_data *d);
+/* Initialization */
+int				parser_init(t_engine_data *d, char *rline_buf);
+void			init_ops(t_operand *ops);
+void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
+void			init_tokens(t_token *tokens);
+bool			check_empty_par(char *prompt);
 
-int		parser_init(t_engine_data *d, char *rline_buf);
+/* Parser engine */
+bool			parser_engine(t_engine_data *d);
+void			handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
+int				later_goes_open_par(char *str, size_t ind);
+t_token_type	find_priv_token(char *prompt, size_t pi);
+void			skip_spaces(char *prompt, size_t *pi);
 
-bool	parser_engine(t_engine_data *d);
-void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
+/* Execution flow */
+int				exec_ops(t_engine_data *d);
+int				close_pipes(t_engine_data *d);
 
-int		later_goes_open_par(char *str, size_t ind);
-t_token	find_priv_token(char *prompt, size_t pi);
-void	skip_spaces(char *prompt, size_t *pi);
-int		exec_ops(t_engine_data *d);
-int		close_pipes(t_engine_data *d);
+/* Debugging */
+void			print_parsed_data(t_engine_data *d);
+void			print_tokens(t_engine_data *d);
 
 int	main(void)
 {
@@ -134,6 +158,7 @@ int	main(void)
 			continue; // Just prompt user to enter another command(s)
 
 		print_parsed_data(&eng_data);
+		print_tokens(&eng_data);
 
 		if (!exec_ops(&eng_data))
 			exit(EXIT_FAILURE);
@@ -147,6 +172,29 @@ int	main(void)
 
 	} // while (1) // readline loop
 	return 0;
+}
+
+int	parser_init(t_engine_data *d, char *rline_buf)
+{
+	d->pi			= 0;
+	d->op_cnt		= 0;
+	d->pipe_cnt		= 0;
+	d->opar_cnt		= 0;
+	d->cpar_cnt		= 0;
+	d->token_cnt	= 0;
+	d->prompt		= rline_buf;
+
+	init_ops(d->ops); // Initialize operators array
+	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
+	init_tokens(d->tokens);
+
+	if (!check_empty_par(d->prompt))
+	{
+		fprintf(stderr, "Parsing error: "
+			"Empty parentheses are not permitted\n");
+		return 0;
+	}
+	return 1;
 }
 
 /* Assign the default value to
@@ -182,6 +230,18 @@ void	init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt)
 	}
 }
 
+void	init_tokens(t_token *tokens)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < MAX_TOKENS_NUM)
+	{
+		tokens[i].op = NULL;
+		++i; 
+	}
+}
+
 /* Checks for existance of empty parentheses.
  * Sequences like: (), (( )), (((  ))), and etc.
  * Returns true if there are no empty sequences*/
@@ -206,62 +266,15 @@ bool	check_empty_par(char *prompt)
 	return true;
 }
 
-void	print_parsed_data(t_engine_data *d)
-{
-	size_t	i;
-
-	// Let's output the pipes we found
-	i = 0; 
-	while (i < d->pipe_cnt)
-	{
-		printf("%lu: [%d] [%d]\n", i + 1,
-			d->pipes[i][READ_END], d->pipes[i][WRITE_END]);
-		++i;
-	}
-	printf("\n");
-
-	// Let's output the operators we found
-	i = 0; 
-	while (i < d->op_cnt)
-	{
-		printf("%lu: [%s] [%d] [%d]\n", i + 1,
-			d->ops[i].name, d->ops[i].read_end, d->ops[i].write_end);
-		++i;
-	}
-	printf("\n");
-}
-
-int	parser_init(t_engine_data *d, char *rline_buf)
-{
-	d->pi			= 0;
-	d->op_cnt		= 0;
-	d->pipe_cnt		= 0;
-	d->opar_cnt		= 0;
-	d->cpar_cnt		= 0;
-	d->token_cnt	= 0;
-	d->prompt		= rline_buf;
-
-	init_ops(d->ops); // Initialize operators array
-	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
-
-	if (!check_empty_par(d->prompt))
-	{
-		fprintf(stderr, "Parsing error: "
-			"Empty parentheses are not permitted\n");
-		return 0;
-	}
-	return 1;
-}
-
 /* Parses the user's prompt string by connecting all
  * operands with pipes and launching or exiting subshells
  * when encountering '(' or ')' parentheses, respectively */
 bool parser_engine(t_engine_data *d)
 {
-	size_t		prompt_len;
-	bool        f_noerr;	// Parsing error flag
-	int			opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
-	t_token		priv_token;
+	size_t			prompt_len;
+	bool			f_noerr;	// Parsing error flag
+	int				opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
+	t_token_type	priv_token;
 	
 	f_noerr = true; // Let's assume there are no errors at first
 	prompt_len = strlen(d->prompt);
@@ -298,6 +311,12 @@ bool parser_engine(t_engine_data *d)
 			// Add this letter in the operators array
 			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
 			d->ops[d->op_cnt].name[1] = '\0';
+
+			// Add this operand into the tokens array
+			d->tokens[d->token_cnt].type = OPERAND;
+			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
+			++d->token_cnt;
+			
 			++d->pi;
 
 			// Let's see what goes next
@@ -332,6 +351,10 @@ bool parser_engine(t_engine_data *d)
 					break;
 				}
 
+				// Add this operand into the tokens array
+				d->tokens[d->token_cnt].type = PIPE;
+				++d->token_cnt;
+
 				// Let's create a pipe
 				if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
 				{
@@ -360,7 +383,7 @@ bool parser_engine(t_engine_data *d)
 						break;
 					else
 					{
-						// If we are here it means ')' was found	
+						// If we are here it means ')' was found
 						priv_token = find_priv_token(d->prompt, d->pi);
 						if (priv_token == CLOSE_PAR && d->pi == prompt_len)
 						{
@@ -389,7 +412,7 @@ bool parser_engine(t_engine_data *d)
 						f_noerr = false;
 						fprintf(stderr, "Parsing error: "
 							"A ')' can go only after an operand or another ')'\n");
-						break;
+						break ;
 					}
 
 					// If the array of opening-parenthesis is empty
@@ -398,12 +421,14 @@ bool parser_engine(t_engine_data *d)
 						f_noerr = false;
 						fprintf(stderr, "Parsing error: "
 							"Some ')' were found but there are no any '(' to match them\n");
-						break;
+						break ;
 					}
 					else
 					{
-						// Now if we're gonna exit the current subshell
-						break;
+						// Add this operand into the tokens array
+						d->tokens[d->token_cnt].type = CLOSE_PAR;
+						++d->token_cnt;
+						break ;
 					}
 				}
 				else // If after the letter goes neither '|' nor ')'
@@ -419,7 +444,7 @@ bool parser_engine(t_engine_data *d)
 						fprintf(stderr, "Parsing error. What is '%c' ?\n",
 							d->prompt[d->pi]);
 					}
-					break;
+					break ;
 				}
 			}
 
@@ -489,7 +514,9 @@ bool parser_engine(t_engine_data *d)
 				}
 				else
 				{
-					// Now if we're gonna exit the current subshell,
+					// Add this operand into the tokens array
+					d->tokens[d->token_cnt].type = CLOSE_PAR;
+					++d->token_cnt;
 					break;
 				}
 			}
@@ -507,6 +534,10 @@ bool parser_engine(t_engine_data *d)
 						"Pipe can go only after a ')' or an operand\n");
 					break;
 				}
+
+				// Add this operand into the tokens array
+				d->tokens[d->token_cnt].type = PIPE;
+				++d->token_cnt;
 
 				// Let's create a pipe
 				if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
@@ -549,6 +580,10 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	size_t	prompt_len;
 	size_t	i;
 
+	// Add this operand into the tokens array
+	d->tokens[d->token_cnt].type = OPEN_PAR;
+	++d->token_cnt;
+
 	prompt_len = strlen(d->prompt);
 	// Add its prompt index to the opening-parentheses array
 	d->open_par[d->opar_cnt] = opar_ind;
@@ -567,7 +602,6 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 		return; // Go further by prompt
 	}
 
-	// We're in our copy, in another process
 	if (!parser_engine(d))
 	{
 		*f_noerr = false;
@@ -580,7 +614,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	 * snd decrement `d->op_cnt` */
 	
     // Let's say we're here!    
-    printf("Child process was completed\n");
+    //printf("parser_engine() completed\n");
 
 	// If the closing-parentheses array is empty
 	if (d->cpar_cnt == 0)
@@ -643,9 +677,9 @@ int	later_goes_open_par(char *str, size_t ind)
 }
 
 /* Just go back and find the previous token */
-t_token	find_priv_token(char *prompt, size_t pi)
+t_token_type	find_priv_token(char *prompt, size_t pi)
 {
-	t_token	token;
+	t_token_type	token;
 	int		i;
 
 	i = (int)pi;
@@ -751,4 +785,58 @@ int	close_pipes(t_engine_data *d)
 		++i;
 	}
 	return 1;
+}
+
+void	print_parsed_data(t_engine_data *d)
+{
+	size_t	i;
+
+	// Let's output the pipes we found
+	i = 0; 
+	printf("\nPipes:\n");
+	while (i < d->pipe_cnt)
+	{
+		printf("%lu: [%d] [%d]\n", i + 1,
+			d->pipes[i][READ_END], d->pipes[i][WRITE_END]);
+		++i;
+	}
+	printf("\n");
+
+	// Let's output the operands we found
+	i = 0; 
+	printf("\nOperands:\n");
+	while (i < d->op_cnt)
+	{
+		printf("%lu: [%s] [%d] [%d]\n", i + 1,
+			d->ops[i].name, d->ops[i].read_end, d->ops[i].write_end);
+		++i;
+	}
+	printf("\n");
+}
+
+void	print_tokens(t_engine_data *d)
+{
+	char	format[MAX_FORMAT_STR_LEN];
+	size_t	i;
+
+	strncpy(format, "%d. %s\n", MAX_FORMAT_STR_LEN);
+	i = 0;
+	printf("\nTokens:\n");
+	while (i < d->token_cnt)
+	{
+		if (d->tokens[i].type == OPERAND)
+			printf(format, i + 1, d->tokens[i].op->name);
+		else if (d->tokens[i].type == PIPE)
+			printf(format, i + 1, TOKEN_PIPE);
+		else if (d->tokens[i].type == OPEN_PAR)
+			printf(format, i + 1, TOKEN_OPEN_PAR);
+		else if (d->tokens[i].type == CLOSE_PAR)
+			printf(format, i + 1, TOKEN_CLOSE_PAR);
+		else if (d->tokens[i].type == AND)
+			printf(format, i + 1, TOKEN_AND);
+		else if (d->tokens[i].type == OR)
+			printf(format, i + 1, TOKEN_OR);
+		++i;
+	}
+	printf("\n");
 }
