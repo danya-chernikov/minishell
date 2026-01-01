@@ -285,7 +285,7 @@ bool parser_engine(t_engine_data *d)
 		
 		// If reached the end of the prompt
 		if (d->pi == prompt_len)
-			break;
+			break ;
 
 		// If it's letter
 		if (isalpha(d->prompt[d->pi]))
@@ -305,7 +305,7 @@ bool parser_engine(t_engine_data *d)
 				f_noerr = false;
 				fprintf(stderr, "Parsing error: "
 					"Before operand must go pipe\n");
-				break;
+				break ;
 			}
 
 			// Add this letter in the operators array
@@ -332,7 +332,7 @@ bool parser_engine(t_engine_data *d)
 				}
 				// Otherwise, it means our prompt contains only one letter-operand
 				++d->op_cnt;
-				break;
+				break ;
 			}
 			// Let's see what goes after the letter
 			// After the letter goes a pipe
@@ -348,7 +348,7 @@ bool parser_engine(t_engine_data *d)
 					f_noerr = false;
 					fprintf(stderr, "Parsing error: "
 						"A pipe can go only after ')' or an operand\n");
-					break;
+					break ;
 				}
 
 				// Add this operand into the tokens array
@@ -380,7 +380,7 @@ bool parser_engine(t_engine_data *d)
 				{
 					handle_open_par(d, opar_ind, &f_noerr);
 					if (!f_noerr)
-						break;
+						break ;
 					else
 					{
 						// If we are here it means ')' was found
@@ -391,7 +391,7 @@ bool parser_engine(t_engine_data *d)
 								d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
 							++d->op_cnt;
 						}
-						continue; // Go further by prompt
+						continue ; // Go further by prompt
 					}
 				}
 
@@ -470,12 +470,12 @@ bool parser_engine(t_engine_data *d)
 					f_noerr = false;
 					fprintf(stderr, "Parsing error: "
 						"A '(' can go only after a pipe or another '('\n");
-					break;
+					break ;
 				}
 
 				handle_open_par(d, d->pi, &f_noerr);
 				if (!f_noerr)
-					break;
+					break ;
 				else
 				{
 					// If we are here it means ')' was found
@@ -486,7 +486,7 @@ bool parser_engine(t_engine_data *d)
 							d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
 						++d->op_cnt;
 					}
-					continue; // Go further by prompt
+					continue ; // Go further by prompt
 				}
 			}
 			else if (d->prompt[d->pi] == ')') // If it's closing-parenthesis
@@ -501,7 +501,7 @@ bool parser_engine(t_engine_data *d)
 					f_noerr = false;
 					fprintf(stderr, "Parsing error: "
 						"A ')' can go only after an operand or another ')'\n");
-					break;
+					break ;
 				}
 
 				// For example: a | (b | (c))
@@ -510,14 +510,14 @@ bool parser_engine(t_engine_data *d)
 					f_noerr = false;
 					fprintf(stderr, "Parsing error: "
 						"Some ')' were found but there are no any '(' to match them\n");
-					break;
+					break ;
 				}
 				else
 				{
 					// Add this operand into the tokens array
 					d->tokens[d->token_cnt].type = CLOSE_PAR;
 					++d->token_cnt;
-					break;
+					break ;
 				}
 			}
 			else if (d->prompt[d->pi] == '|') // If it's pipe 
@@ -639,6 +639,14 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 		++i;
 	}
 
+	if (i == d->cpar_cnt) // We went out of the array border
+	{
+		*f_noerr = false;
+		fprintf(stderr, "Parsing error: "
+			"Some '(' were found but there are no any ')' to match them\n");
+		return; // Go further by prompt
+	}
+
 	// Move the prompt index to the next symbol in the
 	// prompt after the nearest ')' to the last '(' found
 	d->pi = d->close_par[i][0] + 1;
@@ -648,7 +656,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	// By decrementing the opening-parentheses counter we remove
 	// the last element from the array of all opening-parentheses
-	--d->opar_cnt;	
+	--d->opar_cnt;
 }
 
 /* Checks whether there is an opening parenthesis
@@ -680,7 +688,7 @@ int	later_goes_open_par(char *str, size_t ind)
 t_token_type	find_priv_token(char *prompt, size_t pi)
 {
 	t_token_type	token;
-	int		i;
+	int				i;
 
 	i = (int)pi;
 	token = NONE;
