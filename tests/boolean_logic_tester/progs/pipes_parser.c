@@ -91,6 +91,7 @@ typedef struct s_engine_data
 
 /* Initialization */
 int				parser_init(t_engine_data *d, char *rline_buf);
+void			remove_right_spaces(char *prompt);
 void			init_ops(t_operand *ops);
 void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
 void			init_tokens(t_token *tokens);
@@ -174,6 +175,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->token_cnt	= 1; // The first token is always NONE
 	d->prompt		= rline_buf;
 
+	remove_right_spaces(d->prompt);	
 	init_ops(d->ops); // Initialize operators array
 	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
 	init_tokens(d->tokens);
@@ -185,6 +187,21 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 		return 0;
 	}
 	return 1;
+}
+
+void	remove_right_spaces(char *prompt)
+{
+	int	i;
+
+	i = strlen(prompt) - 1;
+	if (prompt[i] == ' ')
+	{
+		while (i >= 0 && prompt[i] == ' ')
+		{
+			prompt[i] = '\0';
+			--i;
+		}
+	}
 }
 
 /* Assign the default value to
@@ -297,14 +314,17 @@ bool parser_engine(t_engine_data *d)
 				break ;
 			}
 
+			// Add this letter in the operators array
+			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
+			d->ops[d->op_cnt].name[1] = '\0';
+
+
 			// Add this operand into the tokens array
 			d->tokens[d->token_cnt].type = OPERAND;
 			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
 			++d->token_cnt;
 
-			// Add this letter in the operators array
-			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
-			d->ops[d->op_cnt].name[1] = '\0';	
+			++d->op_cnt;
 
 			++d->pi; // Move one symbol forward in prompt
 
@@ -316,11 +336,10 @@ bool parser_engine(t_engine_data *d)
 			{
 				if (d->pipe_cnt > 0) // If it's the last operand in the prompt
 				{
-					d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
-					d->ops[d->op_cnt].write_end = NONE_PIPE;
+					d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
+					d->ops[d->op_cnt - 1].write_end = NONE_PIPE;
 				}
 				// Otherwise, it means our prompt contains only one letter-operand
-				++d->op_cnt;
 				break ;
 			}
 			// Let's see what goes after the letter
@@ -352,16 +371,15 @@ bool parser_engine(t_engine_data *d)
 				}
 
 				if (d->pipe_cnt == 0) // If it's the first operand found
-					d->ops[d->op_cnt].read_end = NONE_PIPE;
+					d->ops[d->op_cnt - 1].read_end = NONE_PIPE;
 				else // It's not the first operand
 				// Assign to its stdin the previous pipe index
-					d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
+					d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
 
 				// Assign to its stdout the current pipe index
-				d->ops[d->op_cnt].write_end = d->pipe_cnt;
+				d->ops[d->op_cnt - 1].write_end = d->pipe_cnt;
 
 				++d->pipe_cnt;	// Increment pipe index
-				++d->op_cnt;	// Increment operand index
 
 				opar_ind = later_goes_open_par(d->prompt, d->pi);
 				// If after pipe goes opening-parenthesis '('
@@ -377,8 +395,7 @@ bool parser_engine(t_engine_data *d)
 							d->pi == prompt_len)
 						{
 							if (d->pipe_cnt > 0)
-								d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
-							++d->op_cnt;
+								d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
 						}
 						continue ; // Go further by prompt
 					}
@@ -471,8 +488,7 @@ bool parser_engine(t_engine_data *d)
 						d->pi == prompt_len)
 					{
 						if (d->pipe_cnt > 0)
-							d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
-						++d->op_cnt;
+							d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
 					}
 					continue ; // Go further by prompt
 				}
@@ -535,12 +551,10 @@ bool parser_engine(t_engine_data *d)
 				}
 
 				// Assign to its stdin the previous pipe index
-				d->ops[d->op_cnt].read_end = d->pipe_cnt - 1;
+				d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
 
 				// Assign to its stdout the current pipe index
-				d->ops[d->op_cnt].write_end = d->pipe_cnt;
-
-				++d->op_cnt; // Increment operand index
+				d->ops[d->op_cnt - 1].write_end = d->pipe_cnt;
 
 				++d->pipe_cnt; // Increment pipe index
 			
