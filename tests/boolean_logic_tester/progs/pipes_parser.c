@@ -19,6 +19,8 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
+typedef long long	t_ll;
+
 # define EXIT_CMD			"exit"
 
 # define MAX_FORMAT_STR_LEN	64
@@ -56,6 +58,14 @@ typedef struct s_operand
 	pid_t	pid;
 }	t_operand;
 
+/* The value of -1 means the
+ * index was not assigned */
+typedef struct s_pair
+{
+	int	first;
+	int	second;
+}	t_pair;
+
 typedef enum e_token_type
 {
     OPERAND,
@@ -67,6 +77,13 @@ typedef enum e_token_type
 	NONE // No tokens were found yet
 }   t_token_type;
 
+/* Parenthesis type */
+typedef enum e_par_type
+{
+	OPENING_PAR,
+	CLOSING_PAR
+}	t_par_type;
+
 /* If this token's type is OPERAND
  * we store the pointer to the
  * corresponding operand */
@@ -75,14 +92,6 @@ typedef struct s_token
 	t_token_type	type;
 	t_operand		*op;
 }	t_token;
-
-/* The value of -1 means the
- * index was not assigned */
-typedef struct s_pair
-{
-	int	first;
-	int	second;
-}	t_pair;
 
 typedef struct s_engine_data
 {
@@ -99,7 +108,7 @@ typedef struct s_engine_data
 	int			cpar_cnt;					// Closing-parentheses counter (for now let it be int)
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
 	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
-	size_t		pars_cnt;					// Parentheses pair counter
+	size_t		par_cnt;					// Parentheses pair counter
 	size_t		token_cnt;					// Token counter
 	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
 }	t_engine_data;
@@ -108,7 +117,7 @@ typedef struct s_engine_data
 int				parser_init(t_engine_data *d, char *rline_buf);
 void			init_ops(t_operand *ops);
 void			init_open_par(t_engine_data *d);
-void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
+void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt); // Simplify this
 void			init_tokens(t_token *tokens);
 void			init_pars(t_pair *pars);
 void			remove_right_spaces(char *prompt);
@@ -123,6 +132,8 @@ void			skip_spaces(char *prompt, size_t *pi);
 
 /* Execution flow */
 int				exec_ops(t_engine_data *d);
+t_ll			get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype);
+t_ll			get_token_by_par(t_engine_data *d, size_t pi);
 int				close_pipes(t_engine_data *d);
 
 /* Debugging */
@@ -193,7 +204,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->opar_num		= 0;
 	d->opar_cnt		= 0;
 	d->cpar_cnt		= 0;
-	d->pars_cnt		= 0;
+	d->par_cnt		= 0;
 	d->token_cnt	= 1; // The first token is always NONE
 	d->prompt		= rline_buf;
 
@@ -283,6 +294,9 @@ void	init_tokens(t_token *tokens)
 	tokens[0].type = NONE;
 }
 
+/* Let's say the first element of the
+ * pair is the opening parenthesis,
+ * and the second is the closing one */
 void	init_pars(t_pair *pars)
 {
 	size_t	i;
@@ -600,8 +614,8 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	// Add this opening-parenthesis index to
 	// the pair of all all parentheses pairs
-	d->pars[d->pars_cnt].first = opar_ind;
-	++d->pars_cnt;
+	d->pars[d->par_cnt].first = opar_ind;
+	++d->par_cnt;
 
 	// Move to the next symbol in the prompt after '('
 	d->pi = opar_ind + 1;
@@ -775,6 +789,7 @@ int	exec_ops(t_engine_data *d)
 	int			ti;						// Token index (must be int)
 	size_t		sh_i;					// Subshell index
 	size_t		pi;						// Program index
+	t_ll		cpar_ind;
 
 	// Traversing from right to left the tokens array
 	pi = 0;
@@ -829,6 +844,8 @@ int	exec_ops(t_engine_data *d)
 		}
 		else if (d->tokens[ti].type == CLOSE_PAR)
 		{
+			cpar_ind = get_par_by_token(d, ti, CLOSING_PAR);
+			ti = 
 			// Let's launch a subshell
 			subshs[sh_i] = fork();
 			if (subshs[sh_i] == -1)
@@ -862,6 +879,61 @@ int	exec_ops(t_engine_data *d)
 			"the execution, parent is done\n");*/
 	}
 	return (1);
+}
+
+/* Accepts the index of a parenthesis in the array of tokens
+ * `d->tokens` and returns the index of this parenthesis in
+ * `d->pars`. If there is no parenthesis with such a token
+ * index in `d->pars`, returns -1
+ *     ti - token index
+ * */
+t_ll	get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype)
+{
+	t_ll	i;
+
+	i = 0;
+	// Go through opening-parentheses `d->pars[i].first`
+	if (ptype == OPENING_PAR)
+	{
+		while (i < d->par_cnt)
+		{
+			if (ti == d->pars[i].first)
+				return (i);
+			++i;
+		}
+	}
+	// Go through closing-parentheses `d->pars[i].second`
+	else if (ptype == CLOSING_PAR)
+	{
+		while (i < d->par_cnt)
+		{
+			if (ti == d->pars[i].second)
+				return (i);
+			++i;
+		}
+	}
+	return (-1);
+}
+
+/* Accepts the index of a parenthesis in `d->pars` and
+ * returns the index of this parenthesis in the array
+ * of tokens `d->tokens`. If there is no parenthesis
+ * with such an index in `d->tokens`, returns -1
+ *     pi - index in `d->pars`
+ * */
+t_ll	get_token_by_par(t_engine_data *d, size_t pi)
+{
+	t_ll	ti;
+
+	// Go through opening-parentheses `d->pars[i].first`
+	ti = 0;
+	while (ti < d->token_cnt)
+	{
+		if (pi == ti)
+			return (ti);
+		++ti;
+	}
+	return (-1);
 }
 
 int	close_pipes(t_engine_data *d)
@@ -947,7 +1019,7 @@ void	print_parentheses(t_engine_data *d)
 	i = 0;
 	printf("\nParentheses:\n");
 	printf("#\t(\t)\n");
-	while (i < d->pars_cnt)
+	while (i < d->par_cnt)
 	{
 		printf("%lu\t%d\t%d\n", i + 1, d->pars[i].first, d->pars[i].second);
 		++i;
