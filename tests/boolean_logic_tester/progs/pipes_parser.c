@@ -36,6 +36,7 @@
 # define DEFAULT_FD			-1
 # define NONE_INDEX			-1
 # define NONE_PIPE			-1
+# define NONE_PAR_IND		-1
 # define NOT_CLOSED_PAR		0	// This parenthesis wasn't closed yet (We didn't pass it)
 # define CLOSED_PAR			1	// Thie parenthesis was already closed
 
@@ -75,6 +76,14 @@ typedef struct s_token
 	t_operand		*op;
 }	t_token;
 
+/* The value of -1 means the
+ * index was not assigned */
+typedef struct s_pair
+{
+	int	first;
+	int	second;
+}	t_pair;
+
 typedef struct s_engine_data
 {
 	char		*prompt;
@@ -84,7 +93,7 @@ typedef struct s_engine_data
 	size_t		op_cnt;						// Operand counter
 	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
 	int			opar_cnt;					// Opening-parentheses counter (must be int)
-	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
+	t_pair		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
 	int			cpar_cnt;					// Closing-parentheses counter
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-rarentheses indexes found and their flags
 	size_t		token_cnt;					// Token counter
@@ -97,6 +106,7 @@ void			remove_right_spaces(char *prompt);
 void			init_ops(t_operand *ops);
 void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
 void			init_tokens(t_token *tokens);
+void			init_pars(t_pair *pars);
 bool			check_empty_par(char *prompt);
 
 /* Parser engine */
@@ -112,6 +122,7 @@ int				close_pipes(t_engine_data *d);
 /* Debugging */
 void			print_parsed_data(t_engine_data *d);
 void			print_tokens(t_engine_data *d);
+void			print_parentheses(t_engine_data *d);
 
 int	main(void)
 {
@@ -152,9 +163,10 @@ int	main(void)
 
 		print_parsed_data(&eng_data);
 		print_tokens(&eng_data);
+		print_parentheses(&eng_data);
 
-		if (!exec_ops(&eng_data))
-			exit(EXIT_FAILURE);
+		/*if (!exec_ops(&eng_data))
+			exit(EXIT_FAILURE);*/
 
         // Close all pipes of this prompt
 		if (!close_pipes(&eng_data))
@@ -181,6 +193,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	init_ops(d->ops); // Initialize operators array
 	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
 	init_tokens(d->tokens);
+	init_pars(d->open_par);
 
 	if (!check_empty_par(d->prompt))
 	{
@@ -252,6 +265,19 @@ void	init_tokens(t_token *tokens)
 	tokens[0].type = NONE;
 }
 
+void	init_pars(t_pair *pars)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < MAX_PAR_NUM)
+	{
+		pars->first = NONE_PAR_IND;
+		pars->second = NONE_PAR_IND;
+		++i;
+	}
+}
+
 /* Checks for existance of empty parentheses.
  * Sequences like: (), (( )), (((  ))), and etc.
  * Returns true if there are no empty sequences*/
@@ -319,7 +345,6 @@ bool parser_engine(t_engine_data *d)
 			// Add this letter in the operators array
 			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
 			d->ops[d->op_cnt].name[1] = '\0';
-
 
 			// Add this operand into the tokens array
 			d->tokens[d->token_cnt].type = OPERAND;
@@ -590,7 +615,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	prompt_len = strlen(d->prompt);
 	// Add its prompt index to the opening-parentheses array
-	d->open_par[d->opar_cnt] = opar_ind;
+	d->open_par[d->opar_cnt].first = opar_ind;
 
 	// Move to the next symbol in the prompt after '('
 	d->pi = opar_ind + 1;
@@ -632,7 +657,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// Let's find, in the closing-parentheses array, the nearest
 	// ')' that is not marked as closed to the last found '(' and
 	// that is located on the right from '('
-	last_opar_ind = d->open_par[d->opar_cnt - 1];
+	last_opar_ind = d->open_par[d->opar_cnt - 1].first;
 	i = 0;
 	// The closing-parentheses array is already sorted
 	while (i < d->cpar_cnt)
@@ -650,6 +675,10 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 			"Some '(' were found but there are no any ')' to match them\n");
 		return; // Go further by prompt
 	}
+
+	// Store the pair closing parenthesis index
+	// for the last opening parenthesis found
+	d->open_par[d->opar_cnt - 1].second = d->close_par[i][0];
 
 	// Move the prompt index to the next symbol in the
 	// prompt after the nearest ')' to the last '(' found
@@ -863,6 +892,27 @@ void	print_tokens(t_engine_data *d)
 			printf(format, i + 1, TOKEN_AND);
 		else if (d->tokens[i].type == OR)
 			printf(format, i + 1, TOKEN_OR);
+		++i;
+	}
+	printf("\n");
+}
+
+/* If there were no errors at the parsing stage,
+ * the number of opening and closing parentheses
+ * would be equal */
+void	print_parentheses(t_engine_data *d)
+{	
+	size_t	i;
+
+	i = 0;
+	printf("\nParentheses:\n");
+	printf("#\t(\t)\n");
+	while (i < d->cpar_cnt)
+	{
+		printf("%lu\t%d\t%d\n",
+			i + 1,
+			d->open_par[i].first,
+			d->open_par[i].second);
 		++i;
 	}
 	printf("\n");
