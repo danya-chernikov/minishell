@@ -95,7 +95,7 @@ typedef struct s_engine_data
 	size_t		opar_num;					// Number of all opening-parentheses
 	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
 	int			opar_cnt;					// Opening-parentheses counter (must be int)
-	size_t		open_par[MAX_PAR_NUM][2];	// Opening-parentheses indexes found and thier flags
+	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found and thier flags
 	int			cpar_cnt;					// Closing-parentheses counter (for now let it be int)
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
 	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
@@ -247,8 +247,7 @@ void	init_open_par(t_engine_data *d)
 	i = 0;
 	while (i < d->opar_num)
 	{
-		d->open_par[i][0] = NONE_INDEX;
-		d->open_par[i][1] = NOT_CLOSED_PAR;
+		d->open_par[i] = NONE_INDEX;
 		++i;
 	}
 }
@@ -597,7 +596,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	prompt_len = strlen(d->prompt);
 	// Add its prompt index to the opening-parentheses array
-	d->open_par[d->opar_cnt][0] = opar_ind;
+	d->open_par[d->opar_cnt] = opar_ind;
 
 	// Add this opening-parenthesis index to
 	// the pair of all all parentheses pairs
@@ -644,7 +643,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// Let's find, in the closing-parentheses array, the nearest
 	// ')' that is not marked as closed to the last found '(' and
 	// that is located on the right from '('
-	last_opar_ind = d->open_par[d->opar_cnt - 1][0];
+	last_opar_ind = d->open_par[d->opar_cnt - 1];
 	i = 0;
 	// The closing-parentheses array is already sorted
 	while (i < d->cpar_cnt)
