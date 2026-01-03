@@ -30,15 +30,15 @@
 # define MAX_SUBSHS_NUM		128 // Maximum number of subshells
 # define MAX_TOKEN_LEN		128 // Maximum length of each token
 
-
 # define READ_END			0
 # define WRITE_END			1
+# define NOT_CLOSED_PAR		0	// This parenthesis wasn't closed yet (We didn't pass it)
+# define CLOSED_PAR			1	// Thie parenthesis was already closed
+
 # define DEFAULT_FD			-1
 # define NONE_INDEX			-1
 # define NONE_PIPE			-1
 # define NONE_PAR_IND		-1
-# define NOT_CLOSED_PAR		0	// This parenthesis wasn't closed yet (We didn't pass it)
-# define CLOSED_PAR			1	// Thie parenthesis was already closed
 
 # define TOKEN_PIPE			"|"
 # define TOKEN_OPEN_PAR		"("
@@ -92,26 +92,32 @@ typedef struct s_engine_data
 	int			pipes[MAX_PIPES_NUM][2];
 	size_t		op_cnt;						// Operand counter
 	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
+	size_t		opar_num;					// Number of all opening-parentheses
+	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
 	int			opar_cnt;					// Opening-parentheses counter (must be int)
-	t_pair		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found
-	int			cpar_cnt;					// Closing-parentheses counter
-	size_t		close_par[MAX_PAR_NUM][2];	// Closing-rarentheses indexes found and their flags
+	size_t		open_par[MAX_PAR_NUM][2];	// Opening-parentheses indexes found and thier flags
+	int			cpar_cnt;					// Closing-parentheses counter (for now let it be int)
+	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
+	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
+	size_t		pars_cnt;					// Parentheses pair counter
 	size_t		token_cnt;					// Token counter
 	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
 }	t_engine_data;
 
 /* Initialization */
 int				parser_init(t_engine_data *d, char *rline_buf);
-void			remove_right_spaces(char *prompt);
 void			init_ops(t_operand *ops);
+void			init_open_par(t_engine_data *d);
 void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt);
 void			init_tokens(t_token *tokens);
 void			init_pars(t_pair *pars);
+void			remove_right_spaces(char *prompt);
 bool			check_empty_par(char *prompt);
 
 /* Parser engine */
 bool			parser_engine(t_engine_data *d);
 void			handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
+void			handle_close_par(t_engine_data *d, bool *f_noerr);
 int				later_goes_open_par(char *str, size_t ind);
 void			skip_spaces(char *prompt, size_t *pi);
 
@@ -184,16 +190,20 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->pi			= 0;
 	d->op_cnt		= 0;
 	d->pipe_cnt		= 0;
+	d->opar_num		= 0;
 	d->opar_cnt		= 0;
 	d->cpar_cnt		= 0;
+	d->pars_cnt		= 0;
 	d->token_cnt	= 1; // The first token is always NONE
 	d->prompt		= rline_buf;
 
-	remove_right_spaces(d->prompt);	
 	init_ops(d->ops); // Initialize operators array
+	init_open_par(d);
 	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
 	init_tokens(d->tokens);
-	init_pars(d->open_par);
+	init_pars(d->pars);
+
+	remove_right_spaces(d->prompt);
 
 	if (!check_empty_par(d->prompt))
 	{
@@ -202,21 +212,6 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 		return 0;
 	}
 	return 1;
-}
-
-void	remove_right_spaces(char *prompt)
-{
-	int	i;
-
-	i = strlen(prompt) - 1;
-	if (prompt[i] == ' ')
-	{
-		while (i >= 0 && prompt[i] == ' ')
-		{
-			prompt[i] = '\0';
-			--i;
-		}
-	}
 }
 
 /* Assign the default value to
@@ -230,6 +225,30 @@ void	init_ops(t_operand *ops)
 	{
 		ops[i].write_end = DEFAULT_FD;
 		ops[i].read_end = DEFAULT_FD;
+		++i;
+	}
+}
+
+void	init_open_par(t_engine_data *d)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < strlen(d->prompt))
+	{
+		if (d->prompt[i] == '(')
+		{
+			d->all_open_pars[d->opar_num][0] = i;
+			d->all_open_pars[d->opar_num][1] = NOT_CLOSED_PAR;
+			++d->opar_num;
+		}
+		++i;
+	}
+	i = 0;
+	while (i < d->opar_num)
+	{
+		d->open_par[i][0] = NONE_INDEX;
+		d->open_par[i][1] = NOT_CLOSED_PAR;
 		++i;
 	}
 }
@@ -278,6 +297,21 @@ void	init_pars(t_pair *pars)
 	}
 }
 
+void	remove_right_spaces(char *prompt)
+{
+	int	i;
+
+	i = strlen(prompt) - 1;
+	if (prompt[i] == ' ')
+	{
+		while (i >= 0 && prompt[i] == ' ')
+		{
+			prompt[i] = '\0';
+			--i;
+		}
+	}
+}
+
 /* Checks for existance of empty parentheses.
  * Sequences like: (), (( )), (((  ))), and etc.
  * Returns true if there are no empty sequences*/
@@ -307,9 +341,9 @@ bool	check_empty_par(char *prompt)
  * when encountering '(' or ')' parentheses, respectively */
 bool parser_engine(t_engine_data *d)
 {
-	size_t			prompt_len;
-	bool			f_noerr;	// Parsing error flag
-	int				opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
+	size_t	prompt_len;
+	bool	f_noerr;	// Parsing error flag
+	int		opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
 	
 	f_noerr = true; // Let's assume there are no errors at first
 	prompt_len = strlen(d->prompt);
@@ -435,34 +469,8 @@ bool parser_engine(t_engine_data *d)
 				// If after the letter goes closing-parenthesis ')'
 				if (d->prompt[d->pi] == ')')
 				{
-					// A ')' can go only after an operand or after another ')'
-					if (d->tokens[d->token_cnt - 1].type != OPERAND &&
-						d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
-					{
-						// Situations like:
-						// "a (b | )"
-						// "a | ()"
-						f_noerr = false;
-						fprintf(stderr, "Parsing error: "
-							"A ')' can go only after an operand or another ')'\n");
-						break ;
-					}
-
-					// If the array of opening-parenthesis is empty
-					if (d->opar_cnt == 0)
-					{
-						f_noerr = false;
-						fprintf(stderr, "Parsing error: "
-							"Some ')' were found but there are no any '(' to match them\n");
-						break ;
-					}
-					else
-					{
-						// Add this operand into the tokens array
-						d->tokens[d->token_cnt].type = CLOSE_PAR;
-						++d->token_cnt;
-						break ;
-					}
+					handle_close_par(d, &f_noerr);
+					break ;
 				}
 				else // If after the letter goes neither '|' nor ')'
 				{
@@ -522,34 +530,8 @@ bool parser_engine(t_engine_data *d)
 			}
 			else if (d->prompt[d->pi] == ')') // If it's closing-parenthesis
 			{
-				// A ')' can go only after an operand or another ')'
-				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
-					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
-				{
-					// Situations like:
-					// "a | (b | c | )"
-					// "a | b | ( | a)"
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"A ')' can go only after an operand or another ')'\n");
-					break ;
-				}
-
-				// For example: a | (b | (c))
-				if (d->opar_cnt == 0) // If the array of opening-parentheses is empty
-				{
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"Some ')' were found but there are no any '(' to match them\n");
-					break ;
-				}
-				else
-				{
-					// Add this operand into the tokens array
-					d->tokens[d->token_cnt].type = CLOSE_PAR;
-					++d->token_cnt;
-					break ;
-				}
+				handle_close_par(d, &f_noerr);
+				break ;
 			}
 			else if (d->prompt[d->pi] == '|') // If it's pipe 
 			{
@@ -615,7 +597,12 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	prompt_len = strlen(d->prompt);
 	// Add its prompt index to the opening-parentheses array
-	d->open_par[d->opar_cnt].first = opar_ind;
+	d->open_par[d->opar_cnt][0] = opar_ind;
+
+	// Add this opening-parenthesis index to
+	// the pair of all all parentheses pairs
+	d->pars[d->pars_cnt].first = opar_ind;
+	++d->pars_cnt;
 
 	// Move to the next symbol in the prompt after '('
 	d->pi = opar_ind + 1;
@@ -636,14 +623,14 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 		*f_noerr = false;
 		return;
 	}
-	/* If we're here the child process was terminated (most likely when
-	 * it encountered a closing-parenthesis). Now we have to omit all
-	 * symbols between this ')' and the last found '('. Furthermore,
-	 * we must remove the index of the last found '(' from `d->opar`
-	 * snd decrement `d->op_cnt` */
-	
-    // Let's say we're here!    
-    //printf("parser_engine() completed\n");
+	/* If we're here the child process was
+	 * terminated (most likely when it
+	 * encountered a closing-parenthesis).
+	 * Now we have to omit all symbols between
+	 * this ')' and the last found '('.
+	 * Furthermore, we must remove the index
+	 * of the last found '(' from `d->opar`
+	 * and decrement `d->opar_cnt` */	
 
 	// If the closing-parentheses array is empty
 	if (d->cpar_cnt == 0)
@@ -657,7 +644,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// Let's find, in the closing-parentheses array, the nearest
 	// ')' that is not marked as closed to the last found '(' and
 	// that is located on the right from '('
-	last_opar_ind = d->open_par[d->opar_cnt - 1].first;
+	last_opar_ind = d->open_par[d->opar_cnt - 1][0];
 	i = 0;
 	// The closing-parentheses array is already sorted
 	while (i < d->cpar_cnt)
@@ -676,10 +663,6 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 		return; // Go further by prompt
 	}
 
-	// Store the pair closing parenthesis index
-	// for the last opening parenthesis found
-	d->open_par[d->opar_cnt - 1].second = d->close_par[i][0];
-
 	// Move the prompt index to the next symbol in the
 	// prompt after the nearest ')' to the last '(' found
 	d->pi = d->close_par[i][0] + 1;
@@ -690,6 +673,67 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// By decrementing the opening-parentheses counter we remove
 	// the last element from the array of all opening-parentheses
 	--d->opar_cnt;
+}
+
+void	handle_close_par(t_engine_data *d, bool *f_noerr)
+{
+	int		i;
+	size_t	last_cpar_ind;	// Last closing-parenthesis index
+	size_t	pair_opar_ind;
+
+	// A ')' can go only after an operand or after another ')'
+	if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+		d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
+	{
+		// Situations like:
+		// "a (b | )"
+		// "a | ()"
+		*f_noerr = false;
+		fprintf(stderr, "Parsing error: "
+			"A ')' can go only after an operand or another ')'\n");
+	}
+
+	// If the array of opening-parenthesis is empty
+	if (d->opar_cnt == 0)
+	{
+		*f_noerr = false;
+		fprintf(stderr, "Parsing error: "
+			"Some ')' were found but there are no any '(' to match them\n");
+	}
+	else
+	{
+		// Add this operand into the tokens array
+		d->tokens[d->token_cnt].type = CLOSE_PAR;
+		++d->token_cnt;
+
+		// Let's find the nearest to us (to `d->pi`)
+		// not-yet-closed opening parenthesis to the
+		// left from `d->pi` in `d->open_par`
+		last_cpar_ind = d->pi;
+		i = 0;
+		pair_opar_ind = i;
+		// The `opar_num` after calculating it on the
+		// initialization stage will never be changed
+		// meanwhile `opar_cnt` will be decreased
+		// each time we find a closing-parenthesis
+		while (i < d->opar_num)
+		{
+			if (d->all_open_pars[i][0] < last_cpar_ind &&
+				d->all_open_pars[i][1] == NOT_CLOSED_PAR)
+			{
+				pair_opar_ind = i;
+			}
+			++i;
+		}
+
+		// Add this closing parenthesis index to the
+		// list of all parenthesis pairs to match the
+		// corresponding opening parenthesis index
+		d->pars[pair_opar_ind].second = d->pi;
+
+		// Mark the matched opening-parenthesis as closed
+		d->all_open_pars[pair_opar_ind][1] = CLOSED_PAR;
+	}
 }
 
 /* Checks whether there is an opening parenthesis
@@ -802,7 +846,7 @@ int	exec_ops(t_engine_data *d)
 		}
 		else if (d->tokens[ti].type == OPEN_PAR)
 		{
-			// Exit the current subshell	
+			// Exit the current subshell
 			while (wait(NULL) > 0) {}
 			exit(EXIT_SUCCESS);
 		}
@@ -897,9 +941,6 @@ void	print_tokens(t_engine_data *d)
 	printf("\n");
 }
 
-/* If there were no errors at the parsing stage,
- * the number of opening and closing parentheses
- * would be equal */
 void	print_parentheses(t_engine_data *d)
 {	
 	size_t	i;
@@ -907,12 +948,9 @@ void	print_parentheses(t_engine_data *d)
 	i = 0;
 	printf("\nParentheses:\n");
 	printf("#\t(\t)\n");
-	while (i < d->cpar_cnt)
+	while (i < d->pars_cnt)
 	{
-		printf("%lu\t%d\t%d\n",
-			i + 1,
-			d->open_par[i].first,
-			d->open_par[i].second);
+		printf("%lu\t%d\t%d\n", i + 1, d->pars[i].first, d->pars[i].second);
 		++i;
 	}
 	printf("\n");
