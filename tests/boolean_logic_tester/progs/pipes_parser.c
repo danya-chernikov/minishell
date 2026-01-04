@@ -145,9 +145,12 @@ void			skip_spaces(char *prompt, size_t *pi);
 
 /* Execution flow */
 int				exec_ops(t_engine_data *d);
-t_ll			get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype);
-t_ll			get_token_by_par(t_engine_data *d, size_t pi);
+t_ll			get_par_by_prompt_ind(t_engine_data *d, size_t prompt_ind, t_par_type ptype);
+t_ll			get_token_by_prompt_ind(t_engine_data *d, size_t prompt_ind);
 int				close_pipes(t_engine_data *d);
+
+/* Testing */
+void			getters_tester(t_engine_data *d);
 
 /* Debugging */
 void			print_parsed_data(t_engine_data *d);
@@ -195,6 +198,8 @@ int	main(void)
 		print_tokens(&eng_data);
 		print_parentheses(&eng_data);
 
+		getters_tester(&eng_data);
+
 		/*if (!exec_ops(&eng_data))
 			exit(EXIT_FAILURE);*/
 
@@ -209,6 +214,8 @@ int	main(void)
 	return 0;
 }
 
+/* The first token is always NONE because
+ * we always check previous token value */
 int	parser_init(t_engine_data *d, char *rline_buf)
 {
 	d->pi			= 0;
@@ -218,7 +225,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->opar_cnt		= 0;
 	d->cpar_cnt		= 0;
 	d->par_cnt		= 0;
-	d->token_cnt	= 1; // The first token is always NONE
+	d->token_cnt	= 1;
 	d->prompt		= rline_buf;
 
 	remove_right_spaces(d->prompt);
@@ -623,7 +630,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	// Add this operand into the tokens array
 	d->tokens[d->token_cnt].type = OPEN_PAR;
-	d->tokens[d->token_cnt].start_pi = d->pi;
+	d->tokens[d->token_cnt].start_pi = opar_ind;
 	++d->token_cnt;
 
 	prompt_len = strlen(d->prompt);
@@ -808,7 +815,8 @@ int	exec_ops(t_engine_data *d)
 	int			ti;						// Token index (must be int)
 	size_t		sh_i;					// Subshell index
 	size_t		pi;						// Program index
-	t_ll		cpar_ind;
+	t_ll		cpar_pars_ind;			// Index of closing parenthesis in `d->pars`
+	t_ll		opar_token_ind;			// Index of corresponding opening parenthesis in `d->tokens`
 
 	// Traversing from right to left the tokens array
 	pi = 0;
@@ -863,8 +871,6 @@ int	exec_ops(t_engine_data *d)
 		}
 		else if (d->tokens[ti].type == CLOSE_PAR)
 		{
-			cpar_ind = get_par_by_token(d, ti, CLOSING_PAR);
-			// Let's launch a subshell
 			subshs[sh_i] = fork();
 			if (subshs[sh_i] == -1)
 			{
@@ -873,10 +879,17 @@ int	exec_ops(t_engine_data *d)
 			}
 			if (subshs[sh_i] == 0)
 			{
+				// In child
 				++sh_i;
 				--ti;
 				continue ;
 			}
+			// In parent
+			// Now we should skip all tokens from this ')' to the corresponding '('
+			cpar_pars_ind = get_par_by_prompt_ind(d, d->tokens[ti].start_pi, CLOSING_PAR);
+			opar_token_ind = get_token_by_prompt_ind(d, d->pars[cpar_pars_ind].first);
+			ti = opar_token_ind - 1;
+			// Let's launch a subshell
 		}
 		else if (d->tokens[ti].type == OPEN_PAR)
 		{
@@ -904,29 +917,29 @@ int	exec_ops(t_engine_data *d)
  * `d->pars`. If there is no parenthesis with such a token
  * index in `d->pars`, returns -1
  *
- *     ti - token index
- *     pi - index in `d->pars`
+ *     prompt_ind	- index of token in prompt
+ *     pars_i		- index in `d->pars`
  * */
-t_ll	get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype)
+t_ll	get_par_by_prompt_ind(t_engine_data *d, size_t prompt_ind, t_par_type ptype)
 {
-	t_ll	pi;
+	t_ll	pars_ind;
 
-	pi = 0;
-	while (pi < d->par_cnt)
+	pars_ind = 0;
+	while (pars_ind < d->par_cnt)
 	{
 		// Go through opening-parentheses `d->pars[i].first`
 		if (ptype == OPENING_PAR)
 		{
-			if (ti == d->pars[pi].first)
-				return (pi);
+			if (prompt_ind == d->pars[pars_ind].first)
+				return (pars_ind);
 		}
 		else if (ptype == CLOSING_PAR)
 		{
 			// Go through closing-parentheses `d->pars[i].second`
-			if (ti == d->pars[pi].second)
-				return (pi);
+			if (prompt_ind == d->pars[pars_ind].second)
+				return (pars_ind);
 		}
-		++pi;
+		++pars_ind;
 	}
 	return (-1);
 }
@@ -936,17 +949,17 @@ t_ll	get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype)
  * of tokens `d->tokens`. If there is no parenthesis
  * with such an index in `d->tokens`, returns -1
  *
- *     ti - token index
- *     pi - index in `d->pars`
+ *     ti			- token index
+ *     prompt_ind	- index of token in prompt
  * */
-t_ll	get_token_by_par(t_engine_data *d, size_t pi)
+t_ll	get_token_by_prompt_ind(t_engine_data *d, size_t prompt_ind)
 {
 	t_ll	ti;
 
 	ti = 0;
 	while (ti < d->token_cnt)
 	{
-		if (pi == d->tokens[ti].start_pi)
+		if (prompt_ind == d->tokens[ti].start_pi)
 			return (ti);
 		++ti;
 	}
@@ -973,6 +986,51 @@ int	close_pipes(t_engine_data *d)
 		++i;
 	}
 	return 1;
+}
+
+/* To test get_par_by_prompt_ind() and get_token_by_prompt_ind() */
+void	getters_tester(t_engine_data *d)
+{
+	size_t		i;
+	size_t		prompt_ind;
+	int			ptc; // parenthesis type as char
+	int			choice;
+	t_par_type	ptype;
+
+	i = 0;
+	while (i < 100)
+	{
+		printf("1 - get_par_by_prompt_ind() | 2 - get_token_by_prompt_ind()\n");
+		printf("Enter function to test (1 | 2): ");
+		scanf("%d", &choice);
+
+		if (choice == 1)
+		{
+			printf("Enter prompt index: ");
+			scanf("%lu", &prompt_ind);
+
+			printf("Enter parenthesis type ( 1 - '(' | 2 - ')' ): ");
+			//ptc = (char)getchar();
+			scanf("%d", &ptc);
+			if (ptc == 1)
+				ptype = OPENING_PAR;
+			else if (ptc == 2)
+				ptype = CLOSING_PAR;
+
+			printf("The index in parentheses array: %lld\n",
+				get_par_by_prompt_ind(d, prompt_ind, ptype));
+		}
+		else if (choice == 2)
+		{	
+			printf("Enter prompt index: ");
+			scanf("%lu", &prompt_ind);
+			printf("The index in tokens array: %lld\n",
+				get_token_by_prompt_ind(d, prompt_ind));
+		}
+		else
+			continue;
+		++i;
+	}
 }
 
 void	print_parsed_data(t_engine_data *d)
@@ -1013,17 +1071,17 @@ void	print_tokens(t_engine_data *d)
 	while (i < d->token_cnt)
 	{
 		if (d->tokens[i].type == OPERAND)
-			printf(format, i + 1, d->tokens[i].op->name, d->tokens[i].start_pi);
+			printf(format, i, d->tokens[i].op->name, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == PIPE)
-			printf(format, i + 1, TOKEN_PIPE, d->tokens[i].start_pi);
+			printf(format, i, TOKEN_PIPE, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == OPEN_PAR)
-			printf(format, i + 1, TOKEN_OPEN_PAR, d->tokens[i].start_pi);
+			printf(format, i, TOKEN_OPEN_PAR, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == CLOSE_PAR)
-			printf(format, i + 1, TOKEN_CLOSE_PAR, d->tokens[i].start_pi);
+			printf(format, i, TOKEN_CLOSE_PAR, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == AND)
-			printf(format, i + 1, TOKEN_AND, d->tokens[i].start_pi);
+			printf(format, i, TOKEN_AND, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == OR)
-			printf(format, i + 1, TOKEN_OR, d->tokens[i].start_pi);
+			printf(format, i, TOKEN_OR, d->tokens[i].start_pi);
 		++i;
 	}
 	printf("\n");
