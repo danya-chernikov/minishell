@@ -1,2 +1,3 @@
-gcc pipes_parser_without_parenthesis.c -Wall -lreadline -g3 -O0 -o pipes_parser_without_parenthesis
-gcc pipes_parser.c -Wall -lreadline -g3 -O0 -o pipes_parser
+gcc pipes_parser_without_parentheses.c -Wall -lreadline -g3 -O0 -o pipes_parser_without_parentheses
+gcc pipes_parser_with_parentheses.c -Wall -lreadline -g3 -O0 -o pipes_parser_with_parentheses
+gcc boolean_logic_parser.c -Wall -lreadline -g3 -O0 -o boolean_logic_parser

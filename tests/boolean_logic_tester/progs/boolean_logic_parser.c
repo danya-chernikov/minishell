@@ -1,9 +1,10 @@
 /* This program implements parsing of a basic user prompt
- * containing pipes without parentheses. For simplicity,
- * it launches programs located in the current directory.
- * Each program is named with a single letter of the English
- * alphabet. Lowercase-letter programs always return 0 (success),
- * while uppercase-letter programs always return 1 (failure) */
+ * containing pipes with parentheses and boolean-logic
+ * operators && and ||. For simplicity, it launches programs
+ * located in the current directory. Each program is named
+ * with a single letter of the English alphabet. Lowercase-letter
+ * programs always return 0 (success), while uppercase-letter
+ * programs always return 1 (failure) */
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -24,8 +25,6 @@
 typedef long long	t_ll;
 
 # define EXIT_CMD			"exit"
-# define SUBSHELLS_PIDS_LOG	"subshells_PIDs"
-# define BUF_SIZE			1024
 
 # define MAX_FORMAT_STR_LEN	64
 # define PROMPT_INV_LEN		64	// Maximum length of user's prompt invitation string
@@ -51,6 +50,10 @@ typedef long long	t_ll;
 # define TOKEN_CLOSE_PAR	")"
 # define TOKEN_AND			"&&"
 # define TOKEN_OR			"||"
+
+/* Debugging */
+# define SUBSHELLS_PIDS_LOG	"subshells_PIDs"
+# define BUF_SIZE			1024
 
 /* STDIN_FILENO always must be bonded with read-end;
  * STDOUT_FILENO always must be bonded with write-end */
@@ -146,6 +149,7 @@ void			handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
 void			handle_close_par(t_engine_data *d, bool *f_noerr);
 int				later_goes_open_par(char *str, size_t ind);
 void			skip_spaces(char *prompt, size_t *pi);
+void			parser_error(bool *f_noerr);
 
 /* Execution flow */
 int				exec_ops(t_engine_data *d);
@@ -202,10 +206,8 @@ int	main(void)
 		print_tokens(&eng_data);
 		print_parentheses(&eng_data);
 
-		//getters_tester(&eng_data);
-
-		if (!exec_ops(&eng_data))
-			exit(EXIT_FAILURE);
+		/*if (!exec_ops(&eng_data))
+			exit(EXIT_FAILURE);*/
 
         // Close all pipes of this prompt
 		if (!close_pipes(&eng_data))
@@ -397,20 +399,15 @@ bool parser_engine(t_engine_data *d)
 		// If it's letter
 		if (isalpha(d->prompt[d->pi]))
 		{
-			// Letter-operand can go only after
-			// pipe or be the first token or
-			// go after '('
-			if (d->tokens[d->token_cnt - 1].type != NONE &&
-				d->tokens[d->token_cnt - 1].type != PIPE &&
-				d->tokens[d->token_cnt - 1].type != OPEN_PAR)
+			// Letter-operand can go only after pipe,
+			// '(', &&, || or be the first token
+			if (d->tokens[d->token_cnt - 1].type != PIPE && // Previous token is not a pipe
+				d->tokens[d->token_cnt - 1].type != OPEN_PAR &&
+				d->tokens[d->token_cnt - 1].type != AND &&
+				d->tokens[d->token_cnt - 1].type != OR &&
+				d->tokens[d->token_cnt - 1].type != NONE) // not the first token
 			{
-				// Situations like:
-				// "a | (b | c) d"
-				// "a | b c"
-				// "a (b | c)"	
-				f_noerr = false;
-				fprintf(stderr, "Parsing error: "
-					"Before operand must go pipe\n");
+				parser_error(&f_noerr);
 				break ;
 			}
 
@@ -444,18 +441,15 @@ bool parser_engine(t_engine_data *d)
 			}
 			// Let's see what goes after the letter
 			// After the letter goes a pipe
-			if (d->prompt[d->pi] == '|') // If further goes pipe
+			if (d->prompt[d->pi] == '|' &&
+				d->pi + 1 < prompt_len &&
+				d->prompt[d->pi + 1] != '|') // If further goes pipe
 			{
 				// A pipe can go only after an operand or after a ')'
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
-					// Situations like:
-					// "a ( | b"
-					// "a | | b"
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"A pipe can go only after ')' or an operand\n");
+					parser_error(&f_noerr);
 					break ;
 				}
 
@@ -506,53 +500,55 @@ bool parser_engine(t_engine_data *d)
 			
 			else // if (prompt[pi] != '|') // After letter goes not pipe
 			{
+				// If it's not a pipe, the other possible tokens
+				// that may follow a letter-operand are ), &&, or ||
+
 				// If after the letter goes closing-parenthesis ')'
 				if (d->prompt[d->pi] == ')')
 				{
 					handle_close_par(d, &f_noerr);
 					break ;
 				}
+				// If after the letter goes &&
+				else if (d->pi + 1 < prompt_len &&
+						 d->prompt[d->pi] == '&' &&
+						 d->prompt[d->pi + 1] == '&')
+				{
+					// Add this operator into the tokens array
+					d->tokens[d->token_cnt].type = AND;
+					d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
+					++d->token_cnt;	
+					d->pi += 2;
+					continue ; // Go further by prompt
+				}
+				// If after the letter goes ||
+				else if (d->pi + 1 < prompt_len &&
+						 d->prompt[d->pi] == '|' &&
+						 d->prompt[d->pi + 1] == '|')
+				{
+					// Add this operator into the tokens array
+					d->tokens[d->token_cnt].type = OR;
+					d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
+					++d->token_cnt;	
+					d->pi += 2;
+					continue ; // Go further by prompt
+				}
 				else // If after the letter goes neither '|' nor ')'
 				{
-					f_noerr = false;
-					if (isalpha(d->prompt[d->pi]))
-					{
-						fprintf(stderr, "Parsing error: "
-							"After operand cannot go another operand\n");
-					}
-					else
-					{
-						fprintf(stderr, "Parsing error. What is '%c' ?\n",
-							d->prompt[d->pi]);
-					}
+					parser_error(&f_noerr);
 					break ;
 				}
 			}
 
-		} // if ((prompt[pi] >= 'a' && prompt[pi] <= 'z')
+		} // if (isalpha(prompt[pi]))
 
 		else // If it's not a letter
 		{
-			// In case the first symbol going after omitted spaces is '('
+			// In case the first symbol going after ommitted spaces is '('
 			// Or in other words
 			// If the user command(s) starts with an opening parenthesis
 			if (d->prompt[d->pi] == '(') // For example: (a | b) | c
 			{
-				// A '(' can go only after a pipe or another '('
-				// or also be the first token found
-				if (d->tokens[d->token_cnt - 1].type != NONE &&
-					d->tokens[d->token_cnt - 1].type != PIPE &&
-					d->tokens[d->token_cnt - 1].type != OPEN_PAR) // ~(A + B) = ~A * ~B
-				{
-					// Situations like:
-					// "a | (b | c)(d | e)"
-					// "a | b | c ( | a)"
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"A '(' can go only after a pipe or another '('\n");
-					break ;
-				}
-
 				handle_open_par(d, d->pi, &f_noerr);
 				if (!f_noerr)
 					break ;
@@ -568,23 +564,22 @@ bool parser_engine(t_engine_data *d)
 					continue ; // Go further by prompt
 				}
 			}
+
 			else if (d->prompt[d->pi] == ')') // If it's closing-parenthesis
 			{
 				handle_close_par(d, &f_noerr);
 				break ;
 			}
-			else if (d->prompt[d->pi] == '|') // If it's pipe 
+
+			if (d->prompt[d->pi] == '|' &&
+				d->pi + 1 < prompt_len &&
+				d->prompt[d->pi + 1] != '|') // If it's pipe
 			{
 				// Pipe can go only after a ')' or after an operand
 				if (d->tokens[d->token_cnt - 1].type != CLOSE_PAR &&
 					d->tokens[d->token_cnt - 1].type != OPERAND)
 				{
-					// Situations like:
-					// "a | (b | c)( | d"
-					// "a | b | | c"
-					f_noerr = false;
-					fprintf(stderr, "Parsing error: "
-						"Pipe can go only after a ')' or an operand\n");
+					parser_error(&f_noerr);
 					break;
 				}
 
@@ -610,11 +605,52 @@ bool parser_engine(t_engine_data *d)
 			
 				// Go further by prompt
 
-			} // else if (d->prompt[d->pi] == '|') // If it's pipe 
+			} // else if (d->prompt[d->pi] == '|') // If it's pipe 	
+			
+			else if (d->pi + 1 < prompt_len &&
+					 d->prompt[d->pi] == '&' &&
+					 d->prompt[d->pi + 1] == '&') // If it's &&
+			{
+				// && can go after an operand of a ')'
+				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
+				{
+					parser_error(&f_noerr);
+					break ;
+				}
+
+				// Add this operator into the tokens array
+				d->tokens[d->token_cnt].type = AND;
+				d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
+				++d->token_cnt;	
+				d->pi += 2;
+				continue ; // Go further by prompt
+			}
+
+			// If after the letter goes ||
+			else if (d->pi + 1 < prompt_len &&
+					 d->prompt[d->pi] == '|' &&
+					 d->prompt[d->pi + 1] == '|') // If it's ||
+			{
+				// || can go after an operand of a ')'
+				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
+					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
+				{
+					parser_error(&f_noerr);
+					break ;
+				}
+
+				// Add this operator into the tokens array
+				d->tokens[d->token_cnt].type = OR;
+				d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
+				++d->token_cnt;	
+				d->pi += 2;
+				continue ; // Go further by prompt
+			}
+
 			else
 			{
-				f_noerr = false;
-				fprintf(stderr, "Parsing error. What is '%c' ?\n", d->prompt[d->pi]);
+				parser_error(&f_noerr);
 				break;
 			}
 		} // else // If it's not a letter
@@ -631,6 +667,18 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	size_t	last_opar_ind;
 	size_t	prompt_len;
 	size_t	i;
+
+	// A '(' can go only after: pipe, another
+	// '(', &&, || or be the first token found
+	if (d->tokens[d->token_cnt - 1].type != PIPE &&
+		d->tokens[d->token_cnt - 1].type != OPEN_PAR &&
+		d->tokens[d->token_cnt - 1].type != AND &&
+		d->tokens[d->token_cnt - 1].type != OR &&
+		d->tokens[d->token_cnt - 1].type != NONE)
+	{
+		parser_error(f_noerr);
+		return ;
+	}
 
 	// Add this operand into the tokens array
 	d->tokens[d->token_cnt].type = OPEN_PAR;
@@ -654,16 +702,14 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// When prompt like this "a | b | (" for example
 	if (d->pi == prompt_len)
 	{
-		*f_noerr = false;
-		fprintf(stderr, "Parsing error: "
-			"prompt terminates with '('\n"); // Reword this
-		return; // Go further by prompt
+		parser_error(f_noerr);
+		return ; // Go further by prompt
 	}
 
 	if (!parser_engine(d))
 	{
 		*f_noerr = false;
-		return;
+		return ;
 	}
 	/* If we're here the child process was
 	 * terminated (most likely when it
@@ -677,9 +723,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	// If the closing-parentheses array is empty
 	if (d->cpar_cnt == 0)
 	{
-		*f_noerr = false;
-		fprintf(stderr, "Parsing error: "
-			"Some '(' were found but there are no any ')' to match them\n");
+		parser_error(f_noerr);
 		return; // Go further by prompt
 	}
 
@@ -693,16 +737,14 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 	{
 		if (d->close_par[i][0] > last_opar_ind &&
 			d->close_par[i][1] == NOT_CLOSED_PAR)
-			break;
+			break ;
 		++i;
 	}
 
 	if (i == d->cpar_cnt) // We went out of the array border
 	{
-		*f_noerr = false;
-		fprintf(stderr, "Parsing error: "
-			"Some '(' were found but there are no any ')' to match them\n");
-		return; // Go further by prompt
+		parser_error(f_noerr);
+		return ; // Go further by prompt
 	}
 
 	// Move the prompt index to the next symbol in the
@@ -727,56 +769,49 @@ void	handle_close_par(t_engine_data *d, bool *f_noerr)
 	if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 		d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 	{
-		// Situations like:
-		// "a (b | )"
-		// "a | ()"
-		*f_noerr = false;
-		fprintf(stderr, "Parsing error: "
-			"A ')' can go only after an operand or another ')'\n");
+		parser_error(f_noerr);
+		return ;
 	}
 
 	// If the array of opening-parenthesis is empty
 	if (d->opar_cnt == 0)
 	{
-		*f_noerr = false;
-		fprintf(stderr, "Parsing error: "
-			"Some ')' were found but there are no any '(' to match them\n");
+		parser_error(f_noerr);
+		return ;
 	}
-	else
+
+	// Add this operand into the tokens array
+	d->tokens[d->token_cnt].type = CLOSE_PAR;
+	d->tokens[d->token_cnt].start_pi = d->pi;
+	++d->token_cnt;
+
+	// Let's find the nearest to us (to `d->pi`)
+	// not-yet-closed opening parenthesis to the
+	// left from `d->pi` in `d->open_par`
+	last_cpar_ind = d->pi;
+	i = 0;
+	pair_opar_ind = i;
+	// The `opar_num` after calculating it on the
+	// initialization stage will never be changed
+	// meanwhile `opar_cnt` will be decreased
+	// each time we find a closing-parenthesis
+	while (i < d->opar_num)
 	{
-		// Add this operand into the tokens array
-		d->tokens[d->token_cnt].type = CLOSE_PAR;
-		d->tokens[d->token_cnt].start_pi = d->pi;
-		++d->token_cnt;
-
-		// Let's find the nearest to us (to `d->pi`)
-		// not-yet-closed opening parenthesis to the
-		// left from `d->pi` in `d->open_par`
-		last_cpar_ind = d->pi;
-		i = 0;
-		pair_opar_ind = i;
-		// The `opar_num` after calculating it on the
-		// initialization stage will never be changed
-		// meanwhile `opar_cnt` will be decreased
-		// each time we find a closing-parenthesis
-		while (i < d->opar_num)
+		if (d->all_open_pars[i][0] < last_cpar_ind &&
+			d->all_open_pars[i][1] == NOT_CLOSED_PAR)
 		{
-			if (d->all_open_pars[i][0] < last_cpar_ind &&
-				d->all_open_pars[i][1] == NOT_CLOSED_PAR)
-			{
-				pair_opar_ind = i;
-			}
-			++i;
+			pair_opar_ind = i;
 		}
-
-		// Add this closing parenthesis index to the
-		// list of all parenthesis pairs to match the
-		// corresponding opening parenthesis index
-		d->pars[pair_opar_ind].second = d->pi;
-
-		// Mark the matched opening-parenthesis as closed
-		d->all_open_pars[pair_opar_ind][1] = CLOSED_PAR;
+		++i;
 	}
+
+	// Add this closing parenthesis index to the
+	// list of all parenthesis pairs to match the
+	// corresponding opening parenthesis index
+	d->pars[pair_opar_ind].second = d->pi;
+
+	// Mark the matched opening-parenthesis as closed
+	d->all_open_pars[pair_opar_ind][1] = CLOSED_PAR;
 }
 
 /* Checks whether there is an opening parenthesis
@@ -808,6 +843,12 @@ void	skip_spaces(char *prompt, size_t *pi)
 {
 	while (prompt[*pi] == ' ' && *pi < strlen(prompt))
 		++(*pi);
+}
+
+void	parser_error(bool *f_noerr)
+{
+	*f_noerr = false;
+	fprintf(stderr, "Parsing error\n");
 }
 
 /* Now we have to launch all operand-programs.
@@ -1131,11 +1172,18 @@ void	print_parentheses(t_engine_data *d)
 
 	i = 0;
 	printf("\nParentheses:\n");
-	printf("#\t(\t)\n");
-	while (i < d->par_cnt)
+	if (d->par_cnt == 0)
 	{
-		printf("%lu\t%d\t%d\n", i + 1, d->pars[i].first, d->pars[i].second);
-		++i;
+		printf("----------\n\n");
 	}
-	printf("\n");
+	else
+	{
+		printf("#\t(\t)\n");
+		while (i < d->par_cnt)
+		{
+			printf("%lu\t%d\t%d\n", i + 1, d->pars[i].first, d->pars[i].second);
+			++i;
+		}
+		printf("\n");
+	}
 }
