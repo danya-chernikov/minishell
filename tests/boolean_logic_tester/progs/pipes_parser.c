@@ -84,41 +84,54 @@ typedef enum e_par_type
 	CLOSING_PAR
 }	t_par_type;
 
-/* If this token's type is OPERAND
- * we store the pointer to the
- * corresponding operand */
+/* If this token's type is OPERAND we store
+ * the pointer to the corresponding operand.
+ *
+ *     start_pi - Index of the first character
+ *				  in the prompt string with
+ *				  which this operand starts
+ * */
 typedef struct s_token
 {
 	t_token_type	type;
 	t_operand		*op;
+	size_t			start_pi;
 }	t_token;
 
 typedef struct s_engine_data
 {
-	char		*prompt;
+	char		*prompt;					// Prompt entered by user
 	size_t		pi;							// Prompt index
-	size_t		pipe_cnt;
-	int			pipes[MAX_PIPES_NUM][2];
+
+	size_t		pipe_cnt;					// Pipe counter
+	int			pipes[MAX_PIPES_NUM][2];	// All pipes array
+	
 	size_t		op_cnt;						// Operand counter
 	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
+	
 	size_t		opar_num;					// Number of all opening-parentheses
 	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
+	
 	int			opar_cnt;					// Opening-parentheses counter (must be int)
 	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found and thier flags
+	
 	int			cpar_cnt;					// Closing-parentheses counter (for now let it be int)
 	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
+	
 	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
 	size_t		par_cnt;					// Parentheses pair counter
+	
 	size_t		token_cnt;					// Token counter
 	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
+
 }	t_engine_data;
 
 /* Initialization */
 int				parser_init(t_engine_data *d, char *rline_buf);
 void			init_ops(t_operand *ops);
 void			init_open_par(t_engine_data *d);
-void			init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt); // Simplify this
-void			init_tokens(t_token *tokens);
+void			init_close_par(t_engine_data *d);
+void			init_tokens(t_engine_data *d);
 void			init_pars(t_pair *pars);
 void			remove_right_spaces(char *prompt);
 bool			check_empty_par(char *prompt);
@@ -170,7 +183,7 @@ int	main(void)
 			break;
 		}
 
-		// Let's analyze received prompt/request
+		// Let's analyze the received prompt/request
 		
 		if (!parser_init(&eng_data, rline_buf))
 			continue;
@@ -208,13 +221,13 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->token_cnt	= 1; // The first token is always NONE
 	d->prompt		= rline_buf;
 
+	remove_right_spaces(d->prompt);
+
 	init_ops(d->ops); // Initialize operators array
 	init_open_par(d);
-	init_close_par(d->prompt, d->close_par, &d->cpar_cnt);
-	init_tokens(d->tokens);
+	init_close_par(d);
+	init_tokens(d);
 	init_pars(d->pars);
-
-	remove_right_spaces(d->prompt);
 
 	if (!check_empty_par(d->prompt))
 	{
@@ -264,34 +277,35 @@ void	init_open_par(t_engine_data *d)
 }
 
 /* Counts all closing parentheses and remembers their indexes */
-void	init_close_par(char *prompt, size_t (*par)[2], int *cpar_cnt)
+void	init_close_par(t_engine_data *d)
 {
 	size_t	i;
 
 	i = 0;
-	while (i < strlen(prompt))
+	while (i < strlen(d->prompt))
 	{
-		if (prompt[i] == ')')
+		if (d->prompt[i] == ')')
 		{
-			par[*cpar_cnt][0] = i;
-			par[*cpar_cnt][1] = NOT_CLOSED_PAR;
-			++(*cpar_cnt);
+			d->close_par[d->cpar_cnt][0] = i;
+			d->close_par[d->cpar_cnt][1] = NOT_CLOSED_PAR;
+			++d->cpar_cnt;
 		}
 		++i;
 	}
 }
 
-void	init_tokens(t_token *tokens)
+void	init_tokens(t_engine_data *d)
 {
 	size_t	i;
 
 	i = 0;
 	while (i < MAX_TOKENS_NUM)
 	{
-		tokens[i].op = NULL;
+		d->tokens[i].op = NULL;
 		++i; 
 	}
-	tokens[0].type = NONE;
+	d->tokens[0].type = NONE;
+	d->tokens[0].start_pi = 0;
 }
 
 /* Let's say the first element of the
@@ -396,6 +410,7 @@ bool parser_engine(t_engine_data *d)
 			// Add this operand into the tokens array
 			d->tokens[d->token_cnt].type = OPERAND;
 			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
+			d->tokens[d->token_cnt].start_pi = d->pi;
 			++d->token_cnt;
 
 			++d->op_cnt;
@@ -435,6 +450,7 @@ bool parser_engine(t_engine_data *d)
 
 				// Add this operand into the tokens array
 				d->tokens[d->token_cnt].type = PIPE;
+				d->tokens[d->token_cnt].start_pi = d->pi;
 				++d->token_cnt;
 
 				// Let's create a pipe
@@ -563,6 +579,7 @@ bool parser_engine(t_engine_data *d)
 
 				// Add this operand into the tokens array
 				d->tokens[d->token_cnt].type = PIPE;
+				d->tokens[d->token_cnt].start_pi = d->pi;
 				++d->token_cnt;
 
 				// Let's create a pipe
@@ -606,6 +623,7 @@ void	handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr)
 
 	// Add this operand into the tokens array
 	d->tokens[d->token_cnt].type = OPEN_PAR;
+	d->tokens[d->token_cnt].start_pi = d->pi;
 	++d->token_cnt;
 
 	prompt_len = strlen(d->prompt);
@@ -717,6 +735,7 @@ void	handle_close_par(t_engine_data *d, bool *f_noerr)
 	{
 		// Add this operand into the tokens array
 		d->tokens[d->token_cnt].type = CLOSE_PAR;
+		d->tokens[d->token_cnt].start_pi = d->pi;
 		++d->token_cnt;
 
 		// Let's find the nearest to us (to `d->pi`)
@@ -771,7 +790,7 @@ int	later_goes_open_par(char *str, size_t ind)
 		else
 			return -1;
 	}
-	return -1;
+	return (-1);
 }
 
 void	skip_spaces(char *prompt, size_t *pi)
@@ -845,7 +864,6 @@ int	exec_ops(t_engine_data *d)
 		else if (d->tokens[ti].type == CLOSE_PAR)
 		{
 			cpar_ind = get_par_by_token(d, ti, CLOSING_PAR);
-			ti = 
 			// Let's launch a subshell
 			subshs[sh_i] = fork();
 			if (subshs[sh_i] == -1)
@@ -885,32 +903,30 @@ int	exec_ops(t_engine_data *d)
  * `d->tokens` and returns the index of this parenthesis in
  * `d->pars`. If there is no parenthesis with such a token
  * index in `d->pars`, returns -1
+ *
  *     ti - token index
+ *     pi - index in `d->pars`
  * */
 t_ll	get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype)
 {
-	t_ll	i;
+	t_ll	pi;
 
-	i = 0;
-	// Go through opening-parentheses `d->pars[i].first`
-	if (ptype == OPENING_PAR)
+	pi = 0;
+	while (pi < d->par_cnt)
 	{
-		while (i < d->par_cnt)
+		// Go through opening-parentheses `d->pars[i].first`
+		if (ptype == OPENING_PAR)
 		{
-			if (ti == d->pars[i].first)
-				return (i);
-			++i;
+			if (ti == d->pars[pi].first)
+				return (pi);
 		}
-	}
-	// Go through closing-parentheses `d->pars[i].second`
-	else if (ptype == CLOSING_PAR)
-	{
-		while (i < d->par_cnt)
+		else if (ptype == CLOSING_PAR)
 		{
-			if (ti == d->pars[i].second)
-				return (i);
-			++i;
+			// Go through closing-parentheses `d->pars[i].second`
+			if (ti == d->pars[pi].second)
+				return (pi);
 		}
+		++pi;
 	}
 	return (-1);
 }
@@ -919,17 +935,18 @@ t_ll	get_par_by_token(t_engine_data *d, size_t ti, t_par_type ptype)
  * returns the index of this parenthesis in the array
  * of tokens `d->tokens`. If there is no parenthesis
  * with such an index in `d->tokens`, returns -1
+ *
+ *     ti - token index
  *     pi - index in `d->pars`
  * */
 t_ll	get_token_by_par(t_engine_data *d, size_t pi)
 {
 	t_ll	ti;
 
-	// Go through opening-parentheses `d->pars[i].first`
 	ti = 0;
 	while (ti < d->token_cnt)
 	{
-		if (pi == ti)
+		if (pi == d->tokens[ti].start_pi)
 			return (ti);
 		++ti;
 	}
@@ -990,23 +1007,23 @@ void	print_tokens(t_engine_data *d)
 	char	format[MAX_FORMAT_STR_LEN];
 	size_t	i;
 
-	strncpy(format, "%d. %s\n", MAX_FORMAT_STR_LEN);
+	strncpy(format, "%d\t%s\t%lu\n", MAX_FORMAT_STR_LEN);
 	i = 0;
 	printf("\nTokens:\n");
 	while (i < d->token_cnt)
 	{
 		if (d->tokens[i].type == OPERAND)
-			printf(format, i + 1, d->tokens[i].op->name);
+			printf(format, i + 1, d->tokens[i].op->name, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == PIPE)
-			printf(format, i + 1, TOKEN_PIPE);
+			printf(format, i + 1, TOKEN_PIPE, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == OPEN_PAR)
-			printf(format, i + 1, TOKEN_OPEN_PAR);
+			printf(format, i + 1, TOKEN_OPEN_PAR, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == CLOSE_PAR)
-			printf(format, i + 1, TOKEN_CLOSE_PAR);
+			printf(format, i + 1, TOKEN_CLOSE_PAR, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == AND)
-			printf(format, i + 1, TOKEN_AND);
+			printf(format, i + 1, TOKEN_AND, d->tokens[i].start_pi);
 		else if (d->tokens[i].type == OR)
-			printf(format, i + 1, TOKEN_OR);
+			printf(format, i + 1, TOKEN_OR, d->tokens[i].start_pi);
 		++i;
 	}
 	printf("\n");
