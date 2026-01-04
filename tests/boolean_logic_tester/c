@@ -2,4 +2,5 @@
 rm -rf logs
 mkdir logs
 touch logs/stub
+rm -rf progs/subshells_PIDs
 exit 0

@@ -10,11 +10,13 @@
 # include <string.h>
 # include <errno.h>
 # include <stdbool.h>
+# include <stdint.h>
 
-# include <fcntl.h>
 # include <unistd.h>
+# include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 
 # include <readline/readline.h>
 # include <readline/history.h>
@@ -22,6 +24,8 @@
 typedef long long	t_ll;
 
 # define EXIT_CMD			"exit"
+# define SUBSHELLS_PIDS_LOG	"subshells_PIDs"
+# define BUF_SIZE			1024
 
 # define MAX_FORMAT_STR_LEN	64
 # define PROMPT_INV_LEN		64	// Maximum length of user's prompt invitation string
@@ -198,10 +202,10 @@ int	main(void)
 		print_tokens(&eng_data);
 		print_parentheses(&eng_data);
 
-		getters_tester(&eng_data);
+		//getters_tester(&eng_data);
 
-		/*if (!exec_ops(&eng_data))
-			exit(EXIT_FAILURE);*/
+		if (!exec_ops(&eng_data))
+			exit(EXIT_FAILURE);
 
         // Close all pipes of this prompt
 		if (!close_pipes(&eng_data))
@@ -806,7 +810,8 @@ void	skip_spaces(char *prompt, size_t *pi)
 		++(*pi);
 }
 
-// Now we have to launch all operand-programs
+/* Now we have to launch all operand-programs.
+ * On error returns 0. On success returns 1 */
 int	exec_ops(t_engine_data *d)
 {
 	t_operand	*op;					// Pointer to the current operand
@@ -818,7 +823,30 @@ int	exec_ops(t_engine_data *d)
 	t_ll		cpar_pars_ind;			// Index of closing parenthesis in `d->pars`
 	t_ll		opar_token_ind;			// Index of corresponding opening parenthesis in `d->tokens`
 
-	// Traversing from right to left the tokens array
+	int			fd_log;
+	char		buf[BUF_SIZE];			// Buffer to write into the log file
+	ssize_t		nr;						// Number of bytes written to the log file
+
+	// Create a log file to write the PIDs of all subshells we launch
+	fd_log = open(SUBSHELLS_PIDS_LOG,
+				  O_WRONLY | O_CREAT | O_APPEND,
+				  S_IWUSR | S_IRUSR | S_IWGRP | S_IRGRP | S_IROTH); // 644
+	if (fd_log == -1)
+	{
+		fprintf(stderr, "Can't create/open the log file: %s\n", strerror(errno));
+		return (0);
+	}
+	// Write the parent shell's PID into the log file
+	snprintf(buf, BUF_SIZE, "Hi! I'm a parent shell! My PID is: %jd\n",
+		(intmax_t)getpid());
+	nr = write(fd_log, buf, strlen(buf));
+	if (nr != strlen(buf))
+	{
+		fprintf(stderr, "Couldn't write into the log file\n");
+		return (0);
+	}
+
+	// Traversing from right to left the tokens array	
 	pi = 0;
 	sh_i = 0;
 	ti = (int)(d->token_cnt) - 1;
@@ -879,6 +907,15 @@ int	exec_ops(t_engine_data *d)
 			}
 			if (subshs[sh_i] == 0)
 			{
+				snprintf(buf, BUF_SIZE, "Hi! I'm a subshell! My PID is: %jd\n",
+					(intmax_t)getpid());
+				nr = write(fd_log, buf, strlen(buf));
+				if (nr != strlen(buf))
+				{
+					fprintf(stderr, "Couldn't write into the log file\n");
+					return (0);
+				}
+
 				// In child
 				++sh_i;
 				--ti;
@@ -894,7 +931,7 @@ int	exec_ops(t_engine_data *d)
 		else if (d->tokens[ti].type == OPEN_PAR)
 		{
 			// Exit the current subshell
-			while (wait(NULL) > 0) {}
+			while (wait(NULL) > 0) {} // I doubt we need it here...
 			exit(EXIT_SUCCESS);
 		}
 
@@ -909,6 +946,7 @@ int	exec_ops(t_engine_data *d)
 		/*fprintf(stdout, "Parent: Children have finished "
 			"the execution, parent is done\n");*/
 	}
+	close(fd_log);
 	return (1);
 }
 
