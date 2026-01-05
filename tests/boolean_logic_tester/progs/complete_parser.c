@@ -29,11 +29,13 @@ typedef long long	t_ll;
 # define MAX_FORMAT_STR_LEN	64
 # define PROMPT_INV_LEN		64	// Maximum length of user's prompt invitation string
 # define MAX_PIPES_NUM		128
-# define MAX_OPS_NUM		128
+# define MAX_OPS_NUM		128 // Maximum number of operands
 # define MAX_PAR_NUM		128	// Maximum parentheses number
-# define MAX_TOKENS_NUM		128 // Maximum number of tokens
+# define MAX_TOKENS_NUM		256 // Maximum number of tokens
 # define MAX_SUBSHS_NUM		128 // Maximum number of subshells
-# define MAX_TOKEN_LEN		128 // Maximum length of each token
+# define MAX_TOKEN_LEN		512 // Maximum length of each token
+# define MAX_PROGRAM_PATH	256
+# define MAX_QUOTES_NUM		128
 
 # define READ_END			0
 # define WRITE_END			1
@@ -59,7 +61,7 @@ typedef long long	t_ll;
  * STDOUT_FILENO always must be bonded with write-end */
 typedef struct s_operand
 {
-	char	name[2];	// Path to program
+	char	name[2];	// Path to program with its arguments
 	int		read_end;	// stdin
 	int		write_end;	// stdout
 	pid_t	pid;
@@ -83,6 +85,20 @@ typedef enum e_token_type
 	OR,
 	NONE // No tokens were found yet
 }   t_token_type;
+
+typedef enum e_quote_type
+{
+	DOUBLE_QUOTE,
+	SINGLE_QUOTE
+}	t_quote_type;
+
+typedef struct s_quote_interval
+{
+	size_t			li; // Left-side index
+	size_t			ri; // Right-side index
+	t_quote_type	type;
+
+}	t_quote_int;
 
 /* Parenthesis type */
 typedef enum e_par_type
@@ -130,6 +146,9 @@ typedef struct s_engine_data
 	
 	size_t		token_cnt;					// Token counter
 	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
+	
+	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
+	size_t		qpair_cnt;					// Counter off quote pairs
 
 }	t_engine_data;
 
@@ -144,6 +163,7 @@ void			remove_right_spaces(char *prompt);
 bool			check_empty_par(char *prompt);
 
 /* Parser engine */
+bool			quotes_parser(t_engine_data *d);
 bool			parser_engine(t_engine_data *d);
 void			handle_open_par(t_engine_data *d, int opar_ind, bool *f_noerr);
 void			handle_close_par(t_engine_data *d, bool *f_noerr);
@@ -161,6 +181,7 @@ int				close_pipes(t_engine_data *d);
 void			getters_tester(t_engine_data *d);
 
 /* Debugging */
+void			print_quotes(t_engine_data *d);
 void			print_parsed_data(t_engine_data *d);
 void			print_tokens(t_engine_data *d);
 void			print_parentheses(t_engine_data *d);
@@ -199,6 +220,11 @@ int	main(void)
 		if (!parser_init(&eng_data, rline_buf))
 			continue;
 
+		if (!quotes_parser(&eng_data))
+			continue;
+
+		print_quotes(&eng_data);
+/*
 		if (!parser_engine(&eng_data)) // If we got non-critical parser error
 			continue; // Just prompt user to enter another command(s)
 
@@ -206,12 +232,12 @@ int	main(void)
 		print_tokens(&eng_data);
 		print_parentheses(&eng_data);
 
-		/*if (!exec_ops(&eng_data))
-			exit(EXIT_FAILURE);*/
+		if (!exec_ops(&eng_data))
+			exit(EXIT_FAILURE);
 
         // Close all pipes of this prompt
 		if (!close_pipes(&eng_data))
-			exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);*/
 			
 		free(rline_buf);
 		rline_buf = NULL;
@@ -232,6 +258,7 @@ int	parser_init(t_engine_data *d, char *rline_buf)
 	d->cpar_cnt		= 0;
 	d->par_cnt		= 0;
 	d->token_cnt	= 1;
+	d->qpair_cnt	= 0;
 	d->prompt		= rline_buf;
 
 	remove_right_spaces(d->prompt);
@@ -374,6 +401,81 @@ bool	check_empty_par(char *prompt)
 		++i;
 	}
 	return true;
+}
+
+bool quotes_parser(t_engine_data *d)
+{
+	bool	f_noerr;
+	bool	f_dquote;	// Double quote found flag
+	bool	f_squote;	// Single quote found flag
+	size_t	prompt_len;
+	size_t	pi;			// Prompt index
+
+	pi = 0;
+	f_noerr = true;
+	f_dquote = false;
+	f_squote = false;
+	prompt_len = strlen(d->prompt);
+	while (pi < prompt_len)
+	{
+		if (d->prompt[pi] == '"') // If we encounter with a double quote
+		{
+			// If it's the first double quote found
+			if (f_dquote == false)
+			{
+				if (f_squote == true) // But this double quote is inside the single qoute
+				{
+					// Just ingnore this double quote
+				}
+				else
+				{
+					d->quotes[d->qpair_cnt].li = pi;
+					d->quotes[d->qpair_cnt].type = DOUBLE_QUOTE;
+					f_dquote = true;
+				}
+			}
+			else // We have already found earlier a qouble quote
+			{
+				// Let's close this interval and add it into the quote intervals array
+				d->quotes[d->qpair_cnt].ri = pi;
+				++d->qpair_cnt;
+				f_dquote = false;
+				// Go further by prompt
+			}
+		}
+		else if (d->prompt[pi] == '\'') // If we encounter with a single quote
+		{
+			// If it's the first single quote found
+			if (f_squote == false)
+			{
+				if (f_dquote == true) // But this single quote is inside the double qoute
+				{
+					// Just ingnore this single quote
+				}
+				else
+				{
+					d->quotes[d->qpair_cnt].li = pi;
+					d->quotes[d->qpair_cnt].type = SINGLE_QUOTE;
+					f_squote = true;
+				}
+			}
+			else // We have already found earlier a qouble quote
+			{
+				// Let's close this interval and add it into the quote intervals array
+				d->quotes[d->qpair_cnt].ri = pi;
+				++d->qpair_cnt;
+				f_squote = false;
+				// Go further by prompt
+			}
+		}
+		++pi;
+	} // while (pi < prompt_len)
+	
+	// If after parsing there are any unmatched
+	// quotes (quotes without pairs) left 
+	if (f_squote || f_dquote)
+		parser_error(&f_noerr);
+	return (f_noerr);
 }
 
 /* Parses the user's prompt string by connecting all
@@ -1110,6 +1212,28 @@ void	getters_tester(t_engine_data *d)
 		}
 		else
 			continue;
+		++i;
+	}
+}
+
+void	print_quotes(t_engine_data *d)
+{
+	size_t	i;
+	char	quote;
+
+	i = 0;
+	printf("\nQuote intervals:\n");
+	while (i < d->qpair_cnt)
+	{
+		if (d->quotes[i].type == DOUBLE_QUOTE)
+			quote = '"';
+		else
+			quote = '\'';
+		printf("%zu\t%c\t%zu\t%zu\n",
+			i + 1,
+			quote,
+			d->quotes[i].li,
+			d->quotes[i].ri);
 		++i;
 	}
 }
