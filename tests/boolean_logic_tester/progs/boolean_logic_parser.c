@@ -428,6 +428,8 @@ bool parser_engine(t_engine_data *d)
 			// Let's see what goes next
 			skip_spaces(d->prompt, &d->pi);
 
+			// Here we should check whether this is the end of the current pipeline
+
 			// It means nothing is on the right (just spaces)
 			if (d->pi == prompt_len) // We reached the end of the prompt
 			{
