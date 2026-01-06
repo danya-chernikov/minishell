@@ -6,7 +6,8 @@
 
 # include "libft.h"
 
-typedef long long	t_ll;
+typedef long long		t_ll;
+typedef unsigned char	u_char;
 
 /* The value of -1 means the
  * index was not assigned */

@@ -27,7 +27,7 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c parser.h engine.h quote.h builtin.h debug.h
+main.o : main.c libft.h parser.h engine.h quote.h builtin.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c main.c
 
 parser.o : parser.c parser.h
