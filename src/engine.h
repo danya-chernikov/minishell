@@ -1,9 +1,16 @@
 #ifndef ENGINE_H
 # define ENGINE_H
 
-# include "shell.h"
+# include <stdio.h>
+# include <fcntl.h>
+# include <sys/wait.h>
+# include <unistd.h> // Do we need it here?
 
-# define SEARCH_DEPTH	20
+# include "parser.h"
+# include "shell.h"
+# include "debug.h"
+
+# define MAX_SUBSHS_NUM	128 // Maximum number of subshells
 
 /* cmds		- commands to execute inside shell;
  * posargv	- positional arguments;
@@ -41,6 +48,7 @@ typedef struct s_engine_params
 	t_shell_mode	mode;
 }	t_engine_params;
 
-int	engine(t_engine_params *params);
+int	exec_ops(t_parser_data *d);
+int	close_pipes(t_parser_data *d);
 
 #endif
