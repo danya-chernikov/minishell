@@ -1,6 +1,8 @@
 #ifndef SHELL_H
 # define SHELL_H
 
+# include "init.h"
+
 # define MINISHELL_VERSION	"1.0-release"
 
 /* The default path is used when
@@ -62,7 +64,7 @@
  *     bash --login
  * INT_NONLOG - interactive non-login shell:
  *     bash */
-typedef enum shell_mode
+typedef enum e_shell_mode
 {
 	NONINT_SCRIPT,
 	NONINT_CMD,

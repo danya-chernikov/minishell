@@ -1,0 +1,23 @@
+ls | grep "a" && ls | grep "b"		OK
+
+ls | grep 'a' && ls | grep 'b'		OK
+
+ls | grep "a'" && ls | grep 'b"'	OK
+
+ls | grep "							KO
+
+ls | grep '							KO
+
+ls | grep """"						OK
+
+ls | grep "'''''"					OK
+
+ls | grep '"""""'					OK
+
+ls | grep "''"''"					KO
+
+ls | grep '""'""'					KO
+
+ls | grep '"						KO
+
+ls | grep "a && ls | grep b"		OK
