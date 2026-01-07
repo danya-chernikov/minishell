@@ -6,8 +6,13 @@
 
 # include "libft.h"
 
-typedef long long		t_ll;
-typedef unsigned char	u_char;
+typedef unsigned char		t_uchar;
+typedef unsigned short		t_ushort;
+typedef unsigned int		t_uint;
+typedef unsigned long		t_ul;
+typedef long long			t_ll;
+typedef unsigned long long	t_ull;
+typedef long double			t_ld;
 
 /* The value of -1 means the
  * index was not assigned */

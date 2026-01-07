@@ -6,10 +6,12 @@ NAME=minishell
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c parser.c engine.c shell.c init.c par.c quote.c \
-	 token.c operand.c aux.c builtin.c error.c debug.c test.c
+	 token.c operand.c aux.c builtin.c error.c debug.c test.c \
+	 vector1.c vector2.c vector3.c vector4.c
 
 OBJS=main.o parser.o engine.o shell.o init.o par.o quote.o \
-	 token.o operand.o aux.o builtin.o error.o debug.o test.o
+	 token.o operand.o aux.o builtin.o error.o debug.o test.o \
+	 vector1.o vector2.o vector3.o vector4.o
 
 all : libft $(NAME)
 
@@ -63,11 +65,22 @@ builtin.o : builtin.c builtin.h
 error.o : error.c error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c error.c
 
+vector1.o : vector1.c vector.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c vector1.c
+
+vector2.o : vector2.c vector.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c vector2.c
+
+vector3.o : vector3.c vector.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c vector3.c
+
+vector4.o : vector4.c vector.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c vector4.c
+
 debug.o : debug.c debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c debug.c
 
 test.o : test.c test.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -c test.c
-
 
 .PHONY: all clean fclean re libft
