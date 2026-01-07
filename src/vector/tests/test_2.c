@@ -8,13 +8,24 @@ int	main()
 	int			var;
 
 	vector_init(&v, INT, 10);
+
 	i = 0;
 	while (i < 10)
 	{
 		vector_push_back(&v, (void *)&i);
 		++i;
 	}
-	vector_print(&v);
+
+	printf("Vector: "); vector_print(&v, " "); printf("\n\n");
+
+	var = 100;
+	vector_push_back(&v, (void *)&var);
+
+	var = 200;
+	vector_push_back(&v, (void *)&var);
+
+	printf("Vector: "); vector_print(&v, " "); printf("\n");
+
 	vector_free(&v);
 	return (0);
 }

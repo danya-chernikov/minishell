@@ -14,10 +14,16 @@ int	main()
 	var = 10;
 	vector_push_back(&v, (void *)&var);
 	printf("Vector: "); vector_print(&v, " "); printf("\n");
+	printf("vector_front() = %d\n", *((int *)vector_front(&v)));
+	printf("vector_back() = %d\n", *((int *)vector_back(&v)));
+	printf("\n");
 
 	var = 20;
 	vector_push_back(&v, (void *)&var);
 	printf("Vector: "); vector_print(&v, " "); printf("\n");
+	printf("vector_front() = %d\n", *((int *)vector_front(&v)));
+	printf("vector_back() = %d\n", *((int *)vector_back(&v)));
+	printf("\n");
 
 	last = *((int *)vector_pop_back(&v));
 	printf("\nlast = %d\n", last);
