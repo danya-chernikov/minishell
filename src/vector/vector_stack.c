@@ -69,6 +69,6 @@ static void	push_back2(t_vector *v, void *val)
 		((double *)v->data)[v->size] = *((double *)val);
 	else if (v->data_type == LONG_DOUBLE)
 		((t_ld *)v->data)[v->size] = *((t_ld *)val);
-	/*else if (v->data_type == VOID)
-		((void *)v->data)[ind] = (void *)val;*/
+	else if (v->data_type == VOID)
+		((void **)v->data)[v->size] = (void *)val;
 }

@@ -47,6 +47,6 @@ static void	vector_si2(t_vector *v, size_t ind, void *val)
 		((double *)v->data)[ind] = *((double *)val);
 	else if (v->data_type == LONG_DOUBLE)
 		((t_ld *)v->data)[ind] = *((t_ld *)val);
-	/*else if (v->data_type == VOID)
-		((void *)v->data)[ind] = (void *)val;*/
+	else if (v->data_type == VOID)
+		((void **)v->data)[ind] = (void *)val;
 }
