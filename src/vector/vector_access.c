@@ -2,12 +2,12 @@
 
 void	*vector_at(const t_vector *v, size_t ind)
 {
-	
+	return (v->data + (ind * v->esize));
 }
 
 void	*vector_mat(const t_vector *v, size_t ri, size_t ci)
 {
-
+	return (v->data + (((v->col_n * ri) + ci)) * v->esize);
 }
 
 // Access the first element
