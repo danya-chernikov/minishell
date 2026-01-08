@@ -7,13 +7,11 @@ NAME=minishell
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
-SRCS=main.c parser.c engine.c shell.c init.c par.c quote.c \
-	 token.c operand.c aux.c builtin.c error.c debug.c test.c \
-	 vector1.c vector2.c vector3.c vector4.c
+SRCS=main.c engine.c parser.c exec.c shell.c init.c par.c quote.c \
+	 token.c operand.c aux.c builtin.c error.c debug.c test.c
 
-OBJS=main.o parser.o engine.o shell.o init.o par.o quote.o \
-	 token.o operand.o aux.o builtin.o error.o debug.o test.o \
-	 vector1.o vector2.o vector3.o vector4.o
+OBJS=main.o engine.o parser.o exec.o shell.o init.o par.o quote.o \
+	 token.o operand.o aux.o builtin.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -28,6 +26,7 @@ $(NAME) : $(OBJS)
 	$(OBJS) \
 	-l$(LIBFT_NAME) -l$(LIBVECTOR_NAME) -lreadline \
 	-no-pie \
+	-DDEBUG \
 	-o $(NAME)
 
 clean :
@@ -38,14 +37,17 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c libft.h parser.h engine.h quote.h builtin.h debug.h
+main.o : main.c libft.h engine.h builtin.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c main.c
+
+engine.o : engine.c engine.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c engine.c
 
 parser.o : parser.c parser.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c parser.c
 
-engine.o : engine.c engine.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c engine.c
+exec.o : exec.c exec.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c exec.c
 
 shell.o : shell.c shell.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c shell.c

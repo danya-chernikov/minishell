@@ -8,6 +8,7 @@
 
 # include "parser.h"
 
+void	print_all(t_parser_data *d);
 void	print_quotes(t_parser_data *d);
 void	print_parsed_data(t_parser_data *d);
 void	print_tokens(t_parser_data *d);

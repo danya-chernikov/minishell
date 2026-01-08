@@ -1,5 +1,13 @@
 #include "debug.h"
 
+void	print_all(t_parser_data *d)
+{
+	print_parsed_data(d);
+	print_tokens(d);
+	print_parentheses(d);
+	print_quotes(d);
+}
+
 void	print_quotes(t_parser_data *d)
 {
 	size_t	i;

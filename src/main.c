@@ -6,11 +6,8 @@
 
 #include "libft.h"
 
-#include "parser.h"
 #include "engine.h"
-#include "quote.h"
-#include "builtin.h"
-#include "debug.h"
+#include "builtin.h" // for exit
 
 int	main(int argc, char **argv, char **env)
 {
@@ -18,9 +15,9 @@ int	main(int argc, char **argv, char **env)
 	(void)argv;
 	(void)env;
 
-	t_parser_data	pdata;
-	char			prompt[PROMPT_INV_LEN];
-	char			*rline_buf;
+	char	prompt[PROMPT_INV_LEN];
+	char	*rline_buf;
+	int		ret_code; // Shells' return code
 
 	rline_buf = NULL;
 	strncpy(prompt, "dchernik@c3r3s6: ", PROMPT_INV_LEN);
@@ -41,34 +38,12 @@ int	main(int argc, char **argv, char **env)
 			rline_buf = NULL;
 			break;
 		}
-
-		// Let's analyze the received prompt/request
-		
-		if (!parser_init(&pdata, rline_buf))
-			continue;
-
-		if (!quotes_parser(&pdata))
-			continue;
-
-		print_quotes(&pdata);
-		/*
-		if (!parser_engine(&pdata)) // If we got non-critical parser error
-			continue; // Just prompt user to enter another command(s)
-
-		print_parsed_data(&pdata);
-		print_tokens(&pdata);
-		print_parentheses(&pdata);
-
-		if (!exec_ops(&pdata))
+		if (shell_engine(rline_buf, &ret_code) == -1) // Critial system error occured
 			exit(EXIT_FAILURE);
-
-        // Close all pipes of this prompt
-		if (!close_pipes(&pdata))
-			exit(EXIT_FAILURE);*/
-			
+		// In case if non-critial parser error occured
+		// we just free `rline_buf` and prompt user again
 		free(rline_buf);
 		rline_buf = NULL;
-
 	}
 	return (0);
 }
