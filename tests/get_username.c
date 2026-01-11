@@ -29,7 +29,7 @@ int	main()
 	gid_t		my_gid;
 	int			fd;
 	char		*line;
-	char		**ptokens;
+	char		**ptokens; // dasswd tokens ._.
 
 	term_name = ttyname(STDIN_FILENO);
 	if (!term_name)
@@ -69,6 +69,11 @@ int	main()
 		}
 		free(line);
 	} while (line);
-	close(fd);
+
+	if (close(fd) == -1)
+	{
+		perror("close");
+		return 1;
+	}
 	return 0;
 }
