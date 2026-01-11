@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/09 22:41:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/11 19:55:33 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 # define LIBFT_H
 
 # include <stddef.h>
+# include <sys/types.h>
 
+/* ==================== get_next_line() DEFINITIONS  ==================== */
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
@@ -47,6 +49,65 @@
 # define RET			1
 # define BREAK			2
 # define CONT			3
+
+/* get_next_line.c */
+char	*get_next_line(int fd);
+int		loop_alg(char *buf, char **line, long long *v, int *flags);
+int		get_chunk(char *buf, char **line, long long *v, int *flags);
+void	process_new_line(char *buf, char **line, long long *v, int *flags);
+int		process_end_chunk(char **line, long long *v, int *flags);
+
+/* get_next_line_utils.c */
+int		init(char *buf, char **line, long long *v, int *flags);
+int		alloc_mem(char **line, long long *v, int *flags);
+void	check_reaching_end(long long *v, int *flags);
+void	clear_func_state(char **line, long long *v, int *flags);
+
+
+/* ==================== SYSTEM CALLS COPYCAT DEFINITIONS ================ */
+
+/* UNKNOWN_STR - A value that may be assigned to any `char *`
+ *				 field of the s_passwd structure or to any
+ *				 other entity if we did not manage to find
+ *				 its real value, or any other data we were
+ *				 looking for */
+#define COMMON_HOME_DIR		"/home"
+#define PASSWD_PATH			"/etc/passwd"
+#define PROC_INFO_SOURCE	"/proc/self/status"
+#define PROC_PID_TOKEN		"Pid"
+#define PROC_PPID_TOKEN		"PPid"
+#define UNKNOWN_STR			"unknown" 
+
+/* The analogue of system
+ * `passwd` structure.
+ *     pw_name   - username;
+ *     pw_passwd - user password;
+ *     pw_uid    - user ID;
+ *     pw_gid    - group ID;
+ *     pw_gecos  - user information;
+ *     pw_dir    - home directory;
+ *     pw_shell  - shell program. */
+typedef struct s_passwd
+{
+	char	*pw_name;
+	char	*pw_passwd;
+	uid_t	pw_uid;
+	gid_t	pw_gid;
+	char	*pw_gecos;
+	char	*pw_dir;
+	char	*pw_shell;
+} t_passwd;
+
+int	ft_getpid(pid_t *pid);
+int	ft_getppid(pid_t *ppid);
+int	ft_getuid(uid_t *uid);
+int	ft_getgid(gid_t *gid);
+int	ft_getpwuid(struct t_passwd *pwd, uid_t uid);
+
+/* ==================== Libft DEFINITIONS =============================== */
+
+#define SPLIT_ERR_MSG	"Error: ft_split()\n"
+#define GNL_ERR_MSG		"Error: get_next_line()\n"
 
 typedef struct s_list
 {
@@ -91,6 +152,9 @@ void		ft_striteri(char *s, void (*f)(unsigned int, char *));
 char		*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char		*ft_substr(char const *s, unsigned int start, size_t len);
 
+/* ft_aux.c */
+void		split_free(char ***res);
+
 /* Singly-linked list */
 t_list		*ft_lstnew(void *content);
 void		ft_lstadd_front(t_list **lst, t_list *new);
@@ -102,18 +166,5 @@ void		ft_lstclear(t_list **lst, void (*del)(void *));
 void		ft_lstiter(t_list *lst, void (*f)(void *));
 t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void		ft_list_remove_if(t_list **beg_list, void *data_ref, int (*cmp)());
-
-/* get_next_line.c */
-char	*get_next_line(int fd);
-int		loop_alg(char *buf, char **line, long long *v, int *flags);
-int		get_chunk(char *buf, char **line, long long *v, int *flags);
-void	process_new_line(char *buf, char **line, long long *v, int *flags);
-int		process_end_chunk(char **line, long long *v, int *flags);
-
-/* get_next_line_utils.c */
-int		init(char *buf, char **line, long long *v, int *flags);
-int		alloc_mem(char **line, long long *v, int *flags);
-void	check_reaching_end(long long *v, int *flags);
-void	clear_func_state(char **line, long long *v, int *flags);
 
 #endif

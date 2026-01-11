@@ -9,7 +9,9 @@ MAIN_SRCS=ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c \
 	 ft_atoi.c ft_calloc.c ft_realloc.c ft_strdup.c ft_substr.c ft_strjoin.c \
 	 ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c ft_striteri.c \
 	 ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c \
-	 get_next_line.c get_next_line_utils.c
+	 get_next_line.c get_next_line_utils.c \
+	 ft_getpid.c ft_getppid.c ft_getuid.c ft_getgid.c ft_getpwuid.c \
+	 ft_aux.c
 	 
 BONUS_SRCS=ft_lstnew_bonus.c ft_lstsize_bonus.c ft_lstadd_front_bonus.c \
 	ft_lstlast_bonus.c ft_lstadd_back_bonus.c ft_lstdelone_bonus.c \
@@ -23,7 +25,9 @@ MAIN_OBJS=ft_isalpha.o ft_isdigit.o ft_isalnum.o ft_isascii.o ft_isprint.o \
 	 ft_atoi.o ft_calloc.o ft_realloc.o ft_strdup.o ft_substr.o ft_strjoin.o \
 	 ft_strtrim.o ft_split.o ft_itoa.o ft_strmapi.o ft_striteri.o \
 	 ft_putchar_fd.o ft_putstr_fd.o ft_putendl_fd.o ft_putnbr_fd.o \
-	 get_next_line.o get_next_line_utils.o
+	 get_next_line.o get_next_line_utils.o \
+	 ft_getpid.o ft_getppid.o ft_getuid.o ft_getgid.o \
+	 ft_aux.o
 
 BONUS_OBJS=ft_lstnew_bonus.o ft_lstsize_bonus.o ft_lstadd_front_bonus.o \
 	ft_lstlast_bonus.o ft_lstadd_back_bonus.o ft_lstdelone_bonus.o \
