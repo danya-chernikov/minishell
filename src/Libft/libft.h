@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/12 02:05:19 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/12 14:53:44 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <stddef.h>
 # include <sys/types.h>
+# include <dirent.h>
 
 /* ==================== get_next_line() DEFINITIONS  ==================== */
 # ifndef BUFFER_SIZE
@@ -40,6 +41,7 @@
 # define I				5
 # define RES			6
 # define PRIV_MEM_S		7
+# define ERR			8
 
 /* NORM  - normal execution. Means to do nothing;
  * RET   - indicate that the `line` must be returned;
@@ -51,17 +53,18 @@
 # define CONT			3
 
 /* get_next_line.c */
-char	*get_next_line(int fd);
-int		loop_alg(char *buf, char **line, long long *v, int *flags);
-int		get_chunk(char *buf, char **line, long long *v, int *flags);
-void	process_new_line(char *buf, char **line, long long *v, int *flags);
-int		process_end_chunk(char **line, long long *v, int *flags);
+char	*get_next_line(int fd, int *err);
+int		gnl_loop_alg(char *buf, char **line, long long *v, int *flags);
+int		gnl_get_chunk(char *buf, char **line, long long *v, int *flags);
+void	gnl_process_new_line(char *buf, char **line, long long *v, int *flags);
+int		gnl_process_end_chunk(char **line, long long *v, int *flags);
 
 /* get_next_line_utils.c */
-int		init(char *buf, char **line, long long *v, int *flags);
-int		alloc_mem(char **line, long long *v, int *flags);
-void	check_reaching_end(long long *v, int *flags);
-void	clear_func_state(char **line, long long *v, int *flags);
+int		gnl_init(char *buf, char **line, long long *v, int *flags);
+int		gnl_alloc_mem(char **line, long long *v, int *flags);
+void	gnl_check_reaching_end(long long *v, int *flags);
+void	gnl_clear_func_state(char **line, long long *v, int *flags);
+void	gnl_finish(int fd);
 
 
 /* ==================== SYSTEM CALLS COPYCAT DEFINITIONS ================ */
@@ -103,6 +106,10 @@ int	ft_getppid(pid_t *ppid);
 int	ft_getuid(uid_t *uid);
 int	ft_getgid(gid_t *gid);
 int	ft_getpwuid(t_passwd *pwd, uid_t uid);
+
+/* ft_getpwuid_aux.c */
+int	fill_pwd_struct(t_passwd *pwd, char **ptokens, uid_t uid);
+int	fill_pwd_struct2(t_passwd *pwd, struct dirent *entry, char *user_dir, uid_t uid);
 
 /* ==================== Libft DEFINITIONS =============================== */
 
@@ -154,6 +161,7 @@ char		*ft_substr(char const *s, unsigned int start, size_t len);
 
 /* ft_aux.c */
 void		split_free(char ***res);
+size_t		split_size(char **res);
 void		free_pwd(t_passwd *pwd);
 
 /* Singly-linked list */

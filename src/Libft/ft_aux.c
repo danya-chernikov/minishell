@@ -14,6 +14,16 @@ void	split_free(char ***res)
 	free(*res);
 }
 
+size_t	split_size(char **res)
+{
+	size_t	i;
+
+	i = 0;
+	while (res[i])
+		++i;
+	return (i);
+}
+
 void	free_pwd(t_passwd *pwd)
 {
 	if (pwd->pw_name)

@@ -35,23 +35,31 @@ int	ft_getppid(pid_t *ppid)
 	return (0);
 }
 
-/* On success returns 1,
- * on failure 0 */
+/* Returns 1 on success and 0 on failure.
+ * It is crucial to allow get_next_line() 
+ * to read all lines of the file. Therefore,
+ * gnl_clear_func_state() is called at the
+ * end of get_next_line() so it can be used
+ * safely afterward */
 static int	alg(int fd, pid_t *ppid)
 {
 	char	*line;
+	int		err;
 
-	line = get_next_line(fd);
+	line = get_next_line(fd, &err);
 	while (line)
 	{
 		if (!check_token(line, ppid))
 			return (0);
 		free(line);
 		if (*ppid != 0)
+		{
+			gnl_finish(fd);
 			return (1);
-		line = get_next_line(fd);
+		}
+		line = get_next_line(fd, &err);
 	}
-	if (!line)
+	if (!line && err)
 	{
 		write(STDERR_FILENO, GNL_ERR_MSG, ft_strlen(GNL_ERR_MSG));
 		return (0);
@@ -72,7 +80,8 @@ static int	check_token(char *line, pid_t *ppid)
 		return (0);
 	}
 	tlen = ft_strlen(PROC_PPID_TOKEN);
-	if (!ft_strncmp(ptokens[0], PROC_PPID_TOKEN, tlen) &&
+	if (split_size(ptokens) > 1 &&
+		!ft_strncmp(ptokens[0], PROC_PPID_TOKEN, tlen) &&
 		ft_strlen(ptokens[0]) == tlen)
 	{
 		*ppid = ft_atoi(ptokens[1]);

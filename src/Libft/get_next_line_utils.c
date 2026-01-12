@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 19:48:44 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/09 23:03:17 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/12 15:03:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int	init(char *buf, char **line, long long *v, int *flags)
+int	gnl_init(char *buf, char **line, long long *v, int *flags)
 {
 	if (flags[EXIT])
 		return (BREAK);
@@ -28,6 +28,8 @@ int	init(char *buf, char **line, long long *v, int *flags)
 		v[RLEN] = read(v[FD], buf, BUFFER_SIZE);
 		if (v[RLEN] <= 0)
 		{
+			if (v[RLEN] == -1)
+				v[ERR] = 1;
 			if (flags[EXIT])
 			{
 				(*line)[v[LINE_POS] - v[LINE_LEN] + v[I]] = '\0';
@@ -40,7 +42,7 @@ int	init(char *buf, char **line, long long *v, int *flags)
 	return (NORM);
 }
 
-int	alloc_mem(char **line, long long *v, int *flags)
+int	gnl_alloc_mem(char **line, long long *v, int *flags)
 {
 	if (!flags[ALLOC])
 	{
@@ -54,11 +56,14 @@ int	alloc_mem(char **line, long long *v, int *flags)
 		v[PRIV_MEM_S] = (v[LINE_POS] + 2) * sizeof (char);
 	}
 	if (*line == NULL)
+	{
+		v[ERR] = 1;
 		return (BREAK);
+	}
 	return (NORM);
 }
 
-void	check_reaching_end(long long *v, int *flags)
+void	gnl_check_reaching_end(long long *v, int *flags)
 {
 	if (v[BUF_POS] == v[RLEN])
 	{
@@ -67,7 +72,8 @@ void	check_reaching_end(long long *v, int *flags)
 	}
 }
 
-void	clear_func_state(char **line, long long *v, int *flags)
+/* Inner interface */
+void	gnl_clear_func_state(char **line, long long *v, int *flags)
 {
 	*line = NULL;
 	v[BUF_POS] = 0;
@@ -79,4 +85,27 @@ void	clear_func_state(char **line, long long *v, int *flags)
 	flags[ALLOC] = 0;
 	flags[END] = 0;
 	flags[AGAIN] = 0;
+}
+
+/* Outer interface. Used when we need
+ * to stop get_next_line() for some
+ * reason. However, get_next_line()
+ * must always finish reading the entire
+ * line from the file descriptor `fd`.
+ * Therefore, the caller must use this
+ * function if it decides to stop execution,
+ * so that gnl_clear_func_state() is called
+ * to ensure the correct functioning of all
+ * subsequent get_next_line() calls */
+void	gnl_finish(int fd)
+{
+	char	*line;
+	int		err;
+
+	line = get_next_line(fd, &err);
+	while (line)
+	{
+		line = get_next_line(fd, &err);
+		free(line);
+	}
 }
