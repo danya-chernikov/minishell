@@ -26,7 +26,7 @@ MAIN_OBJS=ft_isalpha.o ft_isdigit.o ft_isalnum.o ft_isascii.o ft_isprint.o \
 	 ft_strtrim.o ft_split.o ft_itoa.o ft_strmapi.o ft_striteri.o \
 	 ft_putchar_fd.o ft_putstr_fd.o ft_putendl_fd.o ft_putnbr_fd.o \
 	 get_next_line.o get_next_line_utils.o \
-	 ft_getpid.o ft_getppid.o ft_getuid.o ft_getgid.o \
+	 ft_getpid.o ft_getppid.o ft_getuid.o ft_getgid.o ft_getpwuid.o \
 	 ft_aux.o
 
 BONUS_OBJS=ft_lstnew_bonus.o ft_lstsize_bonus.o ft_lstadd_front_bonus.o \

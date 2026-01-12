@@ -6,13 +6,13 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:41:57 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/07 15:25:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/12 02:08:52 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*memset(void *s, int c, size_t n)
+void	*ft_memset(void *s, int c, size_t n)
 {
 	size_t			i;
 	unsigned char	*buf;

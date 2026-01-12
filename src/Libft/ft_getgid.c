@@ -9,7 +9,7 @@ int	ft_getgid(gid_t *gid)
 {
 	char		*term_name;
 	ssize_t		ret;
-	struct stat	sb;
+	struct stat	st;
 
 	term_name = ttyname(STDIN_FILENO);
 	if (!term_name)
@@ -17,12 +17,12 @@ int	ft_getgid(gid_t *gid)
 		perror("ttyname");
 		return (-1);
 	}
-	ret = stat(term_name, &sb);
+	ret = stat(term_name, &st);
 	if (ret)
 	{
 		perror("stat");
 		return (-1);
 	}
-	*gid = sb.st_gid;
+	*gid = st.st_gid;
 	return (0);
 }

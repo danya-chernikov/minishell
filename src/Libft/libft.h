@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/11 19:55:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/12 02:05:19 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	clear_func_state(char **line, long long *v, int *flags);
 #define PROC_INFO_SOURCE	"/proc/self/status"
 #define PROC_PID_TOKEN		"Pid"
 #define PROC_PPID_TOKEN		"PPid"
-#define UNKNOWN_STR			"unknown" 
+#define UNKNOWN_USER_NAME	"unknown" 
 
 /* The analogue of system
  * `passwd` structure.
@@ -102,7 +102,7 @@ int	ft_getpid(pid_t *pid);
 int	ft_getppid(pid_t *ppid);
 int	ft_getuid(uid_t *uid);
 int	ft_getgid(gid_t *gid);
-int	ft_getpwuid(struct t_passwd *pwd, uid_t uid);
+int	ft_getpwuid(t_passwd *pwd, uid_t uid);
 
 /* ==================== Libft DEFINITIONS =============================== */
 
@@ -154,6 +154,7 @@ char		*ft_substr(char const *s, unsigned int start, size_t len);
 
 /* ft_aux.c */
 void		split_free(char ***res);
+void		free_pwd(t_passwd *pwd);
 
 /* Singly-linked list */
 t_list		*ft_lstnew(void *content);
