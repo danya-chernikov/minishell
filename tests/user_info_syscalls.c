@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h>
 
 int main()
 {
@@ -15,19 +16,23 @@ int main()
 
 	ret = ft_getpid(&pid);
 	if (!ret)
-		printf("My PID is %jd\n\n", (intmax_t)pid);
+		printf("My PID is %jd\n", (intmax_t)pid);
+	printf("Kernel Linux PID: %jd\n\n", (intmax_t)getpid());
 
 	ret = ft_getppid(&ppid);
 	if (!ret)
-		printf("My PPID is %jd\n\n", (intmax_t)ppid);
+		printf("My PPID is %jd\n", (intmax_t)ppid);
+	printf("Kernel Linux PPID: %jd\n\n", (intmax_t)getppid());
 	
 	ret = ft_getuid(&uid);
 	if (!ret)
-		printf("My UID is %d\n\n", uid);
+		printf("My UID is %d\n", uid);
+	printf("Kernel Linux UID: %d\n\n", getuid());
 
 	ret = ft_getgid(&gid);
 	if (!ret)
-		printf("My GID is %d\n\n", gid);
+		printf("My GID is %d\n", gid);
+	printf("Kernel Linux GID: %d\n\n", getgid());
 
 	ret = ft_getpwuid(&pwd, uid);
 	if (ret == 0)

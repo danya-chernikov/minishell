@@ -1,7 +1,7 @@
 #ifndef ENGINE_H
 # define ENGINE_H
 
-# include "parser.h"
+# include "prompt_parser.h"
 # include "exec.h"
 # include "quote.h"
 # include "debug.h"

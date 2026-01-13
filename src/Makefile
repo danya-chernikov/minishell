@@ -7,11 +7,13 @@ NAME=minishell
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
-SRCS=main.c engine.c parser.c exec.c shell.c init.c par.c quote.c \
-	 token.c operand.c aux.c builtin.c error.c debug.c test.c
+SRCS=main.c init.c cmdargs_parser.c shell.c engine.c prompt_parser.c \
+	 exec.c shell.c history.c par.c quote.c token.c operand.c aux.c \
+	 builtin.c error.c debug.c test.c
 
-OBJS=main.o engine.o parser.o exec.o shell.o init.o par.o quote.o \
-	 token.o operand.o aux.o builtin.o error.o debug.o test.o
+OBJS=main.o init.o cmdargs_parser.o shell.o engine.o prompt_parser.o \
+	 exec.o shell.o history.o par.o quote.o token.o operand.o aux.o \
+	 builtin.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -40,20 +42,23 @@ re : fclean all
 main.o : main.c libft.h engine.h builtin.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c main.c
 
+init.o : init.c init.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init.c
+
+cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c cmdargs_parser.c
+
+prompt_parser.o : prompt_parser.c parser.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c prompt_parser.c
+
 engine.o : engine.c engine.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c engine.c
-
-parser.o : parser.c parser.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c parser.c
 
 exec.o : exec.c exec.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c exec.c
 
 shell.o : shell.c shell.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c shell.c
-
-init.o : init.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init.c
 
 par.o : par.c par.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c par.c
