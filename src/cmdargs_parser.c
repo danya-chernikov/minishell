@@ -20,6 +20,10 @@ int	cmdargs_parser(t_shell *msh)
 {
 	int	opt_i;
 
+	// Set $0
+	get_last_path_comp(msh->argv[0]);
+	msh->vars[PV_ARGV0].value = ft_strdup(msh->argv[0]);
+
 	opt_i = 1;
 	while (opt_i < msh->argc)
 	{
@@ -34,18 +38,20 @@ int	cmdargs_parser(t_shell *msh)
 		}
 
 		// --version
-		if (is_version_opt(msh->argv[opt_i]))
+		else if (is_version_opt(msh->argv[opt_i]))
 		{
 			print_version();
 			break ;
 		}
 
 		// -v/--verbose
-		if (is_verbose_opt(msh->argv[opt_i]))
+		else if (is_verbose_opt(msh->argv[opt_i]))
+		{
 			msh->opts.f_verbose = true;
+		}
 
 		// -l/--login
-		if (is_login_opt(msh->argv[opt_i]))
+		else if (is_login_opt(msh->argv[opt_i]))
 		{
 			msh->opts.f_login = true;
 			if (set_argv0_login(msh) == COMMON_SYS_ERR)
@@ -53,7 +59,7 @@ int	cmdargs_parser(t_shell *msh)
 		}
 
 		// --norc
-		if (is_norc_opt(msh->argv[opt_i]))
+		else if (is_norc_opt(msh->argv[opt_i]))
 			msh->opts.f_norc = true;
 
 		// -c
@@ -61,7 +67,7 @@ int	cmdargs_parser(t_shell *msh)
 		// an expression in "" or just one command
 		// without quotes (in this case its arguments
 		// and options will not be recognized)
-		if (is_c_opt(msh->argv[opt_i]))
+		else if (is_c_opt(msh->argv[opt_i]))
 		{
 			msh->opts.f_c = true;
 			msh->mode = NONINT_CMD_MODE;
@@ -133,27 +139,30 @@ int	cmdargs_parser(t_shell *msh)
 				free(msh->vars[PV_ARGNUM].value);
 			msh->vars[PV_ARGNUM].value = ft_itoa(arg_i);
 			
-			// Let's set $* variable
-			// Just concatenate all arguments passed to the script
-			all_argv_len += arg_i - 1; // Count spaces
-			++all_argv_len; // Count the NULL terminator
-			
-			all_argv = (char *)malloc(all_argv_len * sizeof(char));
-			if (!all_argv)
+			if (arg_i > 0) // If the script had any arguments
 			{
-				perror("malloc");
-				return (COMMON_SYS_ERR);
-			}
+				// Let's set $* variable
+				// Just concatenate all arguments passed to the script
+				all_argv_len += arg_i - 1; // Count spaces
+				++all_argv_len; // Count the NULL terminator
+				
+				all_argv = (char *)malloc(all_argv_len * sizeof(char));
+				if (!all_argv)
+				{
+					perror("malloc");
+					return (COMMON_SYS_ERR);
+				}
 
-			ft_strlcpy(all_argv, msh->vars[PV_ARGV1].value, all_argv_len);
-			i = 1;
-			while (i < arg_i)
-			{
-				ft_strlcat(all_argv, " ", all_argv_len);
-				ft_strlcat(all_argv, msh->vars[PV_ARGV1 + i].value, all_argv_len);
-				++i;
+				ft_strlcpy(all_argv, msh->vars[PV_ARGV1].value, all_argv_len);
+				i = 1;
+				while (i < arg_i)
+				{
+					ft_strlcat(all_argv, " ", all_argv_len);
+					ft_strlcat(all_argv, msh->vars[PV_ARGV1 + i].value, all_argv_len);
+					++i;
+				}
+				msh->vars[PV_ALLARGS].value = all_argv;
 			}
-			msh->vars[PV_ALLARGS].value = all_argv;
 			
 			// After locating a script,
 			// we always stop parsing
@@ -169,6 +178,7 @@ int	set_argv0_login(t_shell *msh)
 	char	*new_argv0;
 	size_t	new_size;
 
+	get_last_path_comp(msh->argv[0]);
 	new_size = ft_strlen(msh->argv[0]) + 1;
 	new_argv0 = (char *)malloc(new_size * sizeof(char));
 	if (!new_argv0)
@@ -177,7 +187,9 @@ int	set_argv0_login(t_shell *msh)
 		return (COMMON_SYS_ERR);
 	}
 	new_argv0[0] = '-'; // Mark the login shell
-	ft_strlcpy(new_argv0 + sizeof(char), new_argv0, new_size);
+	ft_strlcpy(new_argv0 + sizeof(char), msh->argv[0], new_size);
+	if (msh->vars[PV_ARGV0].value)
+		free(msh->vars[PV_ARGV0].value);
 	msh->vars[PV_ARGV0].value = new_argv0;
 	return (COMMON_SUCCESS);
 }
@@ -218,6 +230,40 @@ int	erase_quotes(char *str)
 		}
 	}
 	return (COMMON_SUCCESS);
+}
+
+/* Eliminates all except the last path component.
+ * For example:
+ *     path = "/home/dchernik/Downloads/circle03/minishell/src/minishell"
+ *     get_last_path_comp(path);
+ *     path = "minishell" */
+void	get_last_path_comp(char *path) // Give it better name
+{
+	int	i;
+	int	j;
+	int	slash_ind;
+	int	path_len;
+
+	i = 0;
+	slash_ind = -1;
+	path_len = (int)ft_strlen(path);
+	while (i < path_len)
+	{
+		if (path[i] == '/')
+			slash_ind = i;
+		++i;
+	}
+	if (slash_ind == -1)
+		return ;
+	j = 0;
+	i = slash_ind + 1;
+	while (i < path_len)
+	{
+		path[j] = path[i];
+		++i;
+		++j;
+	}
+	path[j] = '\0';
 }
 
 bool	is_help_opt(char *opt)

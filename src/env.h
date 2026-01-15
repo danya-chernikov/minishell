@@ -7,6 +7,10 @@
  * it isn't inherited from the
  * parent or found in any configs */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+# define DEF_PS1			"\s-\v\$"
+# define DEF_PS2			">"
+# define DEF_PS4			"+"
+
 # define PARAM_VARS_NUM		15
 # define SCRIPT_ARGS_NUM	9
 # define LOCAL_VARS_NUM		14
@@ -59,7 +63,7 @@ typedef struct s_env_var
 
 }	t_env_var;
 
-char	*get_val_by_name(char *name);
+char	*get_env_val_by_name(char *name);
 
 void	print_env(t_env_var *var);
 void	set_env(t_env_var *var, char *value);

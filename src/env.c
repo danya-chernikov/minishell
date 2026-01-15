@@ -1,28 +1,32 @@
 #include "env.h"
 
-char	*get_val_by_name(char *name)
+/* Returns variable's value
+ * by its name */
+char	*env_get(char *name)
 {
-	(void)name;
-	return (NULL);
+
 }
 
-void	print_env(t_env_var *var)
+void	env_print(char *name)
 {
-	(void)var;
+
 }
 
-void	set_env(t_env_var *var, char *value)
+/* If a variable named `name` already exists,
+ * its old value is overwritten with `value`.
+ * If it does not exist, a new variable named
+ * `name` is created with the value `value` */
+void	env_set(char *name, char *value)
 {
-	(void)var;
-	(void)value;
+
 }
 
-void	unset_env(t_env_var *var)
+void	env_unset(char *name)
 {
-	(void)var;
+
 }
 
-void	export_env(t_env_var *var)
+void	env_export(char *name)
 {
-	(void)var;
+
 }

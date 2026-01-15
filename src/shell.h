@@ -98,30 +98,33 @@ typedef enum e_shell_mode
  *					  the history file on exit.
  *					  (Set to the same value as HISTFILESIZE).
  *
- * c_cmd		- all what goes after -c option in case if present */
+ * c_cmd		- all what goes after -c option in case if present;
+ *
+ * vars_num		- number of envionment variables we crrently have. */
 typedef struct e_shell
 {
 	t_shell_mode	mode;
 	t_options		opts;
 	t_configs		configs;
-	t_env_var		*vars;
-	t_hist_cmd		*history;
+	t_env_var		*vars;// on heap
+	t_hist_cmd		*history;//on heap
 	int				argc;
 	char			**argv;
 	char			**env;
+	size_t			vars_num;
 	int				histsize;
 	int				histfilesize;
-	char			*script;
-	char			*c_cmd;
+	char			*script;//on stack
+	char			*c_cmd;// on stack
 }	t_shell;
 
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 
-int		msh_init_param_vars(t_env_var *vars);
+int		msh_init_param_vars(t_shell *msh);
 void	msh_free_param_vars(t_env_var *vars);
 
-int		msh_set_env_vars(t_shell *msh);
 int		msh_set_local_vars(t_shell *msh);
+int		msh_set_env_vars(t_shell *msh);
 
 void	msh_free(t_shell *msh);
 
