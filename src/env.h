@@ -1,7 +1,6 @@
 #ifndef ENV_H
 # define ENV_H
 
-
 # include <stdbool.h>
 
 /* The default path is used when
@@ -9,12 +8,13 @@
  * parent or found in any configs */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # define PARAM_VARS_NUM		15
+# define SCRIPT_ARGS_NUM	9
 # define LOCAL_VARS_NUM		14
 # define MAX_ENV_VARS_NUM	1024
 
 typedef enum e_paramvar
 {
-	PV_HOME,	// ~
+	PV_HOME = 0,// ~
 	PV_RETCODE,	// $?
 	PV_PID,		// $$
 	PV_ARGNUM,	// $#
@@ -61,9 +61,13 @@ typedef struct s_env_var
 
 int		init_param_vars(t_env_var *vars);
 
-int		set_param_vars(t_env_var *vars);
 int		set_env_vars(t_env_var *vars);
 int		set_local_vars(t_env_var *vars);
+
+void	print_env();
+void	set_env();
+void	unset_env();
+void	export_env();
 
 void	free_param_vars(t_env_var *vars);
 

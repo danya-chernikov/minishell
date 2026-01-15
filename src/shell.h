@@ -8,12 +8,10 @@
 
 # include <stdbool.h>
 
-/* If returns from a function marks its
- * caller should invoke exit(EXIT_SUCCESS) */
-# define EXIT_SUCCESS_RET	2
-
 /* Minishell information */
-# define MSH_VERSION	"1.0-release" 
+# define MSH_NAME_SHORT	"msh"
+# define MSH_NAME_LONG	"minishell"
+# define MSH_VERSION	"1.0-release"
 # define MSH_ARCH		"x86_64"
 # define MSH_OSTYPE		"linux-gnu"
 
@@ -39,24 +37,31 @@ typedef struct s_options
 	bool	f_c;
 }	t_options;
 
-/* NONINT_SCRIPT - non-interactive script executing:
- *     bash script.sh
+/* NONINT_SCRIPT_MODE - non-interactive script executing:
+ * In this mode we do NOT read any configs (check this)
+ *     ./minishell script.sh
  *     ./script.sh (with shebang inside)
- * NONINT_CMD - non-interactive shell launch with `-c` option:
- *     bash -c "..."
- *     bash -c '...'
- * INT_LOG - interactive login shell:
- *     bash -l
- *     bash --login
- * INT_NONLOG - interactive non-login shell:
- *     bash */
+ * NONINT_CMD_MODE - non-interactive shell launch with `-c` option:
+ * In this mode we do NOT read any configs (check this)
+ *     ./minishell -c "..."
+ *     ./minishell -c '...'
+ * NONINT_STDIN_MODE - non-interactive shell but accepting commands from STDIN
+ * In this mode we do NOT read any configs (check this)
+ *     ./minishell -c "..."
+ *     ./minishell | wc -l; ls; exit
+ *     echo ls | ./minishell | wc -l
+ *     ./minishell < commands_file
+ * INT_MODE - interactive login or non-login shell:
+ * Only in this mode we read configs and support history
+ *     ./minishell -l
+ *     ./minishell --login
+ *     ./minishell */
 typedef enum e_shell_mode
 {
-	NONINT_SCRIPT,	// ./minishell script.sh arg1 arg2
-	NONINT_CMD,		// ./minishell -c 'command' OR ./minishell -c "command"
-	NONINT_STDIN,	// echo "ls -la" | ./minishell OR ./minishell < commands_file
-	INT_LOG,		// ./minishell --login OR ./minishell -l
-	INT_NONLOG		// ./minishell
+	NONINT_SCRIPT_MODE,	// ./minishell script.sh arg1 arg2
+	NONINT_CMD_MODE,	// ./minishell -c 'command' OR ./minishell -c "command"
+	NONINT_STDIN_MODE,	// echo "ls -la" | ./minishell OR ./minishell < commands_file
+	INT_MODE,			// ./minishell --login OR ./minishell -l OR ./minishell
 }	t_shell_mode;
 
 /* histsize		- analogue of HISTSIZE.
@@ -90,7 +95,9 @@ typedef enum e_shell_mode
  *					  If set to a positive value `n`, only the last `n`
  *					  commands from the current session are written to
  *					  the history file on exit.
- *					  (Set to the same value as HISTFILESIZE). */
+ *					  (Set to the same value as HISTFILESIZE).
+ *
+ * c_cmd		- all what goes after -c option in case if present */
 typedef struct e_shell
 {
 	t_shell_mode	mode;
@@ -104,33 +111,8 @@ typedef struct e_shell
 	int				histsize;
 	int				histfilesize;
 	char			*script_path;
+	char			*c_cmd;
 }	t_shell;
-
-/* cmds		- commands to execute inside shell;
- * posargv	- positional arguments;
- * pos_argc - number of positional arguemnts;
- * settings	- shell settings;
- * env		- inherited environment.
- *
- * NONINT_SCRIPT (We want our shell execute a script)
- *     cmd=NULL;
- *     mode=NONINT_SCRIPT;
- * NONINT_CMD
- *     script_path=NULL;
- *     mode=NONINT_CMD;
- * INT_LOG
- *     cmds=NULL;
- *     script_path=NULL;
- *     pos_argv=NULL;
- *     pos_argc=0;
- *     mode=INT_LOG;
- * INT_NONLOG
- *     cmds=NULL;
- *     script_path=NULL;
- *     pos_argv=NULL;
- *     pos_argc=0;
- *     mode=INT_NONLOG.
- * */
 
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 void	msh_free(t_shell *msh);

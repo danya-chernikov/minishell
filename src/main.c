@@ -6,19 +6,49 @@
 
 #include "libft.h"
 
-#include "init.h"
+#include "shell.h"
 #include "engine.h"
 #include "builtin.h" // for exit
 
+/*
+	SUCCESS_CODE = 0,
+	SYS_ERR = 1,
+	CMD_BUILTIN_ERR = 2,
+	SYNTAX_ERR = 2,
+	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
+	CMD_NOT_LOCATED_ERR = 127
+ * */
 int	main(int argc, char **argv, char **env)
 {
 	t_shell	msh;
-	int		ret;		// Functions' return code
-	int		ret_code;	// Shells' return code
+	int		fret;
+	int		shret;
 
-	ret_code = EXIT_SUCCESS;
-	ret = msh_init(&msh);
-	if (!ret)
+	shret = EXIT_SUCCESS;
+	fret = msh_init(&msh);
+	if (fret == COMMON_SYS_ERR) // -1
+		shret = SYS_ERR; // 1
+	else
+	{
+		// One of the other possible errors
+		// described in the `e_exit_code`
+		// structure, or 128 + N, where N
+		// is the number of the signal
+		// that interrupted our minishell
+		shret = fret;
+	}
+
+	// Initialize all variables what
+	// are left (local and environmental)
+	msh_set_vars(&msh);
+
+	// Read configs
+	
+	// Execute all things from configs
+	
+	// Setup history (read lines from history file and add them)
+	
+	// Depending on our shell mode launch the appropriate engine
 
 	/*
 	char	prompt[PROMPT_INV_LEN];
@@ -52,5 +82,5 @@ int	main(int argc, char **argv, char **env)
 	}*/
 
 	msh_free(&msh);
-	return (ret_code);
+	return (shret);
 }

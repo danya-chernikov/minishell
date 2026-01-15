@@ -1,1 +1,1 @@
-vim main.c init.c init.h cmdargs_parser.c cmdargs_parser.h shell.c shell.h env.c env.h config.h history.c history.h engine.c engine.h prompt_parser.c prompt_parser.h Makefile
+vim main.c cmdargs_parser.c cmdargs_parser.h shell.c shell.h env.c env.h config.h history.c history.h engine.c engine.h prompt_parser.c prompt_parser.h error.c error.h Makefile

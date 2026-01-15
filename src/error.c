@@ -1,5 +1,6 @@
 #include "error.h"
 
+/* We use it when parsing the prompt */
 void	parser_error(bool *f_noerr)
 {
 	*f_noerr = false;
@@ -13,8 +14,24 @@ void	print_sys_error(char *msg)
 
 	err = strerror(errno);
 	ft_strlcpy(err_buf, msg, ERR_BUF_SIZE);
-	ft_strlcat(err_buf, ": ", 2);
-	ft_strlcat(err_buf, err, ft_strlen(err));
-	ft_strlcat(err_buf, "\n", 1);
+	ft_strlcat(err_buf, ": ", ERR_BUF_SIZE);
+	ft_strlcat(err_buf, err, ERR_BUF_SIZE);
+	ft_strlcat(err_buf, "\n", ERR_BUF_SIZE);
+	write(STDERR_FILENO, err_buf, ft_strlen(err_buf));
+}
+
+void	print_shell_error(char *culprit, char *msg)
+{
+	char	err_buf[ERR_BUF_SIZE];
+
+	ft_strlcpy(err_buf, MSH_NAME_SHORT, ERR_BUF_SIZE);
+	ft_strlcat(err_buf, ": ", ERR_BUF_SIZE);
+	if (culprit)
+	{
+		ft_strlcat(err_buf, culprit, ERR_BUF_SIZE);
+		ft_strlcat(err_buf, ": ", ERR_BUF_SIZE);
+	}
+	ft_strlcat(err_buf, msg, ERR_BUF_SIZE);
+	ft_strlcat(err_buf, "\n", ERR_BUF_SIZE);
 	write(STDERR_FILENO, err_buf, ft_strlen(err_buf));
 }

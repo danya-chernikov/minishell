@@ -10,10 +10,9 @@
 static int	alg(int fd, pid_t *pid);
 static int	check_token(char *line, pid_t *pid);
 
-/* On failure `errcode` will be -1,
+/* On failure returns -1,
  * on success 0 is returned.
- *     ptokens - process tokens ._.
- * */
+ *     ptokens - process tokens ._. */
 int	ft_getpid(pid_t *pid)
 {
 	int	fd;

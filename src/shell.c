@@ -18,7 +18,12 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	int	res;
 
+	// By default, let's think our
+	// shell will be interactive
+	msh->INT_MODE;
+
 	script_path = NULL;
+	c_cmd		= NULL;
 
 	// Assign arguments of main()
 	msh->argc	= argc;
@@ -26,18 +31,19 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	msh-env		= env;
 
 	// Init shell options
-	msh->opts.f_login = false;
-	msh->opts.f_verbose = false;
-	msh->opts.f_norc = false;
-	msh->opts.f_c = false;
+	msh->opts.f_login	= false;
+	msh->opts.f_verbose	= false;
+	msh->opts.f_norc	= false;
+	msh->opts.f_c		= false;
 
 	// Allocate environmental variables
 	msh->vars = (t_env_var *)malloc(MAX_ENV_VARS_NUM * sizeof(t_env_var));
 	if (!msh->vars)
 	{
 		perror("malloc");
-		return (0);
+		return (COMMON_SYS_ERR);
 	}
+
 	// Init history
 	msh->histsize = DEF_HISTSIZE;
 	msh->histfilesize = DEF_HISTFILESIZE;
@@ -46,33 +52,31 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	{
 		perror("malloc");
 		free(msh->vars);
-		return (0);
+		return (COMMON_SYS_ERR);
 	}
-	// Create shell parameters
-	if (!init_paramvars(msh->vars))
+
+	// Initialize shell parameters
+	if (init_param_vars(msh->vars) == COMMON_SYS_ERR)
 	{
 		free(msh->history);
 		free(msh->vars);
-		return (0);
+		return (COMMON_SYS_ERR);
 	}
 
-	// After this shell options may be cahanged
-	res = cmdargs_parser(&msh);
-	if (res == 0) // Error
-		return (0);
-	else if (res == EXIT_SUCCESS_RET) // We should call exit(EXIT_SUCCESS)
-		return (EXIT_SUCCESS_RET);
-
-	/*
-	NONINT_SCRIPT,	// ./minishell script.sh arg1 arg2
-	NONINT_CMD,		// ./minishell -c 'command' OR ./minishell -c "command"
-	NONINT_STDIN,	// echo "ls -la" | ./minishell
-	INT_LOG,		// ./minishell --login OR ./minishell -l
-	INT_NONLOG		// ./minishell
-	*/
+	// Parsing the command-line arguments
+	// of our shell. At this stage, we can
+	// determine the shell's mode and set
+	// some parameter variables
+	res = cmdargs_parser(msh);
+	if (res == COMMON_SUCCESS)
+		return (EXIT_SUCCESS);
+	else if (res == COMMON_FAILURE)
+		return (COMMON_FAILURE);
+	else // The code we should transfer to the caller
+		return (res);
 
 	// Here we just determine if print prompt or not
-	// if the commands source of our shell is STDIN
+	// if the commands source of our shell is STDIN.
 	// Our bash may have 3 command sources
 	// 1. bash script.sh			from script
 	// 2. bash -c 'commands'		from -c option
@@ -87,14 +91,8 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	// In all these cases the parent shell who launches bash will handle pipes and redirections!
 	if (!isatty(STDIN_FILENO)) // If shell is not connected to any terminal
 	{
-		if (msh->mode != NONINT_SCRIPT && msh->mode != NONINT_CMD) // 
+		if (msh->mode != NONINT_SCRIPT_MODE && msh->mode != NONINT_CMD_MODE)
 			msh->mode = NONINT_STDIN; // We do not have to print prompt!
-	}
-	else // Let's check if user launched smth like "./minishell < file"
-	{
-		// Try non-blocking reading from stdin
-		// If there is no any data accessible
-		// We consider bash was run in any other mode than NONINT_STDIN
 	}
 
 	// Alalyze `env` and set all variables
@@ -102,10 +100,10 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	set_env_vars(vars);
 	set_local_vars(vars);
 
-	return (1);
+	return (COMMON_SUCCESS);
 }
 
-int	msh_set_vars(t_shell*msh)
+int	msh_set_vars(t_shell *msh)
 {
 
 }
