@@ -59,16 +59,11 @@ typedef struct s_env_var
 
 }	t_env_var;
 
-int		init_param_vars(t_env_var *vars);
+char	*get_val_by_name(char *name);
 
-int		set_env_vars(t_env_var *vars);
-int		set_local_vars(t_env_var *vars);
-
-void	print_env();
-void	set_env();
-void	unset_env();
-void	export_env();
-
-void	free_param_vars(t_env_var *vars);
+void	print_env(t_env_var *var);
+void	set_env(t_env_var *var, char *value);
+void	unset_env(t_env_var *var);
+void	export_env(t_env_var *var);
 
 #endif

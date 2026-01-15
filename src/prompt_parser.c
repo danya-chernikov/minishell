@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "prompt_parser.h"
 
 /* The first token is always NONE because
  * we always check previous token value */

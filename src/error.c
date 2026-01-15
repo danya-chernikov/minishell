@@ -1,4 +1,5 @@
 #include "error.h"
+#include "shell.h"
 
 /* We use it when parsing the prompt */
 void	parser_error(bool *f_noerr)

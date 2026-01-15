@@ -1,5 +1,5 @@
 #include "token.h"
-#include "parser.h"
+#include "prompt_parser.h"
 
 void	init_tokens(t_parser_data *d)
 {

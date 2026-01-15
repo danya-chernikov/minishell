@@ -1,5 +1,7 @@
 #ifndef HISTORY_H
-#define HISTORY_H
+# define HISTORY_H
+
+# include <stddef.h>
 
 # define MAX_HIST_LINES_NUM	4096
 
@@ -36,7 +38,7 @@ typedef enum e_hist_type
 typedef struct e_hist_cmd
 {
 	size_t		line_num;
-	t_vector	cmd;
+	char		*cmd;
 	t_hist_type	type;
 }	t_hist_cmd;
 

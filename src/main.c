@@ -10,14 +10,6 @@
 #include "engine.h"
 #include "builtin.h" // for exit
 
-/*
-	SUCCESS_CODE = 0,
-	SYS_ERR = 1,
-	CMD_BUILTIN_ERR = 2,
-	SYNTAX_ERR = 2,
-	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
-	CMD_NOT_LOCATED_ERR = 127
- * */
 int	main(int argc, char **argv, char **env)
 {
 	t_shell	msh;
@@ -25,7 +17,7 @@ int	main(int argc, char **argv, char **env)
 	int		shret;
 
 	shret = EXIT_SUCCESS;
-	fret = msh_init(&msh);
+	fret = msh_init(&msh, argc, argv, env);
 	if (fret == COMMON_SYS_ERR) // -1
 		shret = SYS_ERR; // 1
 	else
@@ -40,7 +32,7 @@ int	main(int argc, char **argv, char **env)
 
 	// Initialize all variables what
 	// are left (local and environmental)
-	msh_set_vars(&msh);
+	//msh_set_vars(&msh);
 
 	// Read configs
 	

@@ -1,9 +1,9 @@
 #ifndef SHELL_H
 # define SHELL_H
 
-# include "vector.h"
 # include "config.h"
 # include "history.h"
+# include "error.h"
 # include "env.h"
 
 # include <stdbool.h>
@@ -18,6 +18,7 @@
 /* Minishell options */
 # define LOGIN_LONG_OPT		"--login"
 # define VERBOSE_LONG_OPT	"--verbose"
+# define VERSION_LONG_OPT	"--version"
 # define NORC_LONG_OPT		"--norc"
 # define HELP_LONG_OPT		"--help"
 # define LOGIN_SHORT_OPT	"-l"
@@ -110,11 +111,18 @@ typedef struct e_shell
 	char			**env;
 	int				histsize;
 	int				histfilesize;
-	char			*script_path;
+	char			*script;
 	char			*c_cmd;
 }	t_shell;
 
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
+
+int		msh_init_param_vars(t_env_var *vars);
+void	msh_free_param_vars(t_env_var *vars);
+
+int		msh_set_env_vars(t_shell *msh);
+int		msh_set_local_vars(t_shell *msh);
+
 void	msh_free(t_shell *msh);
 
 #endif

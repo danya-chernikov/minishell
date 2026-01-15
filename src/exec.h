@@ -6,7 +6,7 @@
 # include <sys/wait.h>
 # include <unistd.h> // Do we need it here?
 
-# include "parser.h"
+# include "prompt_parser.h"
 # include "shell.h"
 # include "debug.h"
 

@@ -7,12 +7,12 @@ NAME=minishell
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
-SRCS=main.c init.c cmdargs_parser.c shell.c engine.c prompt_parser.c \
-	 exec.c shell.c history.c par.c quote.c token.c operand.c aux.c \
+SRCS=main.c shell.c cmdargs_parser.c engine.c prompt_parser.c \
+	 exec.c history.c par.c quote.c token.c operand.c aux.c \
 	 builtin.c error.c debug.c test.c
 
-OBJS=main.o init.o cmdargs_parser.o shell.o engine.o prompt_parser.o \
-	 exec.o shell.o history.o par.o quote.o token.o operand.o aux.o \
+OBJS=main.o shell.o cmdargs_parser.o engine.o prompt_parser.o \
+	 exec.o history.o par.o quote.o token.o operand.o aux.o \
 	 builtin.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
@@ -39,16 +39,16 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c libft.h engine.h builtin.h
+main.o : main.c shell.h engine.h builtin.h libft.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c main.c
 
-init.o : init.c init.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init.c
+shell.o : shell.c shell.h cmdargs_parser.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c shell.c
 
 cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c cmdargs_parser.c
 
-prompt_parser.o : prompt_parser.c parser.h
+prompt_parser.o : prompt_parser.c prompt_parser.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c prompt_parser.c
 
 engine.o : engine.c engine.h
@@ -57,16 +57,13 @@ engine.o : engine.c engine.h
 exec.o : exec.c exec.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c exec.c
 
-shell.o : shell.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c shell.c
-
 par.o : par.c par.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c par.c
 
-quote.o : quote.c parser.h quote.h
+quote.o : quote.c prompt_parser.h quote.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c quote.c
 
-token.o : token.c parser.h token.h
+token.o : token.c prompt_parser.h token.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c token.c
 
 operand.o : operand.c operand.h
@@ -78,7 +75,7 @@ aux.o : aux.c aux.h
 builtin.o : builtin.c builtin.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c builtin.c
 
-error.o : error.c error.h
+error.o : error.c error.h shell.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c error.c
 
 debug.o : debug.c debug.h

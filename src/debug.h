@@ -6,7 +6,7 @@
 
 # include <stdio.h>
 
-# include "parser.h"
+# include "prompt_parser.h"
 
 void	print_all(t_parser_data *d);
 void	print_quotes(t_parser_data *d);
