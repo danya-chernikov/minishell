@@ -109,16 +109,22 @@ int	cmdargs_parser(t_shell *msh)
 
 			// Check $0 first (what if before script.sh we had -l/--login options?
 			if (!msh->vars[PV_ARGV0].value) // If not exist yet
-				msh->vars[PV_ARGV0].value = ft_strdup(msh->argv[0]);
+				msh->vars[PV_ARGV0].value = ft_strdup(msh->argv[opt_i]);
 
-			all_argv_len = 1; // In order to now how much memory allocate to store
-			arg_i = 0; // Script's argument index
-			while (1 + arg_i < msh->argc && arg_i < SCRIPT_ARGS_NUM)
+			all_argv_len = 0; // In order to know how much memory allocate to store
+			arg_i = 1; // Script's argument index
+			while (opt_i + arg_i < msh->argc && arg_i - 1 < SCRIPT_ARGS_NUM)
 			{
-				msh->vars[PV_ARGV1 + arg_i].value = ft_strdup(msh->argv[1 + arg_i]);
-				all_argv_len += ft_strlen(msh->argv[1 + arg_i]);
+				if (!erase_quotes(msh->argv[opt_i + arg_i]))
+				{
+					print_shell_error(C_SHORT_OPT, SYNTAX_ERR_MSG);
+					return (SYNTAX_ERR);
+				}
+				msh->vars[PV_ARGV0 + arg_i].value = ft_strdup(msh->argv[opt_i + arg_i]);
+				all_argv_len += ft_strlen(msh->argv[opt_i + arg_i]);
 				++arg_i;
 			}
+			--arg_i;
 			// The `arg_i` now contains the number
 			// of arguments passed to our script
 
@@ -130,7 +136,7 @@ int	cmdargs_parser(t_shell *msh)
 			// Let's set $* variable
 			// Just concatenate all arguments passed to the script
 			all_argv_len += arg_i - 1; // Count spaces
-			++all_argv_len; // Count NULL terminator
+			++all_argv_len; // Count the NULL terminator
 			
 			all_argv = (char *)malloc(all_argv_len * sizeof(char));
 			if (!all_argv)

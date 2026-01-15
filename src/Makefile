@@ -57,6 +57,9 @@ engine.o : engine.c engine.h
 exec.o : exec.c exec.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c exec.c
 
+history.o : history.c history.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c history.c
+
 par.o : par.c par.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c par.c
 
