@@ -2,6 +2,84 @@
 # define ENV_H
 
 # include <stdbool.h>
+
+/* Each variable's number here corresponds to its index in the `vars`
+ * array of the `s_shell` structure. In our minishell, we have the
+ * following kinds of variables:
+ *
+ *     SPECIAL PARAMETER VARIABLES:
+ *         Shell parameter variables with special behavior.
+ *         Netiher of these variables can be changed or deleted.
+ *		       0.  ~
+ *             1.  $?
+ *             2.  $$
+ *             3.  $#
+ *             4.  $*
+ *             5.  $0
+ *             6.  $1
+ *             7.  $2
+ *             8.  $3
+ *             9.  $4
+ *             10. $5
+ *             11. $6
+ *             12. $7
+ *             13. $8
+ *             14. $9
+ *
+ *     SO-CALLED 'SPECIAL' LOCAL VARIABLES (`f_inherit` flag is cleared)
+ *         Local variables that have a critical or near-critical role
+ *         in the shell's operation. Some of them cannot be modified
+ *         or deleted (`f_readonly` flag is set), while others can
+ *         (`f_readonly` flag is cleared);
+ *         The complete list of them:
+ *             15. MINISHELLPID			(can't be changed/deleted)
+ *			   16. MINISHELL_SUBSHELL	(has default)
+ *			   17. MINISHELL_VERSION	(has default)
+ *			   18. HISTFILESIZE			(has default)
+ *			   19. HISTFILE				(has default)
+ *			   20. HISTSIZE				(has default)
+ *			   21. MINISHELL
+ *			   22. HOSTNAME
+ *			   23. PS1					(has default)
+ *			   24. PS2					(has default)
+ *			   25. PS4					(has default)
+ *			   26. PPID					(can't be changed/deleted)
+ *			   27. UID					(can't be changed/deleted)
+ *			   28. EUID					(can't be changed/deleted)
+ *
+ *     CLASSICAL ENVIRONMENT VARIABLES (`f_inherit` flag is set)
+ *         Variables inherited by child processes. Nothing special here.
+ *         There are variables that were inherited. We can change the
+ *         value of any of them. However, among these variables there
+ *         are some special beasts that directly affect the shell's
+ *         workflow and behavior. Changing or deleting them may somewhat
+ *         'ruin' the current shell session as well as all its ancestors.
+ *         Some of these variables are even managed dynamically by the
+ *         shell itself, for example $SHLVL
+ *         The complete list of them:
+ *             29. PATH
+ *             30. SHLVL
+ *             31. OLDPWD
+ *             32. PWD
+ *             33. HOME
+ *             34. SHELL
+ *             35. USER
+ *             36. LOGNAME
+ *
+ *         So yeah.. the first 37 indices in vars are reserved for easier
+ *         access. After that, all newly added local or environment variables
+ *         will have mixed indices
+ *
+ *     USER'S LOCAL VARIABLES 
+ *         Created by the user. These variables may be exported
+ *         and therefore inherited by child processes;
+ *         Examples: 
+ *             BLA='keke'
+ *             LOL='azaza'*
+ *
+ * */
+
+# include <stdbool.h>
 # include <stddef.h>
 
 /* The default path is used when
@@ -64,11 +142,16 @@ typedef enum e_var_type
  *
  * A variable is considered non-existent
  * when its name is NULL and/or its value
- * is NULL */
+ * is NULL.
+ *
+ *     f_inherit - marks if a variable
+ *				   may be exported or not */
+
 typedef struct s_env_var
 {
 	t_var_type	type;
 	bool		f_readonly;
+	bool		f_inherit; 
 	char		*name;
 	char		*value;
 
@@ -88,9 +171,13 @@ typedef struct s_env
 int			env_init(t_env *env);
 char		*env_get_val(t_env *env, char *name);
 t_env_var	*env_get_ptr(t_env *env, char *name);
+bool		env_exist(t_env *env, char *name);
 int			env_set(t_env *env, char *name, char *value);
-void		env_unset(t_env *env, char *name);
-void		env_export(t_env *env, char *name);
-void		env_print(t_env *env, char *name);
+int			env_unset(t_env *env, char *name);
+int			env_export(t_env *env, char *name);
+void		env_print_value(t_env *env, char *name);
+void		env_print_env(t_env *env);
+void		env_print_all(t_env *env);
+void		env_print_locals(t_env *env);
 
 #endif

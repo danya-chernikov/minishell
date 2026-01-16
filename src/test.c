@@ -44,3 +44,10 @@ void	getters_tester(t_parser_data *d)
 		++i;
 	}
 }
+
+/* To test the environment
+ * variables interface */
+void	env_tester(void)
+{
+
+}
