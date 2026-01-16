@@ -7,11 +7,11 @@ NAME=minishell
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
-SRCS=main.c shell.c cmdargs_parser.c engine.c prompt_parser.c \
+SRCS=main.c shell.c cmdargs_parser.c engine.c prompt_parser.c env.c \
 	 exec.c history.c par.c quote.c token.c operand.c aux.c \
 	 builtin.c error.c debug.c test.c
 
-OBJS=main.o shell.o cmdargs_parser.o engine.o prompt_parser.o \
+OBJS=main.o shell.o cmdargs_parser.o engine.o prompt_parser.o env.o \
 	 exec.o history.o par.o quote.o token.o operand.o aux.o \
 	 builtin.o error.o debug.o test.o
 

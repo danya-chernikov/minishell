@@ -22,7 +22,7 @@ int	cmdargs_parser(t_shell *msh)
 
 	// Set $0
 	get_last_path_comp(msh->argv[0]);
-	msh->vars[PV_ARGV0].value = ft_strdup(msh->argv[0]);
+	msh->env.vars[PV_ARGV0].value = ft_strdup(msh->argv[0]);
 
 	opt_i = 1;
 	while (opt_i < msh->argc)
@@ -69,107 +69,133 @@ int	cmdargs_parser(t_shell *msh)
 		// and options will not be recognized)
 		else if (is_c_opt(msh->argv[opt_i]))
 		{
-			msh->opts.f_c = true;
-			msh->mode = NONINT_CMD_MODE;
-			// If after -c goes nothing
-			if (opt_i == msh->argc - 1)
-			{
-				print_shell_error(C_SHORT_OPT, C_OPT_ERR_MSG);
-				return (SYNTAX_ERR);
-			}
-			if (!erase_quotes(msh->argv[opt_i + 1]))
-			{
-				print_shell_error(C_SHORT_OPT, SYNTAX_ERR_MSG);
-				return (SYNTAX_ERR);
-			}
-			// If after erasing quotes nothing left,
-			// e.g. when user run
-			//     $ bash -c ''
-			// We simply pass an empty string to
-			// the engine, and it, in turn, does
-			// nothing when it sees an empty line
-			
-			// After locating a -c we always
-			// stop parsing cmd arguments
-			msh->c_cmd = msh->argv[opt_i + 1];
-			return (COMMON_SUCCESS);
+			return (handle_c_opt(msh, opt_i));
 		}
 		else
 		{
-			int		i;
-			int		arg_i;
-			size_t	all_argv_len;
-			char	*all_argv;
-
+			// Check for invalid option
 			// If this argument claims to be an option
 			if (msh->argv[opt_i][0] == '-')
 			{
 				print_shell_error(msh->argv[opt_i], INV_OPT_ERR_MSG);
 				print_help();
 				return (SYNTAX_ERR);
-			}
-			// We're gonna try to treat this as a script
-			// path leaded by possible arguments 
-			msh->mode = NONINT_SCRIPT_MODE;
-			msh->script = msh->argv[opt_i];
-
-			// Check $0 first (what if before script.sh we had -l/--login options?
-			if (!msh->vars[PV_ARGV0].value) // If not exist yet
-				msh->vars[PV_ARGV0].value = ft_strdup(msh->argv[opt_i]);
-
-			all_argv_len = 0; // In order to know how much memory allocate to store
-			arg_i = 1; // Script's argument index
-			while (opt_i + arg_i < msh->argc && arg_i - 1 < SCRIPT_ARGS_NUM)
-			{
-				if (!erase_quotes(msh->argv[opt_i + arg_i]))
-				{
-					print_shell_error(C_SHORT_OPT, SYNTAX_ERR_MSG);
-					return (SYNTAX_ERR);
-				}
-				msh->vars[PV_ARGV0 + arg_i].value = ft_strdup(msh->argv[opt_i + arg_i]);
-				all_argv_len += ft_strlen(msh->argv[opt_i + arg_i]);
-				++arg_i;
-			}
-			--arg_i;
-			// The `arg_i` now contains the number
-			// of arguments passed to our script
-
-			// Let's set $# variable
-			if (msh->vars[PV_ARGNUM].value)
-				free(msh->vars[PV_ARGNUM].value);
-			msh->vars[PV_ARGNUM].value = ft_itoa(arg_i);
-			
-			if (arg_i > 0) // If the script had any arguments
-			{
-				// Let's set $* variable
-				// Just concatenate all arguments passed to the script
-				all_argv_len += arg_i - 1; // Count spaces
-				++all_argv_len; // Count the NULL terminator
-				
-				all_argv = (char *)malloc(all_argv_len * sizeof(char));
-				if (!all_argv)
-				{
-					perror("malloc");
-					return (COMMON_SYS_ERR);
-				}
-
-				ft_strlcpy(all_argv, msh->vars[PV_ARGV1].value, all_argv_len);
-				i = 1;
-				while (i < arg_i)
-				{
-					ft_strlcat(all_argv, " ", all_argv_len);
-					ft_strlcat(all_argv, msh->vars[PV_ARGV1 + i].value, all_argv_len);
-					++i;
-				}
-				msh->vars[PV_ALLARGS].value = all_argv;
-			}
-			
+			}		
+			return (handle_script(msh, opt_i));
 			// After locating a script,
 			// we always stop parsing
-			break ;
 		}
 		++opt_i;
 	} // while (opt_i < argc)
+	return (COMMON_SUCCESS);
+}
+
+int	handle_c_opt(t_shell *msh, int opt_i)
+{
+	msh->opts.f_c = true;
+	msh->mode = NONINT_CMD_MODE;
+	// If after -c goes nothing
+	if (opt_i == msh->argc - 1)
+	{
+		print_shell_error(C_SHORT_OPT, C_OPT_ERR_MSG);
+		return (SYNTAX_ERR);
+	}
+	if (!erase_quotes(msh->argv[opt_i + 1]))
+	{
+		print_shell_error(C_SHORT_OPT, SYNTAX_ERR_MSG);
+		return (SYNTAX_ERR);
+	}
+	// If after erasing quotes nothing left,
+	// e.g. when user run
+	//     $ bash -c ''
+	// We simply pass an empty string to
+	// the engine, and it, in turn, does
+	// nothing when it sees an empty line
+	
+	// After locating a -c we always
+	// stop parsing cmd arguments
+	msh->c_cmd = msh->argv[opt_i + 1];
+	return (COMMON_SUCCESS);
+}
+
+int	handle_script(t_shell *msh, int opt_i)
+{
+	int		arg_i;
+	size_t	allargv_len;
+
+	// We're gonna try to treat this as a script
+	// path leaded by possible arguments 
+	msh->mode = NONINT_SCRIPT_MODE;
+	msh->script = msh->argv[opt_i];
+
+	if (set_script_args(msh, opt_i, &allargv_len, &arg_i) == SYNTAX_ERR)
+		return (SYNTAX_ERR);
+
+	// Let's set $# variable
+	if (msh->env.vars[PV_ARGNUM].value)
+		free(msh->env.vars[PV_ARGNUM].value);
+	msh->env.vars[PV_ARGNUM].value = ft_itoa(arg_i);
+	
+	if (set_allargs_var(msh, allargv_len, arg_i) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+
+	return (COMMON_SUCCESS);
+}
+
+int	set_script_args(t_shell *msh, int opt_i, size_t *allargv_len, int *arg_i)
+{
+	// Check $0 first (what if before script.sh we had -l/--login options?
+	if (!msh->env.vars[PV_ARGV0].value) // If not exist yet
+		msh->env.vars[PV_ARGV0].value = ft_strdup(msh->argv[opt_i]);
+
+	*allargv_len = 0; // In order to know how much memory allocate to store
+	*arg_i = 1; // Script's argument index
+	while (opt_i + *arg_i < msh->argc && *arg_i - 1 < SCRIPT_ARGS_NUM)
+	{
+		if (!erase_quotes(msh->argv[opt_i + *arg_i]))
+		{
+			print_shell_error(C_SHORT_OPT, SYNTAX_ERR_MSG);
+			return (SYNTAX_ERR);
+		}
+		msh->env.vars[PV_ARGV0 + *arg_i].value = ft_strdup(msh->argv[opt_i + *arg_i]);
+		*allargv_len += ft_strlen(msh->argv[opt_i + *arg_i]);
+		++(*arg_i);
+	}
+	--(*arg_i);
+	// The `arg_i` now contains the number
+	// of arguments passed to our script
+	return (COMMON_SUCCESS);
+}
+
+int	set_allargs_var(t_shell *msh, size_t allargv_len, int arg_i)
+{
+	char	*allargv;
+	int		i;
+
+	if (arg_i > 0) // If the script had any arguments
+	{
+		// Let's set $* variable
+		// Just concatenate all arguments passed to the script
+		allargv_len += arg_i - 1; // Count spaces
+		++allargv_len; // Count the NULL terminator
+		
+		allargv = malloc(allargv_len * sizeof(char));
+		if (!allargv)
+		{
+			perror("malloc");
+			return (COMMON_SYS_ERR);
+		}
+
+		ft_strlcpy(allargv, msh->env.vars[PV_ARGV1].value, allargv_len);
+		i = 1;
+		while (i < arg_i)
+		{
+			ft_strlcat(allargv, " ", allargv_len);
+			ft_strlcat(allargv, msh->env.vars[PV_ARGV1 + i].value, allargv_len);
+			++i;
+		}
+		msh->env.vars[PV_ALLARGS].value = allargv;
+	}
 	return (COMMON_SUCCESS);
 }
 
@@ -180,7 +206,7 @@ int	set_argv0_login(t_shell *msh)
 
 	get_last_path_comp(msh->argv[0]);
 	new_size = ft_strlen(msh->argv[0]) + 1;
-	new_argv0 = (char *)malloc(new_size * sizeof(char));
+	new_argv0 = malloc(new_size * sizeof(char));
 	if (!new_argv0)
 	{
 		perror("malloc");
@@ -188,9 +214,9 @@ int	set_argv0_login(t_shell *msh)
 	}
 	new_argv0[0] = '-'; // Mark the login shell
 	ft_strlcpy(new_argv0 + sizeof(char), msh->argv[0], new_size);
-	if (msh->vars[PV_ARGV0].value)
-		free(msh->vars[PV_ARGV0].value);
-	msh->vars[PV_ARGV0].value = new_argv0;
+	if (msh->env.vars[PV_ARGV0].value)
+		free(msh->env.vars[PV_ARGV0].value);
+	msh->env.vars[PV_ARGV0].value = new_argv0;
 	return (COMMON_SUCCESS);
 }
 

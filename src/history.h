@@ -3,6 +3,8 @@
 
 # include <stddef.h>
 
+# include "error.h"
+
 # define MAX_HIST_LINES_NUM	4096
 
 /* When unsetting both HISTSIZE and HISTFILESIZE,
@@ -37,9 +39,20 @@ typedef enum e_hist_type
  *			  current session have it as 0 */
 typedef struct e_hist_cmd
 {
+	t_hist_type	type;
 	size_t		line_num;
 	char		*cmd;
-	t_hist_type	type;
+
 }	t_hist_cmd;
+
+typedef struct e_history
+{
+	t_hist_cmd	*lines;//on heap
+	int			histsize;
+	int			histfilesize;
+
+}	t_history;
+
+int	history_init(t_history *history);
 
 #endif

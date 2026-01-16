@@ -106,22 +106,18 @@ typedef struct e_shell
 	t_shell_mode	mode;
 	t_options		opts;
 	t_configs		configs;
-	t_env_var		*vars;// on heap
-	t_hist_cmd		*history;//on heap
+	t_history		history;
+	t_env			env;
 	int				argc;
 	char			**argv;
-	char			**env;
-	size_t			vars_num;
-	int				histsize;
-	int				histfilesize;
 	char			*script;//on stack
 	char			*c_cmd;// on stack
 }	t_shell;
 
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 
-int		msh_init_param_vars(t_shell *msh);
-void	msh_free_param_vars(t_env_var *vars);
+int		msh_init_param_vars(t_env *env);
+void	msh_free_param_vars(t_env *env);
 
 int		msh_set_local_vars(t_shell *msh);
 int		msh_set_env_vars(t_shell *msh);

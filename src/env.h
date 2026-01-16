@@ -2,6 +2,7 @@
 # define ENV_H
 
 # include <stdbool.h>
+# include <stddef.h>
 
 /* The default path is used when
  * it isn't inherited from the
@@ -58,16 +59,27 @@ typedef struct s_env_var
 {
 	t_var_type	type;
 	bool		f_readonly;
-	char		*name;		// We'll just not have any limit here!
-	char		*value;		// Here as well, no limit
+	char		*name;
+	char		*value;
 
 }	t_env_var;
 
-char	*get_env_val_by_name(char *name);
+/* ienv - inherited environment from our
+ *		  parent (the third argument of
+ *		  the main() function) */
+typedef struct s_env
+{	
+	size_t		vars_num;
+	char		**inh_env;
+	t_env_var	*vars;// on heap
 
-void	print_env(t_env_var *var);
-void	set_env(t_env_var *var, char *value);
-void	unset_env(t_env_var *var);
-void	export_env(t_env_var *var);
+}	t_env;
+
+int		env_init(t_env *env);
+char	*env_get(char *name);
+void	env_set(char *name, char *value);
+void	env_unset(char *name);
+void	env_export(char *name);
+void	env_print(char *name);
 
 #endif

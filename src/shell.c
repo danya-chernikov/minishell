@@ -21,21 +21,20 @@
 int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	int		res;
-	size_t	i;
 
 	// By default, let's think our
 	// shell will be interactive
 	msh->mode = INT_MODE;
 
-	msh->vars		= NULL;
-	msh->history	= NULL;
-	msh->script		= NULL;
-	msh->c_cmd		= NULL;
+	msh->env.vars		= NULL;
+	msh->history.lines	= NULL;
+	msh->script			= NULL;
+	msh->c_cmd			= NULL;
 
 	// Assign arguments of main()
-	msh->argc	= argc;
-	msh->argv	= argv;
-	msh->env	= env;
+	msh->argc			= argc;
+	msh->argv			= argv;
+	msh->env.inh_env	= env;
 
 	// Init shell options
 	msh->opts.f_login	= false;
@@ -44,44 +43,16 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->opts.f_c		= false;
 
 	// Allocate environmental variables
-	msh->vars = (t_env_var *)malloc(MAX_ENV_VARS_NUM * sizeof(t_env_var));
-	if (!msh->vars)
-	{
-		perror("malloc");
+	if (env_init(&msh->env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	}
-	i = 0;
-	while (i < MAX_ENV_VARS_NUM)
-	{
-		msh->vars[i].name = NULL;
-		msh->vars[i].value = NULL;
-		++i;
-	}
 
-	// Init history
-	msh->histsize = DEF_HISTSIZE;
-	msh->histfilesize = DEF_HISTFILESIZE;
-	msh->history = (t_hist_cmd *)malloc(MAX_HIST_LINES_NUM * sizeof(t_hist_cmd));
-	if (!msh->history)
-	{
-		perror("malloc");
-		free(msh->vars);
+	// Init history	
+	if (history_init(&msh->history) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	}
-	i = 0;
-	while (i < MAX_HIST_LINES_NUM)
-	{
-		msh->history[i].cmd = NULL;
-		++i;
-	}
 
 	// Initialize shell parameters
-	if (msh_init_param_vars(msh) == COMMON_SYS_ERR)
-	{
-		free(msh->history);
-		free(msh->vars);
+	if (msh_init_param_vars(&msh->env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	}
 
 	// Parsing the command-line arguments
 	// of our shell. At this stage, we can
@@ -127,7 +98,7 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
  * value, we will always allocate memory
  * on the heap, so it will be easier to
  * free everything later in one go */
-int	msh_init_param_vars(t_shell *msh)
+int	msh_init_param_vars(t_env *env)
 {
 	size_t	i;
 	int		res;
@@ -137,42 +108,42 @@ int	msh_init_param_vars(t_shell *msh)
 	// Init ~, $? and $$
 	while (i < 2)
 	{
-		msh->vars[i].type = PARAM;
-		msh->vars[i].value = NULL;
+		env->vars[i].type = PARAM;
+		env->vars[i].value = NULL;
 		++i;
 	}
 	// Init all the rest variables
 	i = 2;
 	while (i < PARAM_VARS_NUM)
 	{
-		msh->vars[i].type = PARAM;
-		msh->vars[i].f_readonly = true;
-		msh->vars[i].value = NULL;
+		env->vars[i].type = PARAM;
+		env->vars[i].f_readonly = true;
+		env->vars[i].value = NULL;
 		++i;
 	}
-	msh->vars[PV_HOME].name		= ft_strdup("~"); // may be changed!
-	msh->vars[PV_RETCODE].name	= ft_strdup("$?");// may be changed!
-	msh->vars[PV_PID].name		= ft_strdup("$$");
-	msh->vars[PV_ARGNUM].name	= ft_strdup("$#");
-	msh->vars[PV_ALLARGS].name	= ft_strdup("$*");
-	msh->vars[PV_ARGV0].name	= ft_strdup("$0");
-	msh->vars[PV_ARGV1].name	= ft_strdup("$1");
-	msh->vars[PV_ARGV2].name	= ft_strdup("$2");
-	msh->vars[PV_ARGV3].name	= ft_strdup("$3");
-	msh->vars[PV_ARGV4].name	= ft_strdup("$4");
-	msh->vars[PV_ARGV5].name	= ft_strdup("$5");
-	msh->vars[PV_ARGV6].name	= ft_strdup("$6");
-	msh->vars[PV_ARGV7].name	= ft_strdup("$7");
-	msh->vars[PV_ARGV8].name	= ft_strdup("$8");
-	msh->vars[PV_ARGV9].name	= ft_strdup("$9");
+	env->vars[PV_HOME].name		= ft_strdup("~"); // may be changed!
+	env->vars[PV_RETCODE].name	= ft_strdup("$?");// may be changed!
+	env->vars[PV_PID].name		= ft_strdup("$$");
+	env->vars[PV_ARGNUM].name	= ft_strdup("$#");
+	env->vars[PV_ALLARGS].name	= ft_strdup("$*");
+	env->vars[PV_ARGV0].name	= ft_strdup("$0");
+	env->vars[PV_ARGV1].name	= ft_strdup("$1");
+	env->vars[PV_ARGV2].name	= ft_strdup("$2");
+	env->vars[PV_ARGV3].name	= ft_strdup("$3");
+	env->vars[PV_ARGV4].name	= ft_strdup("$4");
+	env->vars[PV_ARGV5].name	= ft_strdup("$5");
+	env->vars[PV_ARGV6].name	= ft_strdup("$6");
+	env->vars[PV_ARGV7].name	= ft_strdup("$7");
+	env->vars[PV_ARGV8].name	= ft_strdup("$8");
+	env->vars[PV_ARGV9].name	= ft_strdup("$9");
 
-	msh->vars_num = PARAM_VARS_NUM;
+	env->vars_num = PARAM_VARS_NUM;
 
 	// Check for memory errors
 	i = 0;
 	while (i < PARAM_VARS_NUM)
 	{
-		if (!msh->vars[i].name)
+		if (!env->vars[i].name)
 		{
 			perror("malloc");
 			return (COMMON_SYS_ERR);
@@ -188,44 +159,46 @@ int	msh_init_param_vars(t_shell *msh)
 		print_shell_error("ft_getpid()", GETPID_ERR_MSG);
 		return (COMMON_SYS_ERR);
 	}
-	msh->vars[PV_PID].value = ft_itoa((int)pid);
+	env->vars[PV_PID].value = ft_itoa((int)pid);
 	// Set $#
-	msh->vars[PV_ARGNUM].value = ft_strdup("0");
+	env->vars[PV_ARGNUM].value = ft_strdup("0");
 
 	return (COMMON_SUCCESS);
 }
 
 
-void	msh_free_param_vars(t_env_var *vars)
+void	msh_free_param_vars(t_env *env)
 {
 	size_t	i;
 
 	i = 0;
 	while (i < PARAM_VARS_NUM)
 	{
-		if (vars[i].name)
-			free(vars[i].name);
-		if (vars[i].value)
-			free(vars[i].value);
+		if (env->vars[i].name)
+			free(env->vars[i].name);
+		if (env->vars[i].value)
+			free(env->vars[i].value);
 		++i;
 	}
 }
 
 int		msh_set_local_vars(t_shell *msh)
 {
-
+	(void)msh;
 	return (COMMON_SUCCESS);
 }
 
 int		msh_set_env_vars(t_shell *msh)
 {
-
+	(void)msh;
 	return (COMMON_SUCCESS);
 }
 
 void	msh_free(t_shell *msh)
 {
-	msh_free_param_vars(msh->vars);
-	free(msh->history);
-	free(msh->vars);
+	msh_free_param_vars(&msh->env);
+	if (msh->env.vars)
+		free(msh->env.vars);
+	if (msh->history.lines)
+		free(msh->history.lines);
 }
