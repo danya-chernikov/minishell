@@ -44,17 +44,27 @@ typedef enum e_var_type
 	PARAM		// ~, $?, $$, $#, $*, $0, $1, $2, $3, $4, $5, $6, $7, $8, $9
 }	t_var_type;
 
-/* If `type` is PARAM, `value` points to
- * the corresponding argument in `argv`;
+/* If type is PARAM, value usually
+ * (but not always.. this applies
+ * to positional script parameters)
+ * is a heap-allocated duplicate of
+ * the corresponding argument in argv;
  *
- * If `type` is INHERIT, `value` points
- * to the corresponding value in `env`
- * or if it wasn't inherited it points
- * to the string we determine ourself;
+ * If type is ENV, value points to a
+ * heap-allocated duplicate of the
+ * corresponding value in env (third
+ * argument of main function); if it
+ * was not inherited, it points to a
+ * string determined internally (also
+ * heap-allocated);
  *
- * If `type` is LOCAL, `value` points to
- * the string we determine ourselfs.
- * */
+ * If type is LOCAL, value points to a
+ * heap-allocated string determined
+ * internally.
+ *
+ * A variable is considered non-existent
+ * when its name is NULL and/or its value
+ * is NULL */
 typedef struct s_env_var
 {
 	t_var_type	type;
@@ -64,9 +74,9 @@ typedef struct s_env_var
 
 }	t_env_var;
 
-/* ienv - inherited environment from our
- *		  parent (the third argument of
- *		  the main() function) */
+/* inh_env - inherited environment from our
+ *			 parent (the third argument of
+ *			 the main function) */
 typedef struct s_env
 {	
 	size_t		vars_num;
@@ -75,11 +85,12 @@ typedef struct s_env
 
 }	t_env;
 
-int		env_init(t_env *env);
-char	*env_get(char *name);
-void	env_set(char *name, char *value);
-void	env_unset(char *name);
-void	env_export(char *name);
-void	env_print(char *name);
+int			env_init(t_env *env);
+char		*env_get_val(t_env *env, char *name);
+t_env_var	*env_get_ptr(t_env *env, char *name);
+void		env_set(t_env *env, char *name, char *value);
+void		env_unset(t_env *env, char *name);
+void		env_export(t_env *env, char *name);
+void		env_print(t_env *env, char *name);
 
 #endif
