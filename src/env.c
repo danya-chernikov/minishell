@@ -33,7 +33,7 @@ char	*env_get_val(t_env *env, char *name)
 	i = 0;
 	while (i < env->vars_num)
 	{
-		if (!ft_strcmp(env->vars[i].name, name, ft_strlen(name)) &&
+		if (!ft_strncmp(env->vars[i].name, name, ft_strlen(name)) &&
 			ft_strlen(env->vars[i].name) == ft_strlen(name))
 		{
 			return (env->vars[i].value);
@@ -49,11 +49,11 @@ t_env_var	*env_get_ptr(t_env *env, char *name)
 {
 	t_env_var	*var;
 
-	var = env->vars[0];
+	var = &env->vars[0];
 	while (var)
 	{
-		if (!ft_strcmp(var->name, name, ft_strlen(name)) &&
-			ft_strlen(env->name) == ft_strlen(name))
+		if (!ft_strncmp(var->name, name, ft_strlen(name)) &&
+			ft_strlen(var->name) == ft_strlen(name))
 		{
 			return (var);
 		}
@@ -95,14 +95,17 @@ int	env_set(t_env *env, char *name, char *value) // Or maybe **value?
 void	env_unset(t_env *env, char *name)
 {
 	(void)name;
+	(void)env;
 }
 
 void	env_export(t_env *env, char *name)
 {
 	(void)name;
+	(void)env;
 }
 
 void	env_print(t_env *env, char *name)
 {
+	(void)env;
 	(void)name;
 }

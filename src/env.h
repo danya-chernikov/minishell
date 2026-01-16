@@ -88,7 +88,7 @@ typedef struct s_env
 int			env_init(t_env *env);
 char		*env_get_val(t_env *env, char *name);
 t_env_var	*env_get_ptr(t_env *env, char *name);
-void		env_set(t_env *env, char *name, char *value);
+int			env_set(t_env *env, char *name, char *value);
 void		env_unset(t_env *env, char *name);
 void		env_export(t_env *env, char *name);
 void		env_print(t_env *env, char *name);
