@@ -62,8 +62,10 @@ static int	alg(int fd, pid_t *ppid)
 	if (!line && err)
 	{
 		write(STDERR_FILENO, GNL_ERR_MSG, ft_strlen(GNL_ERR_MSG));
+		gnl_finish(fd); // I guess we need it also here
 		return (0);
 	}
+	gnl_finish(fd); // And here
 	return (1);
 }
 

@@ -88,38 +88,43 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 
 	// Alalyze `env` and set all variables
 
-	msh_set_env_vars(msh);
-	msh_set_local_vars(msh);
+	if (msh_set_env_vars(msh) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (msh_set_local_vars(msh) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
 
 	return (COMMON_SUCCESS);
 }
 
-/* For each environment variable name and
- * value, we will always allocate memory
- * on the heap, so it will be easier to
- * free everything later in one go */
+/* For each environment variable name
+ * and value, we will always allocate
+ * memory on the heap, so it will be
+ * easier to free everything later
+ * in one go */
 int	msh_init_param_vars(t_env *env)
 {
-	size_t	i;
-	int		res;
-	pid_t	pid;
+	t_paramvar	vi;
+	size_t		i;
+	int			res;
+	pid_t		pid;
 
-	i = 0;
-	// Init ~, $? and $$
-	while (i < 2)
+	vi = PV_HOME;
+	// Init ~, $?
+	while (vi < PV_PID)
 	{
-		env->vars[i].type = PARAM;
-		env->vars[i].value = NULL;
-		++i;
+		env->vars[vi].type = PARAM;
+		env->vars[vi].f_inherit = false;
+		env->vars[vi].value = NULL;
+		++vi;
 	}
 	// Init all the rest variables
-	i = 2;
-	while (i < PARAM_VARS_NUM)
+	while (vi < PARAM_VARS_NUM)
 	{
-		env->vars[i].type = PARAM;
-		env->vars[i].f_readonly = true;
-		env->vars[i].value = NULL;
-		++i;
+		env->vars[vi].type = PARAM;
+		env->vars[vi].f_readonly = true;
+		env->vars[vi].f_inherit = false;
+		env->vars[vi].value = NULL;
+		++vi;
 	}
 	env->vars[PV_HOME].name		= ft_strdup("~"); // may be changed!
 	env->vars[PV_RETCODE].name	= ft_strdup("$?");// may be changed!
@@ -166,25 +171,181 @@ int	msh_init_param_vars(t_env *env)
 	return (COMMON_SUCCESS);
 }
 
-
-void	msh_free_param_vars(t_env *env)
+void	msh_free_all_vars(t_env *env)
 {
 	size_t	i;
 
 	i = 0;
-	while (i < PARAM_VARS_NUM)
+	while (i < MAX_ENV_VARS_NUM)
 	{
 		if (env->vars[i].name)
+		{
 			free(env->vars[i].name);
+			env->vars[i].name = NULL;
+		}
 		if (env->vars[i].value)
+		{
 			free(env->vars[i].value);
+			env->vars[i].value = NULL;
+		}
 		++i;
 	}
 }
 
+/*
+ *
+	SL_MSHPID=16,	// MSHPID (can)
+	SL_MSHSUBSH,	// MSH_SUBSHELL
+	SL_MSHVER,		// MSH_VERSION
+	SL_HFSIZE,		// HISTFILESIZE
+	SL_HFILE,		// HISTFILE
+	SL_HSIZE,		// HISTSIZE
+	SL_MSH,			// MSH
+	SL_HOSTNAME,	// HOSTNAME
+	SL_HOSTTYPE,	// HOSTTYPE
+	SL_OSTYPE,		// OSTYPE
+	SL_MACHTYPE,	// MACHTYPE
+	SL_PS1,			// PS1
+	SL_PS2,			// PS2
+	SL_PS4,			// PS4
+	SL_PPID,		// PPID 
+	SL_UID,			// UID
+	SL_EUID			// EUID
+ * */
 int		msh_set_local_vars(t_shell *msh)
 {
-	(void)msh;
+	t_slocal_var	vi;
+
+	vi = SL_MSHPPID;
+	while (vi < MSH_SUBSHELL)
+	{
+		env->vars[SL_MSHPID].type		= LOCAL;
+		env->vars[SL_MSHPID].f_readonly	= true;
+		env->vars[SL_MSHPID].f_inherit	= false;
+		++vi;
+	}
+
+	// PPID
+	pid_t	ppid;	
+	int		res;
+
+	res = getppid(&ppid);
+	if (res == -1)
+	{
+		print_shell_error("getppid()", GETPPID_ERR_MSG);
+		return (COMMON_SYS_ERR);
+	}
+	env->vars[SL_PPID].name			= ft_strdup("PPID");
+	env->vars[SL_PPID].value		= ft_strdup(itoa((int)ppid));
+
+	// UID
+	
+
+	// EUID
+	
+
+	// MSHPID
+	// It's calculated on access, i.e. when the shell tries to expand it
+	env->vars[SL_MSHPID].name		= ft_strdup("MSHPID");
+	env->vars[SL_MSHPID].value		= NULL;
+
+	while (vi < PARAM_VARS_NUM + SLOCAL_VARS_NUM)
+	{
+		env->vars[vi].type			= LOCAL;
+		env->vars[vi].f_readonly	= false;
+		env->vars[vi].f_inherit		= false;
+		++vi;
+	}
+
+	// MSH_SUBSHELL	
+	env->vars[SL_MSHSUBSH].name		= ft_strdup("MSH_SUBSHELL");
+	env->vars[SL_MSHSUBSH].value	= ft_strdup("0");
+
+	// MSH_VERSION	
+	env->vars[SL_MSHVER].name		= ft_strdup("MSH_VERSION");
+	env->vars[SL_MSHVER].value		= ft_strdup(MSH_VERSION);
+
+	// MSH_HISTFILESIZE
+	env->vars[SL_HFSIZE].name		= ft_strdup("HISTFILESIZE");
+	env->vars[SL_HFSIZE].value		= ft_strdup(DEF_HISTFILESIZE);
+
+	// MSH_HISTFILE
+	env->vars[SL_HFILE].name		= ft_strdup("HISTFILE");
+	env->vars[SL_HFILE].value		= ft_strdup(DEF_MSH_HIST_PATH);
+	
+	// MSH_HISTSIZE
+	env->vars[SL_HSIZE].name		= ft_strdup("HISTSIZE");
+	env->vars[SL_HSIZE].value		= ft_strdup(DEF_HISTSIZE);
+
+	// MSH
+	env->vars[SL_MSH].name			= ft_strdup("MSH");
+	env->vars[SL_MSH].value			= ft_strdup(msh->argv[0]);
+
+	// HOSTNAME	
+	int		fd;			// Host file descriptor
+	int		gnlerr;		// get_next_line() error
+	char	*hostname;
+
+	fd = open(HOSTNAME_PATH, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("open");
+		return (COMMON_SYS_ERR);
+	}
+	hostname = get_next_line(&gnlerr);
+	if (!hostname && gnlerr)
+	{	
+		// Let's consider get_next_line() error as system error
+		print_shell_error("get_next_line()", GNL_ERR_MSG);
+		gnl_finish(fd); // Obligatory!
+		return (COMMON_SYS_ERR);
+	}
+	if (close(fd) == -1)
+	{
+		perror("close");
+		return (COMMON_SYS_ERR);
+	}
+	env->vars[SL_HOSTNAME].name		= ft_strdup("HOSTNAME");
+	env->vars[SL_HOSTNAME].value	= ft_strdup(hostname);
+
+	// HOSTTYPE	
+	env->vars[SL_HOSTTYPE].name		= ft_strdup("HOSTTYPE");
+	env->vars[SL_HOSTTYPE].value	= ft_strdup(MSH_ARCH);
+
+	// OSTYPE	
+	env->vars[SL_OSTYPE].name		= ft_strdup("OSTYPE");
+	env->vars[SL_OSTYPE].value		= ft_strdup(MSH_OSTYPE);
+	
+	// HOSTMACH	
+	char	*hostmach;
+	size_t	hm_len;
+
+	hm_len = ft_strlen(MSH_ARCH) + 3 + ft_strlen(MSH_OSTYPE) + 1;
+	hostmach = malloc(hm_len * sizeof(char));
+	if (!hostmach)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	ft_strlcpy(hostmach, MSH_ARCH, hm_len);
+	ft_strlcat(hostmach, "-pc-", hm_len);
+	ft_strlcat(hostmach, MSH_OSTYPE, hm_len);
+	env->vars[SL_HOSTNAME].name		= ft_strdup("HOSTMACH");
+	env->vars[SL_HOSTNAME].value	= ft_strdup(hostmach);
+
+	// PS1
+	env->vars[SL_PS1].name			= ft_strdup("PS1");
+	env->vars[SL_PS2].value			= ft_strdup();
+
+	// PS2
+	
+
+	// PS4
+
+	env->vars_num += SLOCAL_VARS_NUM;
+
+	// Check for malloc() errors
+
 	return (COMMON_SUCCESS);
 }
 

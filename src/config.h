@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+# define HOSTNAME_PATH	"/etc/hostname" // Where to put it if not here?
+
 /* minishell config files
  * etc_prof_path	  - DEF_MINISHL_ETC_PROF_PATH		="/etc/profile";
  *						DEF_BASH_ETC_PROF_PATH			="/etc/profile";
@@ -42,7 +44,6 @@
 # define DEF_BASH_HOME_CMN_PROF_PATH	"~/.profile"
 # define DEF_BASH_HOME_LOGOUT_PATH		"~/.bash_logout"
 # define DEF_BASH_ETC_LOGOUT_PATH		"/etc/bash.bash_logout"
-# define DEF_BASH_HOME_HIST_PATH		"~/.bash_history"
 
 /* minishell default configs paths */
 /* `/etc/profile`					 - also called system-wide startup file;
@@ -58,7 +59,6 @@
 # define DEF_MSH_HOME_CMN_PROF_PATH	"~/.profile"
 # define DEF_MSH_HOME_LOGOUT_PATH	"~/.minishell_logout"
 # define DEF_MSH_ETC_LOGOUT_PATH	"/etc/minishell.minishell_logout"
-# define DEF_MSH_HOME_HIST_PATH		"~/.minishell_history"
 
 /* NON-LOGIN SHELL */
 /* Original bash default configs paths */

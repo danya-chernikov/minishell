@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+/* On success returns 0,
+ * on error -1 */
 int	ft_getuid(uid_t *uid)
 {
 	char		*term_name;

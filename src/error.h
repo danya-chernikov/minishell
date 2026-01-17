@@ -28,6 +28,7 @@
 # define CMD_NOT_FOUND_ERR_MSG	"command not found"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
+# define GETPPID_ERR_MSG		"Could not get my PPID"
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was

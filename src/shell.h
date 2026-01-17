@@ -9,11 +9,11 @@
 # include <stdbool.h>
 
 /* Minishell information */
-# define MSH_NAME_SHORT	"msh"
-# define MSH_NAME_LONG	"minishell"
-# define MSH_VERSION	"1.0-release"
-# define MSH_ARCH		"x86_64"
-# define MSH_OSTYPE		"linux-gnu"
+# define MSH_NAME_SHORT		"msh"
+# define MSH_NAME_LONG		"minishell"
+# define MSH_VERSION		"1.0-release"
+# define MSH_ARCH			"x86_64"
+# define MSH_OSTYPE			"linux-gnu"
 
 /* Minishell options */
 # define LOGIN_LONG_OPT		"--login"
@@ -117,7 +117,7 @@ typedef struct e_shell
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 
 int		msh_init_param_vars(t_env *env);
-void	msh_free_param_vars(t_env *env);
+void	msh_free_all_vars(t_env *env);
 
 int		msh_set_local_vars(t_shell *msh);
 int		msh_set_env_vars(t_shell *msh);

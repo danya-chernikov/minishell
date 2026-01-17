@@ -4,6 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Maybe it would be better to use a singly
+ * linked list here as variable storage,
+ * but I'm not quite sure.. it's heavy anyway.
+ * In practice, we are never going to have
+ * duplicates in our variables array, because
+ * when we unset a variable we simply free its
+ * value and set it to NULL, we do not touch
+ * its name. So if the user later creates a
+ * new variable with the same name, the value
+ * will be assigned to the same index in the
+ * variables array. */
+
 int	env_init(t_env *env)
 {
 	size_t	i;
@@ -96,6 +108,7 @@ int	env_set(t_env *env, char *name, char *value) // Or maybe **value?
 	{
 		env->vars[env->vars_num - 1].name = name;
 		env->vars[env->vars_num - 1].value = value;
+		++env->vars_num;
 	}
 	return (COMMON_SUCCESS);
 }
@@ -150,7 +163,7 @@ int	env_export(t_env *env, char *name)
 	var = env_get_ptr(env, name);
 	if (var)
 	{
-		if (var->type == LOCAL)
+		if (var->type == LOCAL && var->f_inherit)
 			var->type = ENV;
 	}
 	else
@@ -178,6 +191,7 @@ void	env_print_value(t_env *env, char *name)
  * processes */
 void	env_print_env(t_env *env)
 {
+
 	(void)env;	
 }
 

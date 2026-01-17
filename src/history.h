@@ -16,6 +16,8 @@
  * is written without any problems */
 # define DEF_HISTSIZE		500
 # define DEF_HISTFILESIZE	500
+# define DEF_MSH_HIST_PATH	"~/.minishell_history"
+# define DEF_BASH_HIST_PATH	"~/.bash_history"
 
 /* Type of the history command.
  * Determines whether this

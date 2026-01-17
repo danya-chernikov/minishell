@@ -32,20 +32,31 @@
  *         or deleted (`f_readonly` flag is set), while others can
  *         (`f_readonly` flag is cleared);
  *         The complete list of them:
- *             15. MINISHELLPID			(can't be changed/deleted)
- *			   16. MINISHELL_SUBSHELL	(has default)
- *			   17. MINISHELL_VERSION	(has default)
- *			   18. HISTFILESIZE			(has default)
- *			   19. HISTFILE				(has default)
- *			   20. HISTSIZE				(has default)
- *			   21. MINISHELL
- *			   22. HOSTNAME
- *			   23. PS1					(has default)
- *			   24. PS2					(has default)
- *			   25. PS4					(has default)
- *			   26. PPID					(can't be changed/deleted)
- *			   27. UID					(can't be changed/deleted)
- *			   28. EUID					(can't be changed/deleted)
+ *			   15. PPID					(can't be changed/deleted)
+ *			   16. UID					(can't be changed/deleted)
+ *			   17. EUID					(can't be changed/deleted)
+ *             18. MSHPID				(can't be changed/deleted)
+ *			   19. MSH_SUBSHELL			(has default)
+ *			   20. MSH_VERSION			(has default)
+ *			   21. HISTFILESIZE			(has default)
+ *			   22. HISTFILE				(has default)
+ *			   23. HISTSIZE				(has default)
+ *			   24. MSH					(unknown)
+ *			   25. HOSTNAME				(has default)
+ *			   26. HOSTTYPE				(has default)
+ *			   27. OSTYPE				(has default)
+ *			   28. MACHTYPE				(has default)
+ *			   29. PS1					(has default)
+ *			   30. PS2					(has default)
+ *			   31. PS4					(has default)
+ *
+ *         MINISHELLPID is an analogue of BASHPID. It is a special variable
+ *         whose value is calculated at the moment a (sub)shell expands it.
+ *
+ *         MINISHELL_SUBSHELL is an analogue of BASH_SUBSHELL. It is similar to
+ *         SHLVL, but it is local and specific to subshells. Using this variable,
+ *         we can determine whether we are running inside a subshell. Its value
+ *         is incremented each time a new shell is started.
  *
  *     CLASSICAL ENVIRONMENT VARIABLES (`f_inherit` flag is set)
  *         Variables inherited by child processes. Nothing special here.
@@ -57,7 +68,7 @@
  *         Some of these variables are even managed dynamically by the
  *         shell itself, for example $SHLVL
  *         The complete list of them:
- *             29. PATH
+ *             29. PATH					(has default)
  *             30. SHLVL
  *             31. OLDPWD
  *             32. PWD
@@ -91,10 +102,16 @@
 # define DEF_PS4			"+"
 
 # define PARAM_VARS_NUM		15
+# define SLOCAL_VARS_NUM	17
+# define SENV_VARS_NUM		8
 # define SCRIPT_ARGS_NUM	9
-# define LOCAL_VARS_NUM		14
-# define MAX_ENV_VARS_NUM	1024
+# define MAX_TOTAL_VARS_NUM	8192
 
+/* Do not change the order of these
+ * definitions! Otherwise, you'll
+ * break initialization of parameter
+ * variables (see msh_init_param_vars()
+ * function for reference) */
 typedef enum e_paramvar
 {
 	PV_HOME = 0,// ~
@@ -112,8 +129,54 @@ typedef enum e_paramvar
 	PV_ARGV7,	// ...
 	PV_ARGV8,	// ...
 	PV_ARGV9,	// Only in scripts
-	
+		
 }	t_paramvar;
+
+/* Special local variables are set
+ * by the shell. They can all be
+ * changed or deleted (except MSHPID),
+ * but they cannot be exported.
+ * Do not change order of these
+ * definitions! Otherwise, you'll
+ * break initialization of special local
+ * variables (see msh_set_local_vars()
+ * function for reference) */
+typedef enum e_special_localvar
+{
+	SL_MSHPID=16,	// MSHPID (can)
+	SL_MSHSUBSH,	// MSH_SUBSHELL
+	SL_MSHVER,		// MSH_VERSION
+	SL_HFSIZE,		// HISTFILESIZE
+	SL_HFILE,		// HISTFILE
+	SL_HSIZE,		// HISTSIZE
+	SL_MSH,			// MSH
+	SL_HOSTNAME,	// HOSTNAME
+	SL_HOSTTYPE,	// (has default)
+	SL_OSTYPE,		// (has default)
+	SL_MACHTYPE,	// (has default)
+	SL_PS1,			// PS1
+	SL_PS2,			// PS2
+	SL_PS4,			// PS4
+	SL_PPID,		// PPID 
+	SL_UID,			// UID
+	SL_EUID			// EUID
+
+}	t_slocalvar;
+
+/* These are important environment variables
+ * that affect the functioning of our shell.
+ * almoost*/
+typedef enum e_special_envar
+{
+	SE_PATH=32,
+	SE_SHLVL,
+	SE_OLDPWD,
+	SE_PWD,
+	SE_HOME,
+	SE_SHELL,
+	SE_USER,
+	SE_LOGNAME
+}	t_special_envar;
 
 typedef enum e_var_type
 {

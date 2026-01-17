@@ -81,8 +81,10 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 	if (!line && err)
 	{
 		write(STDERR_FILENO, GNL_ERR_MSG, ft_strlen(GNL_ERR_MSG));
+		gnl_finish(fd); // I guess we need it also her
 		return (-1);
 	}
+	gnl_finish(fd); // And here
 	return (0);
 }
 
