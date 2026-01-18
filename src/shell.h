@@ -36,6 +36,7 @@ typedef struct s_options
 	bool	f_verbose;
 	bool	f_norc;
 	bool	f_c;
+
 }	t_options;
 
 /* NONINT_SCRIPT_MODE - non-interactive script executing:
@@ -63,6 +64,7 @@ typedef enum e_shell_mode
 	NONINT_CMD_MODE,	// ./minishell -c 'command' OR ./minishell -c "command"
 	NONINT_STDIN_MODE,	// echo "ls -la" | ./minishell OR ./minishell < commands_file
 	INT_MODE,			// ./minishell --login OR ./minishell -l OR ./minishell
+
 }	t_shell_mode;
 
 /* histsize		- analogue of HISTSIZE.
@@ -110,8 +112,10 @@ typedef struct e_shell
 	t_env			env;
 	int				argc;
 	char			**argv;
+	char			*prompt_inv;
 	char			*script;//on stack
 	char			*c_cmd;// on stack
+
 }	t_shell;
 
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);

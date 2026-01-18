@@ -31,6 +31,7 @@
 # define SET_CMD		"set"
 # define LOCALS_CMD		"locals"
 # define HISTORY_CMD	"history"
+# define TYPE_CMD		"type"
 # define FALSE_CMD		"false"
 # define TRUE_CMD		"true"
 # define NOP_CMD		":"

@@ -26,10 +26,13 @@
 # define PERM_DENIED_ERR_MSG	"Permission denied"
 # define IS_DIR_ERR_MSG			"Is a directory"
 # define CMD_NOT_FOUND_ERR_MSG	"command not found"
+# define HOME_NOT_SET_ERR_MSG	"HOME not set"
+# define NO_SUCH_FD_ERR_MSG		"No such file or directory"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
 # define GETUID_ERR_MSG			"Could not get my UID/EUID"
+# define GETPWUID_ERR_MSG		"Could not get info about the user who is running me"
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was

@@ -68,14 +68,14 @@
  *         Some of these variables are even managed dynamically by the
  *         shell itself, for example $SHLVL
  *         The complete list of them:
- *             29. PATH					(has default)
- *             30. SHLVL				(calculates during execution)
- *             31. OLDPWD				(calculates during execution)
- *             32. PWD					(calculates during execution)
- *             33. HOME					(finds in the system)
- *             34. SHELL				(finds in the system)
- *             35. USER					(finds in the system)
- *             36. LOGNAME
+ *             32. PATH					(has default)
+ *             33. SHLVL				(calculates during execution)
+ *             34. PWD					(calculates during execution)
+ *             35. OLDPWD				(calculates during execution)
+ *             36. HOME					(finds in the system)
+ *             37. SHELL				(finds in the system)
+ *             38. USER					(finds in the system)
+ *             39. LOGNAME
  *
  *         So yeah.. the first 37 indices in vars are reserved for easier
  *         access. After that, all newly added local or environment variables
@@ -93,18 +93,26 @@
 # include <stdbool.h>
 # include <stddef.h>
 
-/* The default path is used when
- * it isn't inherited from the
- * parent or found in any configs */
+/* The default path is used when it isn't inherited
+ * from the parent or found in any configs.
+ *
+ * In reality, of course, the values of LANG and
+ * LANGUAGE are defined differently, for example
+ * by reading configs of smth.. Here at 42 Urduliz,
+ * it is currently read from `/etc/default/locale`
+ * if it was not inherited. But let's implement
+ * this later */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # define DEF_PS1			"\\s-\\v\\$"
 # define DEF_PS2			">"
 # define DEF_PS4			"+"
+# define DEF_LANGUAGE		"en"
+# define DEF_LANG			"en_US.UTF-8"
 # define UNKNOWN_VALUE		"?"
 
 # define PARAM_VARS_NUM		15
 # define SLOCAL_VARS_NUM	17
-# define SENV_VARS_NUM		8
+# define SENV_VARS_NUM		9
 # define SCRIPT_ARGS_NUM	9
 # define MAX_TOTAL_VARS_NUM	8192
 
@@ -115,7 +123,7 @@
  * function for reference) */
 typedef enum e_paramvar
 {
-	PV_HOME = 0,// ~
+	PV_HOME = 0,// ~ (`cd` is working with this variable, NOT with $HOME!)
 	PV_RETCODE,	// $?
 	PV_PID,		// $$
 	PV_ARGNUM,	// $#
@@ -144,7 +152,7 @@ typedef enum e_paramvar
  * function for reference) */
 typedef enum e_special_localvar
 {
-	SL_PPID=16,		// PPID 
+	SL_PPID=15,		// PPID 
 	SL_UID,			// UID
 	SL_EUID,		// EUID
 	SL_MSHPID,		// MSHPID
@@ -160,7 +168,7 @@ typedef enum e_special_localvar
 	SL_MACHTYPE,	// (has default)
 	SL_PS1,			// PS1
 	SL_PS2,			// PS2
-	SL_PS4=32,		// PS4
+	SL_PS4=31,		// PS4
 
 }	t_slocalvar;
 
@@ -169,16 +177,16 @@ typedef enum e_special_localvar
  * almoost*/
 typedef enum e_special_envar
 {
-	SE_PATH=33,
+	SE_PATH=32,
 	SE_SHLVL,
-	SE_OLDPWD,
 	SE_PWD,
+	SE_OLDPWD,
 	SE_HOME,
 	SE_SHELL,
 	SE_USER,
-	SE_LOGNAME=40
+	SE_LOGNAME=39
 
-}	t_special_envar;
+}	t_senvar;
 
 typedef enum e_var_type
 {

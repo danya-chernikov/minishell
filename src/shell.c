@@ -123,7 +123,7 @@ int	msh_init_param_vars(t_env *env)
 		env->vars[vi].type = PARAM;
 		env->vars[vi].f_readonly = true;
 		env->vars[vi].f_inherit = false;
-		env->vars[vi].value = NULL;
+		env->vars[vi].value = NULL; // Do we need this?
 		++vi;
 	}
 	env->vars[PV_HOME].name		= ft_strdup("~"); // may be changed!
@@ -192,27 +192,7 @@ void	msh_free_all_vars(t_env *env)
 	}
 }
 
-/*
- *
-	SL_MSHPID=16,	// MSHPID (can)
-	SL_MSHSUBSH,	// MSH_SUBSHELL
-	SL_MSHVER,		// MSH_VERSION
-	SL_HFSIZE,		// HISTFILESIZE
-	SL_HFILE,		// HISTFILE
-	SL_HSIZE,		// HISTSIZE
-	SL_MSH,			// MSH
-	SL_HOSTNAME,	// HOSTNAME
-	SL_HOSTTYPE,	// HOSTTYPE
-	SL_OSTYPE,		// OSTYPE
-	SL_MACHTYPE,	// MACHTYPE
-	SL_PS1,			// PS1
-	SL_PS2,			// PS2
-	SL_PS4,			// PS4
-	SL_PPID,		// PPID 
-	SL_UID,			// UID
-	SL_EUID			// EUID
- * */
-int		msh_set_local_vars(t_env *env, char **argv)
+int	msh_set_local_vars(t_env *env, char **argv)
 {
 	t_slocalvar	vi;
 
@@ -388,9 +368,145 @@ int		msh_set_local_vars(t_env *env, char **argv)
 	return (COMMON_SUCCESS);
 }
 
-int		msh_set_env_vars(t_env *env)
-{
-	(void)env;
+/*
+	SE_PATH=33,
+	SE_SHLVL,
+	SE_PWD,
+	SE_OLDPWD,
+	SE_HOME,
+	SE_SHELL,
+	SE_USER,
+	SE_LOGNAME=40
+ * */
+int	msh_set_env_vars(t_env *env)
+{	
+	t_senvar	vi;
+
+	vi = SE_PATH;
+	while (vi < SE_PATH + SENV_VARS_NUM)
+	{
+		env->vars[vi].type			= ENV;
+		env->vars[vi].f_readonly	= false;
+		env->vars[vi].f_inherit		= true;
+		++vi;
+	}
+
+	// PATH
+	char	*path;
+
+	env->vars[SE_PATH].name			= ft_strdup("PATH");
+	path = getenv("PATH");
+	if (!path)		
+		env->vars[SE_PATH].value	= ft_strdup(DEF_PATH);
+	else	
+		env->vars[SE_PATH].value	= ft_strdup(path);
+
+	// SHLVL
+	// If it exists in `env->ihn_env`, just copy it and
+	// increment it, otherwise create it with the value 1
+	env->vars[SE_SHLVL].name		= ft_strdup("SHLVL");
+	char	*shlvl;
+	int		new_shlvl;
+
+	shlvl = getenv("SHLVL");
+	if (!shlvl)
+		env->vars[SE_SHLVL].value	= ft_strdup("1");
+	else
+	{
+		new_shlvl = ft_atoi(shlvl);	
+		env->vars[SE_SHLVL].value	= ft_itoa(new_shlvl + 1);
+	}
+
+	// PWD
+	char	cwd[PATH_MAX];
+
+	if (!getcwd(cwd, PATH_MAX))
+	{
+		perror("getcwd");
+		return (COMMON_SYS_ERR);
+	}
+	env->vars[SE_PWD].name			= ft_strdup("PWD");
+	env->vars[SE_PWD].value			= ft_strdup(cwd);
+
+	// OLDPWD	
+	env->vars[SE_OLDPWD].name		= ft_strdup("OLDPWD");
+	env->vars[SE_OLDPWD].value		= ft_strdup(cwd);
+
+	/*
+	char	*pw_name;
+	char	*pw_passwd;
+	uid_t	pw_uid;
+	gid_t	pw_gid;
+	char	*pw_gecos;
+	char	*pw_dir;
+	char	*pw_shell;
+	 */
+
+	t_passwd	pwd;
+	uid_t		uid;
+	int			res;
+
+	uid = (uid_t)ft_atoi(env->vars[SL_UID]);
+	res = ft_getpwuid(&pwd, uid);
+		
+	// HOME and USER will always be set
+	// if the call succeeds. SHELL may
+	// be an empty string if the function
+	// fails to determine it
+	if (res) // Success
+	{
+		// HOME
+			
+
+		// SHELL
+
+
+		// USER
+	}
+	else // res <= 0
+	{
+		print_shell_error("ft_getpwuid()", GETPWUID_ERR_MSG);
+		return (COMMON_SYS_ERR);
+	}
+
+
+	
+
+	// LOGNAME	
+	env->vars[SE_LOGNAME].name		= ft_strdup("LOGNAME");
+	env->vars[SE_LOGNAME].value		= ft_strdup(UNKNOWN_VALUE); // "?"
+
+	env->vars_num += SENV_VARS_NUM;
+
+	// Copy all other non-special variables from the
+	// inherited environment. At this stage, we check
+	// whether any environment variable has a name that
+	// matches one of the special local variable names.
+	// If such a variable exists, it means only one thing:
+	// the user deleted one or more special local variables,
+	// then recreated variables with the same names,
+	// assigned them values, exported them, and finally
+	// launched another minishell instance (which is us).
+	// In this case, we must avoid creating environment
+	// variables whose names match the names of special
+	// local variables (cause we already have created
+	// our own special local variables in current session)
+	
+
+
+
+	// Check for malloc() errors	
+	vi = SL_PATH;
+	while (vi < SE_PATH + SLOCAL_VARS_NUM)
+	{
+		if (!env->vars[vi].name || !env->vars[vi].value)
+		{
+			perror("malloc");
+			return (COMMON_SYS_ERR);
+		}
+		++vi;
+	}
+
 	return (COMMON_SUCCESS);
 }
 
