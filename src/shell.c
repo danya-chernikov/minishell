@@ -219,9 +219,9 @@ int		msh_set_local_vars(t_env *env, char **argv)
 	vi = SL_PPID;
 	while (vi < SL_MSHSUBSH)
 	{
-		env->vars[SL_MSHPID].type		= LOCAL;
-		env->vars[SL_MSHPID].f_readonly	= true;
-		env->vars[SL_MSHPID].f_inherit	= false;
+		env->vars[vi].type			= LOCAL;
+		env->vars[vi].f_readonly	= true;
+		env->vars[vi].f_inherit		= false;
 		++vi;
 	}
 
@@ -255,8 +255,8 @@ int		msh_set_local_vars(t_env *env, char **argv)
 		env->vars[SL_UID].value			= ft_itoa((int)uid);
 
 		// EUID
-		env->vars[SL_UID].name			= ft_strdup("EUID");
-		env->vars[SL_UID].value			= ft_itoa((int)uid);
+		env->vars[SL_EUID].name			= ft_strdup("EUID");
+		env->vars[SL_EUID].value		= ft_itoa((int)uid);
 	}
 
 	// MSHPID
@@ -331,6 +331,9 @@ int		msh_set_local_vars(t_env *env, char **argv)
 		perror("close");
 		return (COMMON_SYS_ERR);
 	}
+	if (hostname[strlen(hostname) - 1] == '\n')
+		hostname[strlen(hostname) - 1] = '\0';
+
 	env->vars[SL_HOSTNAME].name		= ft_strdup("HOSTNAME");
 	env->vars[SL_HOSTNAME].value	= ft_strdup(hostname);
 
@@ -343,20 +346,22 @@ int		msh_set_local_vars(t_env *env, char **argv)
 	env->vars[SL_OSTYPE].value		= ft_strdup(MSH_OSTYPE);
 	
 	// HOSTMACH	
-	char	*hostmach;
-	size_t	hm_len;
+	char	*machtype;
+	size_t	mt_len;
 
-	hm_len = ft_strlen(MSH_ARCH) + 3 + ft_strlen(MSH_OSTYPE) + 1;
-	hostmach = malloc(hm_len * sizeof(char));
-	ft_strlcpy(hostmach, MSH_ARCH, hm_len);
-	ft_strlcat(hostmach, "-pc-", hm_len);
-	ft_strlcat(hostmach, MSH_OSTYPE, hm_len);
-	env->vars[SL_HOSTNAME].name		= ft_strdup("HOSTMACH");
-	env->vars[SL_HOSTNAME].value	= ft_strdup(hostmach);
+	mt_len = ft_strlen(MSH_ARCH) + 4 + ft_strlen(MSH_OSTYPE) + 1;
+	machtype = malloc(mt_len * sizeof(char));
+
+	ft_strlcpy(machtype, MSH_ARCH, mt_len);
+	ft_strlcat(machtype, "-pc-", mt_len);
+	ft_strlcat(machtype, MSH_OSTYPE, mt_len);
+
+	env->vars[SL_MACHTYPE].name		= ft_strdup("MACHTYPE");
+	env->vars[SL_MACHTYPE].value	= ft_strdup(machtype);
 
 	// PS1
 	env->vars[SL_PS1].name			= ft_strdup("PS1");
-	env->vars[SL_PS1].name			= ft_strdup(DEF_PS1);
+	env->vars[SL_PS1].value			= ft_strdup(DEF_PS1);
 
 	// PS2	
 	env->vars[SL_PS2].name			= ft_strdup("PS2");
@@ -370,7 +375,7 @@ int		msh_set_local_vars(t_env *env, char **argv)
 
 	// Check for malloc() errors	
 	vi = SL_PPID;
-	while (vi < SL_MSHPID + SLOCAL_VARS_NUM)
+	while (vi < SL_PPID + SLOCAL_VARS_NUM)
 	{
 		if (!env->vars[vi].name || !env->vars[vi].value)
 		{

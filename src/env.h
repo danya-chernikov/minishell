@@ -129,7 +129,7 @@ typedef enum e_paramvar
 	PV_ARGV6,	// ...
 	PV_ARGV7,	// ...
 	PV_ARGV8,	// ...
-	PV_ARGV9,	// Only in scripts
+	PV_ARGV9=14,// Only in scripts
 		
 }	t_paramvar;
 
@@ -160,7 +160,7 @@ typedef enum e_special_localvar
 	SL_MACHTYPE,	// (has default)
 	SL_PS1,			// PS1
 	SL_PS2,			// PS2
-	SL_PS4,			// PS4
+	SL_PS4=32,		// PS4
 
 }	t_slocalvar;
 
@@ -169,14 +169,15 @@ typedef enum e_special_localvar
  * almoost*/
 typedef enum e_special_envar
 {
-	SE_PATH=32,
+	SE_PATH=33,
 	SE_SHLVL,
 	SE_OLDPWD,
 	SE_PWD,
 	SE_HOME,
 	SE_SHELL,
 	SE_USER,
-	SE_LOGNAME
+	SE_LOGNAME=40
+
 }	t_special_envar;
 
 typedef enum e_var_type
