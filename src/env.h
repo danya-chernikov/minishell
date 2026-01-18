@@ -34,7 +34,7 @@
  *         The complete list of them:
  *			   15. PPID					(can't be changed/deleted)
  *			   16. UID					(can't be changed/deleted)
- *			   17. EUID					(can't be changed/deleted)
+ *			   17. EUID					(can't be changed/deleted) the same as UID
  *             18. MSHPID				(can't be changed/deleted)
  *			   19. MSH_SUBSHELL			(has default)
  *			   20. MSH_VERSION			(has default)
@@ -69,12 +69,12 @@
  *         shell itself, for example $SHLVL
  *         The complete list of them:
  *             29. PATH					(has default)
- *             30. SHLVL
- *             31. OLDPWD
- *             32. PWD
- *             33. HOME
- *             34. SHELL
- *             35. USER
+ *             30. SHLVL				(calculates during execution)
+ *             31. OLDPWD				(calculates during execution)
+ *             32. PWD					(calculates during execution)
+ *             33. HOME					(finds in the system)
+ *             34. SHELL				(finds in the system)
+ *             35. USER					(finds in the system)
  *             36. LOGNAME
  *
  *         So yeah.. the first 37 indices in vars are reserved for easier
@@ -97,9 +97,10 @@
  * it isn't inherited from the
  * parent or found in any configs */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-# define DEF_PS1			"\s-\v\$"
+# define DEF_PS1			"\\s-\\v\\$"
 # define DEF_PS2			">"
 # define DEF_PS4			"+"
+# define UNKNOWN_VALUE		"?"
 
 # define PARAM_VARS_NUM		15
 # define SLOCAL_VARS_NUM	17
@@ -143,8 +144,11 @@ typedef enum e_paramvar
  * function for reference) */
 typedef enum e_special_localvar
 {
-	SL_MSHPID=16,	// MSHPID (can)
-	SL_MSHSUBSH,	// MSH_SUBSHELL
+	SL_PPID=16,		// PPID 
+	SL_UID,			// UID
+	SL_EUID,		// EUID
+	SL_MSHPID,		// MSHPID
+	SL_MSHSUBSH,	// MSH_SUBSHELL	
 	SL_MSHVER,		// MSH_VERSION
 	SL_HFSIZE,		// HISTFILESIZE
 	SL_HFILE,		// HISTFILE
@@ -157,9 +161,6 @@ typedef enum e_special_localvar
 	SL_PS1,			// PS1
 	SL_PS2,			// PS2
 	SL_PS4,			// PS4
-	SL_PPID,		// PPID 
-	SL_UID,			// UID
-	SL_EUID			// EUID
 
 }	t_slocalvar;
 

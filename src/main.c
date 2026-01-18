@@ -30,11 +30,6 @@ int	main(int argc, char **argv, char **env)
 		shret = fret;
 	}
 
-	// Initialize all variables what
-	// are left (local and environmental)
-	msh_set_local_vars(&msh);
-	msh_set_env_vars(&msh);
-
 	// Read configs
 	
 	// Execute all things from configs

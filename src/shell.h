@@ -119,8 +119,8 @@ int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 int		msh_init_param_vars(t_env *env);
 void	msh_free_all_vars(t_env *env);
 
-int		msh_set_local_vars(t_shell *msh);
-int		msh_set_env_vars(t_shell *msh);
+int		msh_set_local_vars(t_env *env, char **argv);
+int		msh_set_env_vars(t_env *env);
 
 void	msh_free(t_shell *msh);
 

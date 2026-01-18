@@ -29,6 +29,7 @@
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
+# define GETUID_ERR_MSG			"Could not get my UID/EUID"
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was

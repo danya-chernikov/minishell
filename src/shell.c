@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /* Initializes the `t_shell` structure, which represents our
  * minishell and stores all its settings.
@@ -59,11 +62,9 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	// determine the shell's mode and set
 	// some parameter variables
 	res = cmdargs_parser(msh);
-	if (res == COMMON_SUCCESS)
-		return (EXIT_SUCCESS);
-	else if (res == COMMON_FAILURE)
+	if (res == COMMON_FAILURE)
 		return (COMMON_FAILURE);
-	else // The code we should transfer to the caller
+	else if (res != COMMON_SUCCESS) // The code we should transfer to the caller
 		return (res);
 
 	// Here we just determine if print prompt or not
@@ -86,11 +87,10 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 			msh->mode = NONINT_STDIN_MODE; // We do not have to print prompt!
 	}
 
-	// Alalyze `env` and set all variables
-
-	if (msh_set_env_vars(msh) == COMMON_SYS_ERR)
+	/* Set local and environment variables */
+	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	if (msh_set_local_vars(msh) == COMMON_SYS_ERR)
+	if (msh_set_env_vars(&msh->env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 
 	return (COMMON_SUCCESS);
@@ -176,7 +176,7 @@ void	msh_free_all_vars(t_env *env)
 	size_t	i;
 
 	i = 0;
-	while (i < MAX_ENV_VARS_NUM)
+	while (i < MAX_TOTAL_VARS_NUM)
 	{
 		if (env->vars[i].name)
 		{
@@ -212,12 +212,12 @@ void	msh_free_all_vars(t_env *env)
 	SL_UID,			// UID
 	SL_EUID			// EUID
  * */
-int		msh_set_local_vars(t_shell *msh)
+int		msh_set_local_vars(t_env *env, char **argv)
 {
-	t_slocal_var	vi;
+	t_slocalvar	vi;
 
-	vi = SL_MSHPPID;
-	while (vi < MSH_SUBSHELL)
+	vi = SL_PPID;
+	while (vi < SL_MSHSUBSH)
 	{
 		env->vars[SL_MSHPID].type		= LOCAL;
 		env->vars[SL_MSHPID].f_readonly	= true;
@@ -226,28 +226,54 @@ int		msh_set_local_vars(t_shell *msh)
 	}
 
 	// PPID
-	pid_t	ppid;	
-	int		res;
-
-	res = getppid(&ppid);
-	if (res == -1)
 	{
-		print_shell_error("getppid()", GETPPID_ERR_MSG);
-		return (COMMON_SYS_ERR);
+		pid_t	ppid;
+		int		res;
+
+		res = ft_getppid(&ppid);
+		if (res == -1)
+		{
+			print_shell_error("getppid()", GETPPID_ERR_MSG);
+			return (COMMON_SYS_ERR);
+		}
+		env->vars[SL_PPID].name			= ft_strdup("PPID");
+		env->vars[SL_PPID].value		= ft_itoa((int)ppid);
 	}
-	env->vars[SL_PPID].name			= ft_strdup("PPID");
-	env->vars[SL_PPID].value		= ft_strdup(itoa((int)ppid));
 
 	// UID
-	
+	{
+		uid_t	uid;
+		int		res;
 
-	// EUID
-	
+		res = ft_getuid(&uid);
+		if (res == -1)
+		{
+			print_shell_error("getuid()", GETUID_ERR_MSG);
+			return (COMMON_SYS_ERR);
+		}	
+		env->vars[SL_UID].name			= ft_strdup("UID");
+		env->vars[SL_UID].value			= ft_itoa((int)uid);
+
+		// EUID
+		env->vars[SL_UID].name			= ft_strdup("EUID");
+		env->vars[SL_UID].value			= ft_itoa((int)uid);
+	}
 
 	// MSHPID
 	// It's calculated on access, i.e. when the shell tries to expand it
-	env->vars[SL_MSHPID].name		= ft_strdup("MSHPID");
-	env->vars[SL_MSHPID].value		= NULL;
+	{
+		pid_t	pid;
+		int		res;
+
+		res = ft_getpid(&pid);
+		if (res == -1)
+		{
+			print_shell_error("getpid()", GETPID_ERR_MSG);
+			return (COMMON_SYS_ERR);
+		}
+		env->vars[SL_MSHPID].name		= ft_strdup("MSHPID");
+		env->vars[SL_MSHPID].value		= ft_itoa((int)pid);
+	}
 
 	while (vi < PARAM_VARS_NUM + SLOCAL_VARS_NUM)
 	{
@@ -267,7 +293,7 @@ int		msh_set_local_vars(t_shell *msh)
 
 	// MSH_HISTFILESIZE
 	env->vars[SL_HFSIZE].name		= ft_strdup("HISTFILESIZE");
-	env->vars[SL_HFSIZE].value		= ft_strdup(DEF_HISTFILESIZE);
+	env->vars[SL_HFSIZE].value		= ft_itoa((int)DEF_HISTFILESIZE);
 
 	// MSH_HISTFILE
 	env->vars[SL_HFILE].name		= ft_strdup("HISTFILE");
@@ -275,11 +301,11 @@ int		msh_set_local_vars(t_shell *msh)
 	
 	// MSH_HISTSIZE
 	env->vars[SL_HSIZE].name		= ft_strdup("HISTSIZE");
-	env->vars[SL_HSIZE].value		= ft_strdup(DEF_HISTSIZE);
+	env->vars[SL_HSIZE].value		= ft_itoa((int)DEF_HISTSIZE);
 
 	// MSH
 	env->vars[SL_MSH].name			= ft_strdup("MSH");
-	env->vars[SL_MSH].value			= ft_strdup(msh->argv[0]);
+	env->vars[SL_MSH].value			= ft_strdup(argv[0]);
 
 	// HOSTNAME	
 	int		fd;			// Host file descriptor
@@ -292,7 +318,7 @@ int		msh_set_local_vars(t_shell *msh)
 		perror("open");
 		return (COMMON_SYS_ERR);
 	}
-	hostname = get_next_line(&gnlerr);
+	hostname = get_next_line(fd, &gnlerr);
 	if (!hostname && gnlerr)
 	{	
 		// Let's consider get_next_line() error as system error
@@ -322,11 +348,6 @@ int		msh_set_local_vars(t_shell *msh)
 
 	hm_len = ft_strlen(MSH_ARCH) + 3 + ft_strlen(MSH_OSTYPE) + 1;
 	hostmach = malloc(hm_len * sizeof(char));
-	if (!hostmach)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
 	ft_strlcpy(hostmach, MSH_ARCH, hm_len);
 	ft_strlcat(hostmach, "-pc-", hm_len);
 	ft_strlcat(hostmach, MSH_OSTYPE, hm_len);
@@ -335,29 +356,42 @@ int		msh_set_local_vars(t_shell *msh)
 
 	// PS1
 	env->vars[SL_PS1].name			= ft_strdup("PS1");
-	env->vars[SL_PS2].value			= ft_strdup();
+	env->vars[SL_PS1].name			= ft_strdup(DEF_PS1);
 
-	// PS2
-	
+	// PS2	
+	env->vars[SL_PS2].name			= ft_strdup("PS2");
+	env->vars[SL_PS2].value			= ft_strdup(DEF_PS2);
 
 	// PS4
+	env->vars[SL_PS4].name			= ft_strdup("PS4");
+	env->vars[SL_PS4].value			= ft_strdup(DEF_PS4);
 
 	env->vars_num += SLOCAL_VARS_NUM;
 
-	// Check for malloc() errors
+	// Check for malloc() errors	
+	vi = SL_PPID;
+	while (vi < SL_MSHPID + SLOCAL_VARS_NUM)
+	{
+		if (!env->vars[vi].name || !env->vars[vi].value)
+		{
+			perror("malloc");
+			return (COMMON_SYS_ERR);
+		}
+		++vi;
+	}
 
 	return (COMMON_SUCCESS);
 }
 
-int		msh_set_env_vars(t_shell *msh)
+int		msh_set_env_vars(t_env *env)
 {
-	(void)msh;
+	(void)env;
 	return (COMMON_SUCCESS);
 }
 
 void	msh_free(t_shell *msh)
 {
-	msh_free_param_vars(&msh->env);
+	msh_free_all_vars(&msh->env);
 	if (msh->env.vars)
 		free(msh->env.vars);
 	if (msh->history.lines)
