@@ -23,11 +23,16 @@
 # define SYNTAX_ERR_MSG			"synxtax error"
 # define INV_OPT_ERR_MSG		"invalid option"
 # define C_OPT_ERR_MSG			"option requires an argument"
+# define READONLY_VAR_ERR_MSG	"readonly variable"
 # define PERM_DENIED_ERR_MSG	"Permission denied"
 # define IS_DIR_ERR_MSG			"Is a directory"
 # define CMD_NOT_FOUND_ERR_MSG	"command not found"
 # define HOME_NOT_SET_ERR_MSG	"HOME not set"
 # define NO_SUCH_FD_ERR_MSG		"No such file or directory"
+
+# define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
+# define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"
+# define MAX_ENV_VAL_ERR_MSG	"The variable value is too long"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"

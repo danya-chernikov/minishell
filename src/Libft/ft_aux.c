@@ -23,17 +23,3 @@ size_t	split_size(char **res)
 		++i;
 	return (i);
 }
-
-void	free_pwd(t_passwd *pwd)
-{
-	if (pwd->pw_name)
-		free(pwd->pw_name);
-	if (pwd->pw_passwd)
-		free (pwd->pw_passwd);
-	if (pwd->pw_gecos)
-		free (pwd->pw_gecos);
-	if (pwd->pw_dir)
-		free (pwd->pw_dir);
-	if (pwd->pw_shell)
-		free (pwd->pw_shell);
-}

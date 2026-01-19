@@ -1,8 +1,6 @@
 #ifndef ENV_H
 # define ENV_H
 
-# include <stdbool.h>
-
 /* Each variable's number here corresponds to its index in the `vars`
  * array of the `s_shell` structure. In our minishell, we have the
  * following kinds of variables:
@@ -93,6 +91,8 @@
 # include <stdbool.h>
 # include <stddef.h>
 
+# include "aux_common.h"
+
 /* The default path is used when it isn't inherited
  * from the parent or found in any configs.
  *
@@ -112,9 +112,12 @@
 
 # define PARAM_VARS_NUM		15
 # define SLOCAL_VARS_NUM	17
-# define SENV_VARS_NUM		9
+# define SENV_VARS_NUM		8
 # define SCRIPT_ARGS_NUM	9
 # define MAX_TOTAL_VARS_NUM	8192
+
+# define MAX_ENV_NAME_LEN	4096
+# define MAX_ENV_VAL_LEN	4096
 
 /* Do not change the order of these
  * definitions! Otherwise, you'll

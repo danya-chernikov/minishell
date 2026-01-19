@@ -45,11 +45,8 @@ char	*env_get_val(t_env *env, char *name)
 	i = 0;
 	while (i < env->vars_num)
 	{
-		if (!ft_strncmp(env->vars[i].name, name, ft_strlen(name)) &&
-			ft_strlen(env->vars[i].name) == ft_strlen(name))
-		{
+		if (strings_equal(name, env->vars[i].name))
 			return (env->vars[i].value);
-		}
 		++i;
 	}
 	return (NULL);
@@ -65,11 +62,8 @@ t_env_var	*env_get_ptr(t_env *env, char *name)
 	var = &env->vars[0];
 	while (var)
 	{
-		if (!ft_strncmp(var->name, name, ft_strlen(name)) &&
-			ft_strlen(var->name) == ft_strlen(name))
-		{
+		if (strings_equal(name, env->vars[i].name))
 			return (var);
-		}
 		++var;
 	}
 	return (NULL);
@@ -99,13 +93,21 @@ int	env_set(t_env *env, char *name, char *value) // Or maybe **value?
 				free(var->value);
 			var->value = value;
 		}
-		else
+		else // Variable exists but is read-only
+		{
+			print_shell_error(name, READONLY_VAR_ERR_MSG);
 			return (COMMON_FAILURE);
+		}
 	}
-	// A variable with this name
-	// has not been created yet
+	// A variable with this name has not been created yet
 	else
 	{
+		if (env->vars_num == MAX_TOTAL_VARS_NUM)
+		{
+			// Variable is too long.. so why to print it xd
+			print_shell_error(NULL, MAX_ENV_NUM_ERR_MSG);
+			return (COMMON_FAILURE);
+		}
 		env->vars[env->vars_num - 1].name = name;
 		env->vars[env->vars_num - 1].value = value;
 		++env->vars_num;

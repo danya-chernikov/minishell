@@ -118,14 +118,57 @@ typedef struct e_shell
 
 }	t_shell;
 
+/* shell.c */
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
-
-int		msh_init_param_vars(t_env *env);
+void	msh_free(t_shell *msh);
 void	msh_free_all_vars(t_env *env);
 
+/* init_paramvars.c  */
+int		msh_init_param_vars(t_env *env);
+
+/* LOCAL VARIABLES */
+/* init_localvars.c */
 int		msh_set_local_vars(t_env *env, char **argv);
+
+/* init_localvars2.c */
+int		set_local_ppid(t_env *env);
+int		set_local_uid(t_env *env);
+int		set_local_euid(t_env *env);
+int		set_local_mshpid(t_env *env);
+int		set_local_mshsubsh(t_env *env);
+
+/* init_localvars3.c */
+int		set_local_mshversion(t_env *env);
+int		set_local_histfilesize(t_env *env);
+int		set_local_histfile(t_env *env);
+int		set_local_histfile(t_env *env);
+int		set_local_msh(t_env *env, char **argv);
+
+/* init_localvars4.c */
+int		set_local_hosttype(t_env *env);
+char	*get_hostname(void);
+int		set_local_hostname(t_env *env);
+int		set_local_ostype(t_env *env);
+int		set_local_hostmach(t_env *env);
+
+/* init_localvars5.c */
+int		set_local_ps1(t_env *env);
+int		set_local_ps2(t_env *env);
+int		set_local_ps4(t_env *env);
+
+/* ENVIRONMENT VARIABLES */
+/* init_envars.c */
 int		msh_set_env_vars(t_env *env);
 
-void	msh_free(t_shell *msh);
+/* init_envars2.c */
+void	set_env_path(t_env *env);
+void	set_env_shelevel(t_env *env);
+int		set_env_pwd(t_env *env);
+void	set_env_oldpwd(t_env *env);
+int		set_env_pwd_user_data(t_env *env);
+
+/* init_envars3.c */
+void	set_env_logname(t_env *env);
+int		set_rest_env_vars(t_env *env);
 
 #endif
