@@ -1,4 +1,4 @@
-#include "aux.h"
+#include "aux_prompt_parser.h"
 
 void	remove_right_spaces(char *prompt)
 {

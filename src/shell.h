@@ -141,7 +141,7 @@ int		set_local_mshsubsh(t_env *env);
 int		set_local_mshversion(t_env *env);
 int		set_local_histfilesize(t_env *env);
 int		set_local_histfile(t_env *env);
-int		set_local_histfile(t_env *env);
+int		set_local_histsize(t_env *env);
 int		set_local_msh(t_env *env, char **argv);
 
 /* init_localvars4.c */

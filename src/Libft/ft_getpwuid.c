@@ -64,6 +64,8 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 	line = get_next_line(fd, &err);
 	while (line)
 	{
+		if (line[ft_strlen(line) - 1] == '\n')
+			line[ft_strlen(line) - 1] = '\0';
 		ptokens	= ft_split(line, ':');
 		if (split_size(ptokens) > 2 && ft_atoi(ptokens[2]) == (int)uid)
 		{

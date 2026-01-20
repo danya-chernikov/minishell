@@ -1,6 +1,7 @@
 #include "libft.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 int	fill_pwd_struct(t_passwd *pwd, char **ptokens, uid_t uid)
 {

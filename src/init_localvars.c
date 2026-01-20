@@ -1,5 +1,7 @@
 #include "shell.h"
 
+#include <stdio.h>
+
 static void	prelim_vars_init(t_env *env);
 static void	set_vars(t_env *env, char **argv, int *ret_codes);
 static int	check_mem_errors(t_env *env);
@@ -69,6 +71,8 @@ static void	set_vars(t_env *env, char **argv, int *ret_codes)
 
 static int	check_mem_errors(t_env *env)
 {
+	t_slocalvar	vi;
+
 	vi = SL_PPID;
 	while (vi < SL_PPID + SLOCAL_VARS_NUM)
 	{

@@ -1,93 +1,6 @@
 #ifndef ENV_H
 # define ENV_H
 
-/* Each variable's number here corresponds to its index in the `vars`
- * array of the `s_shell` structure. In our minishell, we have the
- * following kinds of variables:
- *
- *     SPECIAL PARAMETER VARIABLES:
- *         Shell parameter variables with special behavior.
- *         Netiher of these variables can be changed or deleted.
- *		       0.  ~
- *             1.  $?
- *             2.  $$
- *             3.  $#
- *             4.  $*
- *             5.  $0
- *             6.  $1
- *             7.  $2
- *             8.  $3
- *             9.  $4
- *             10. $5
- *             11. $6
- *             12. $7
- *             13. $8
- *             14. $9
- *
- *     SO-CALLED 'SPECIAL' LOCAL VARIABLES (`f_inherit` flag is cleared)
- *         Local variables that have a critical or near-critical role
- *         in the shell's operation. Some of them cannot be modified
- *         or deleted (`f_readonly` flag is set), while others can
- *         (`f_readonly` flag is cleared);
- *         The complete list of them:
- *			   15. PPID					(can't be changed/deleted)
- *			   16. UID					(can't be changed/deleted)
- *			   17. EUID					(can't be changed/deleted) the same as UID
- *             18. MSHPID				(can't be changed/deleted)
- *			   19. MSH_SUBSHELL			(has default)
- *			   20. MSH_VERSION			(has default)
- *			   21. HISTFILESIZE			(has default)
- *			   22. HISTFILE				(has default)
- *			   23. HISTSIZE				(has default)
- *			   24. MSH					(unknown)
- *			   25. HOSTNAME				(has default)
- *			   26. HOSTTYPE				(has default)
- *			   27. OSTYPE				(has default)
- *			   28. MACHTYPE				(has default)
- *			   29. PS1					(has default)
- *			   30. PS2					(has default)
- *			   31. PS4					(has default)
- *
- *         MINISHELLPID is an analogue of BASHPID. It is a special variable
- *         whose value is calculated at the moment a (sub)shell expands it.
- *
- *         MINISHELL_SUBSHELL is an analogue of BASH_SUBSHELL. It is similar to
- *         SHLVL, but it is local and specific to subshells. Using this variable,
- *         we can determine whether we are running inside a subshell. Its value
- *         is incremented each time a new shell is started.
- *
- *     CLASSICAL ENVIRONMENT VARIABLES (`f_inherit` flag is set)
- *         Variables inherited by child processes. Nothing special here.
- *         There are variables that were inherited. We can change the
- *         value of any of them. However, among these variables there
- *         are some special beasts that directly affect the shell's
- *         workflow and behavior. Changing or deleting them may somewhat
- *         'ruin' the current shell session as well as all its ancestors.
- *         Some of these variables are even managed dynamically by the
- *         shell itself, for example $SHLVL
- *         The complete list of them:
- *             32. PATH					(has default)
- *             33. SHLVL				(calculates during execution)
- *             34. PWD					(calculates during execution)
- *             35. OLDPWD				(calculates during execution)
- *             36. HOME					(finds in the system)
- *             37. SHELL				(finds in the system)
- *             38. USER					(finds in the system)
- *             39. LOGNAME
- *
- *         So yeah.. the first 37 indices in vars are reserved for easier
- *         access. After that, all newly added local or environment variables
- *         will have mixed indices
- *
- *     USER'S LOCAL VARIABLES 
- *         Created by the user. These variables may be exported
- *         and therefore inherited by child processes;
- *         Examples: 
- *             BLA='keke'
- *             LOL='azaza'*
- *
- * */
-
 # include <stdbool.h>
 # include <stddef.h>
 
@@ -248,12 +161,99 @@ int			env_init(t_env *env);
 char		*env_get_val(t_env *env, char *name);
 t_env_var	*env_get_ptr(t_env *env, char *name);
 bool		env_exist(t_env *env, char *name);
-int			env_set(t_env *env, char *name, char *value);
+int			env_set(t_env *env, char *name, char *value, t_var_type type);
 int			env_unset(t_env *env, char *name);
 int			env_export(t_env *env, char *name);
 void		env_print_value(t_env *env, char *name);
 void		env_print_env(t_env *env);
 void		env_print_all(t_env *env);
 void		env_print_locals(t_env *env);
+
+/* Each variable's number here corresponds to its index in the `vars`
+ * array of the `s_shell` structure. In our minishell, we have the
+ * following kinds of variables:
+ *
+ *     SPECIAL PARAMETER VARIABLES:
+ *         Shell parameter variables with special behavior.
+ *         Netiher of these variables can be changed or deleted.
+ *		       0.  ~
+ *             1.  $?
+ *             2.  $$
+ *             3.  $#
+ *             4.  $*
+ *             5.  $0
+ *             6.  $1
+ *             7.  $2
+ *             8.  $3
+ *             9.  $4
+ *             10. $5
+ *             11. $6
+ *             12. $7
+ *             13. $8
+ *             14. $9
+ *
+ *     SO-CALLED 'SPECIAL' LOCAL VARIABLES (`f_inherit` flag is cleared)
+ *         Local variables that have a critical or near-critical role
+ *         in the shell's operation. Some of them cannot be modified
+ *         or deleted (`f_readonly` flag is set), while others can
+ *         (`f_readonly` flag is cleared);
+ *         The complete list of them:
+ *			   15. PPID					(can't be changed/deleted)
+ *			   16. UID					(can't be changed/deleted)
+ *			   17. EUID					(can't be changed/deleted) the same as UID
+ *             18. MSHPID				(can't be changed/deleted)
+ *			   19. MSH_SUBSHELL			(has default)
+ *			   20. MSH_VERSION			(has default)
+ *			   21. HISTFILESIZE			(has default)
+ *			   22. HISTFILE				(has default)
+ *			   23. HISTSIZE				(has default)
+ *			   24. MSH					(unknown)
+ *			   25. HOSTNAME				(has default)
+ *			   26. HOSTTYPE				(has default)
+ *			   27. OSTYPE				(has default)
+ *			   28. MACHTYPE				(has default)
+ *			   29. PS1					(has default)
+ *			   30. PS2					(has default)
+ *			   31. PS4					(has default)
+ *
+ *         MINISHELLPID is an analogue of BASHPID. It is a special variable
+ *         whose value is calculated at the moment a (sub)shell expands it.
+ *
+ *         MINISHELL_SUBSHELL is an analogue of BASH_SUBSHELL. It is similar to
+ *         SHLVL, but it is local and specific to subshells. Using this variable,
+ *         we can determine whether we are running inside a subshell. Its value
+ *         is incremented each time a new shell is started.
+ *
+ *     CLASSICAL ENVIRONMENT VARIABLES (`f_inherit` flag is set)
+ *         Variables inherited by child processes. Nothing special here.
+ *         There are variables that were inherited. We can change the
+ *         value of any of them. However, among these variables there
+ *         are some special beasts that directly affect the shell's
+ *         workflow and behavior. Changing or deleting them may somewhat
+ *         'ruin' the current shell session as well as all its ancestors.
+ *         Some of these variables are even managed dynamically by the
+ *         shell itself, for example $SHLVL
+ *         The complete list of them:
+ *             32. PATH					(has default)
+ *             33. SHLVL				(calculates during execution)
+ *             34. PWD					(calculates during execution)
+ *             35. OLDPWD				(calculates during execution)
+ *             36. HOME					(finds in the system)
+ *             37. SHELL				(finds in the system)
+ *             38. USER					(finds in the system)
+ *             39. LOGNAME
+ *
+ *         So yeah.. the first 37 indices in vars are reserved for easier
+ *         access. After that, all newly added local or environment variables
+ *         will have mixed indices
+ *
+ *     USER'S LOCAL VARIABLES 
+ *         Created by the user. These variables may be exported
+ *         and therefore inherited by child processes;
+ *         Examples: 
+ *             BLA='keke'
+ *             LOL='azaza'*
+ *
+ * */
 
 #endif

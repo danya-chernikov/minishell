@@ -7,6 +7,4 @@ bool	strings_equal(char *str1, char *str2);
 int		div2_str_by_delim(char *str, char delim, char **part1, char **part2);
 int		div2_str_by_delim_alloc(char **part1, char **part2);
 
-bool	in_locals(t_env *env, char *var_name); // DOUBT WE NEED IT ANYMORE!
-
 #endif

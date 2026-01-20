@@ -3,7 +3,7 @@
 
 typedef struct s_parser_data	t_parser_data;
 
-# include "aux.h"
+# include "aux_prompt_parser.h"
 
 # define NONE_PAR_IND	-1
 # define NOT_CLOSED_PAR	0	// This parenthesis wasn't closed yet (We didn't pass it)

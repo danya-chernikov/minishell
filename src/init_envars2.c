@@ -1,5 +1,8 @@
 #include "shell.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 // PATH
 void	set_env_path(t_env *env)
 {
@@ -64,7 +67,7 @@ int	set_env_pwd_user_data(t_env *env)
 	uid_t		uid;
 	int			res;
 
-	uid = (uid_t)ft_atoi(env->vars[SL_UID]);
+	uid = (uid_t)ft_atoi(env->vars[SL_UID].value);
 	res = ft_getpwuid(&pwd, uid);
 	if (res) // Success
 	{

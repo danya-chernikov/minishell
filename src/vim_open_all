@@ -1,0 +1,1 @@
+main.c shell.c shell.h cmdargs_parser.c cmdargs_parser.h init_paramvars.c init_localvars.c init_localvars2.c init_localvars3.c init_localvars4.c init_localvars5.c init_envars.c init_envars2.c init_envars3.c env.c env.h history.c prompt_parser.c prompt_parser.h aux_prompt_parser.c quote.c token.c operand.c engine.c exec.c builtin.c error.c error.h aux_common.c debug.c test.c

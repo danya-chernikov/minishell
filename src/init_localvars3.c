@@ -25,7 +25,7 @@ int	set_local_histfile(t_env *env)
 }
 
 // HISTSIZE	
-int	set_local_histfile(t_env *env)
+int	set_local_histsize(t_env *env)
 {
 	env->vars[SL_HSIZE].name = ft_strdup("HISTSIZE");
 	env->vars[SL_HSIZE].value = ft_itoa((int)DEF_HISTSIZE);

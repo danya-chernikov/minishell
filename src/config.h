@@ -1,39 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-# define HOSTNAME_PATH	"/etc/hostname" // Where to put it if not here?
-
-/* minishell config files
- * etc_prof_path	  - DEF_MINISHL_ETC_PROF_PATH		="/etc/profile";
- *						DEF_BASH_ETC_PROF_PATH			="/etc/profile";
- *
- * home_prof_path	  - DEF_MINISHL_HOME_PROF_PATH		="~/.minishell_profile";
- *					    DEF_BASH_HOME_PROF_PATH			="~/.bash_profile";
- *
- * home_login_path	  - DEF_MINISHL_HOME_LOGIN_PATH		="~/.minishell_login";
- *					  - DEF_BASH_HOME_LOGIN_PATH		="~/.bash_login";
- *
- * home_cmn_prof_path - DEF_MINISHL_HOME_CMN_PROF_PATH	="~/.profile";
- *						DEF_BASH_HOME_CMN_PROF_PATH		="~/.profile";
- * 
- * home_logout_path	  - DEF_MINISHL_HOME_LOGOUT_PATH	="~/.minishell_logout";
- *					  - DEF_BASH_HOME_LOGOUT_PATH		="~/.bash_logout";
- *
- * etc_logout_path	  - DEF_MINISHL_ETC_LOGOUT_PATH
- *						="/etc/minishell.minishell_logout";
- *					  - DEF_BASH_ETC_LOGOUT_PATH
- *						="/etc/bash.bash_logout";
- *
- * etc_hist_path	  - DEF_MINISHL_HOME_HIST_PATH		"~/.minishell_history";
- *						DEF_BASH_HOME_HIST_PATH			="~/.bash_history";
- *
- * etc_rc_path		  - DEF_MINISHL_ETC_RC_PATH
- *						="/etc/minishell.minishellrc";
- *					  - DEF_BASH_ETC_RC_PATH
- *						="/etc/bash.bashrc";
- *
- * home_rc_path		  - DEF_MINISHL_HOME_RC_PATH		="~/.minishellrc";
- *					  - DEF_BASH_HOME_RC_PATH			="~/.bashrc". */
+// Where to put it if not here?
+# define HOSTNAME_PATH					"/etc/hostname"
 
 /* LOGIN SHELL*/
 
@@ -85,5 +54,37 @@ typedef struct s_configs
 	char	*etc_rc_path;
 	char	*home_rc_path;
 }	t_configs;
+
+/* minishell config files
+ * etc_prof_path	  - DEF_MINISHL_ETC_PROF_PATH		="/etc/profile";
+ *						DEF_BASH_ETC_PROF_PATH			="/etc/profile";
+ *
+ * home_prof_path	  - DEF_MINISHL_HOME_PROF_PATH		="~/.minishell_profile";
+ *					    DEF_BASH_HOME_PROF_PATH			="~/.bash_profile";
+ *
+ * home_login_path	  - DEF_MINISHL_HOME_LOGIN_PATH		="~/.minishell_login";
+ *					  - DEF_BASH_HOME_LOGIN_PATH		="~/.bash_login";
+ *
+ * home_cmn_prof_path - DEF_MINISHL_HOME_CMN_PROF_PATH	="~/.profile";
+ *						DEF_BASH_HOME_CMN_PROF_PATH		="~/.profile";
+ * 
+ * home_logout_path	  - DEF_MINISHL_HOME_LOGOUT_PATH	="~/.minishell_logout";
+ *					  - DEF_BASH_HOME_LOGOUT_PATH		="~/.bash_logout";
+ *
+ * etc_logout_path	  - DEF_MINISHL_ETC_LOGOUT_PATH
+ *						="/etc/minishell.minishell_logout";
+ *					  - DEF_BASH_ETC_LOGOUT_PATH
+ *						="/etc/bash.bash_logout";
+ *
+ * etc_hist_path	  - DEF_MINISHL_HOME_HIST_PATH		"~/.minishell_history";
+ *						DEF_BASH_HOME_HIST_PATH			="~/.bash_history";
+ *
+ * etc_rc_path		  - DEF_MINISHL_ETC_RC_PATH
+ *						="/etc/minishell.minishellrc";
+ *					  - DEF_BASH_ETC_RC_PATH
+ *						="/etc/bash.bashrc";
+ *
+ * home_rc_path		  - DEF_MINISHL_HOME_RC_PATH		="~/.minishellrc";
+ *					  - DEF_BASH_HOME_RC_PATH			="~/.bashrc". */
 
 #endif

@@ -4,7 +4,7 @@
 # include <stddef.h>
 
 # include "operand.h"
-# include "aux.h"
+# include "aux_prompt_parser.h"
 
 # define TOKEN_PIPE			"|"
 # define TOKEN_OPEN_PAR		"("

@@ -11,7 +11,7 @@
 # include "quote.h"
 # include "token.h"
 # include "operand.h"
-# include "aux.h"
+# include "aux_prompt_parser.h"
 # include "error.h"
 
 # define MAX_FORMAT_STR_LEN	64

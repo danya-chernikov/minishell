@@ -1,5 +1,7 @@
 #include "shell.h"
 
+#include <stdio.h>
+
 static void	prelim_vars_init(t_env *env);
 static int	check_mem_errors(t_env *env);
 
@@ -20,15 +22,21 @@ static int	check_mem_errors(t_env *env);
  * our own special local variables in current session) */
 int	msh_set_env_vars(t_env *env)
 {
+	int	ret;
+
 	prelim_vars_init(env);
 	set_env_path(env);
 	set_env_shelevel(env);
-	set_env_pwd(env);
+	if (set_env_pwd(env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
 	set_env_oldpwd(env);
 	if (set_env_pwd_user_data(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 	set_env_logname(env);
 	env->vars_num += SENV_VARS_NUM;
+	ret = set_rest_env_vars(env);
+	if (ret != COMMON_SUCCESS)
+		return (ret);
 	// Check for memory errors
 	if (check_mem_errors(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);

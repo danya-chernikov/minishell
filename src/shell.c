@@ -1,11 +1,9 @@
 #include "shell.h"
 #include "cmdargs_parser.h"
 
-#include <stdio.h>
+#include "debug.h"
+
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
 
@@ -69,8 +67,16 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	/* Set local and environment variables */
 	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	if (msh_set_env_vars(&msh->env) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
+	res = msh_set_env_vars(&msh->env);
+	if (res != COMMON_SUCCESS)
+		return (res);
+//#ifdef DEBUG
+	printf("Local variables:\n");
+	env_print_locals(&msh->env);
+	printf("\n");
+	printf("Environment variables:\n");
+	env_print_env(&msh->env);
+//#endif
 
 	return (COMMON_SUCCESS);
 }

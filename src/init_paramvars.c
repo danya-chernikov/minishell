@@ -1,5 +1,7 @@
 #include "shell.h"
 
+#include <stdio.h>
+
 static void	prelim_vars_init(t_env *env);
 static void	set_var_names(t_env *env);
 static int	check_mem_errors(t_env *env);
@@ -11,9 +13,8 @@ static int	check_mem_errors(t_env *env);
  * in one go */
 int	msh_init_param_vars(t_env *env)
 {
-	size_t		i;
-	int			res;
-	pid_t		pid;
+	int		res;
+	pid_t	pid;
 
 	prelim_vars_init(env);
 	set_var_names(env);

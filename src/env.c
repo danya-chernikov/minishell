@@ -58,13 +58,15 @@ char	*env_get_val(t_env *env, char *name)
 t_env_var	*env_get_ptr(t_env *env, char *name)
 {
 	t_env_var	*var;
+	size_t		i;
 
-	var = &env->vars[0];
-	while (var)
+	i = 0;
+	while (i < env->vars_num)
 	{
-		if (strings_equal(name, env->vars[i].name))
+		var = &env->vars[i];
+		if (strings_equal(name, var->name))
 			return (var);
-		++var;
+		++i;
 	}
 	return (NULL);
 }
@@ -80,7 +82,7 @@ bool	env_exist(t_env *env, char *name)
  * If a variable named `name` has the read-only
  * flag set returns an error. Both `name` and
  * `value` must live on heap! */
-int	env_set(t_env *env, char *name, char *value) // Or maybe **value?
+int	env_set(t_env *env, char *name, char *value, t_var_type type)
 {
 	t_env_var	*var;
 
@@ -108,8 +110,14 @@ int	env_set(t_env *env, char *name, char *value) // Or maybe **value?
 			print_shell_error(NULL, MAX_ENV_NUM_ERR_MSG);
 			return (COMMON_FAILURE);
 		}
-		env->vars[env->vars_num - 1].name = name;
-		env->vars[env->vars_num - 1].value = value;
+		env->vars[env->vars_num].type = type;
+		env->vars[env->vars_num].f_readonly = false;
+		if (type == ENV)
+			env->vars[env->vars_num].f_inherit = true;
+		else
+			env->vars[env->vars_num].f_inherit = false;
+		env->vars[env->vars_num].name = name;
+		env->vars[env->vars_num].value = value;
 		++env->vars_num;
 	}
 	return (COMMON_SUCCESS);
@@ -193,8 +201,15 @@ void	env_print_value(t_env *env, char *name)
  * processes */
 void	env_print_env(t_env *env)
 {
-
-	(void)env;	
+	size_t	vi;
+	
+	vi = 0;	
+	while (vi < env->vars_num)
+	{
+		if (env->vars[vi].name && env->vars[vi].type == ENV)
+			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		++vi;
+	}
 }
 
 /* Implementation of the `set` built-in
@@ -203,7 +218,15 @@ void	env_print_env(t_env *env)
  * environment variables */
 void	env_print_all(t_env *env)
 {
-	(void)env;	
+	size_t	vi;
+	
+	vi = 0;	
+	while (vi < env->vars_num)
+	{
+		if (env->vars[vi].name && env->vars[vi].type != PARAM)
+			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		++vi;
+	}
 }
 
 /* I honestly have no idea
@@ -215,5 +238,13 @@ void	env_print_all(t_env *env)
  * exactly that wuw */
 void	env_print_locals(t_env *env)
 {
-	(void)env;	
+	size_t	vi;
+	
+	vi = 0;	
+	while (vi < env->vars_num)
+	{
+		if (env->vars[vi].name && env->vars[vi].type == LOCAL)
+			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		++vi;
+	}
 }

@@ -1,5 +1,12 @@
 #include "shell.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 // HOSTTYPE		
 int	set_local_hosttype(t_env *env)
 {
@@ -35,7 +42,7 @@ char	*get_hostname(void)
 	}
 	if (hostname[ft_strlen(hostname) - 1] == '\n')
 		hostname[ft_strlen(hostname) - 1] = '\0';
-	return (COMMON_SUCCESS);
+	return (hostname);
 }
 
 // HOSTNAME	
