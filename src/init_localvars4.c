@@ -40,8 +40,7 @@ char	*get_hostname(void)
 		perror("close");
 		return (NULL);
 	}
-	if (hostname[ft_strlen(hostname) - 1] == '\n')
-		hostname[ft_strlen(hostname) - 1] = '\0';
+	remove_newline(hostname);
 	return (hostname);
 }
 

@@ -6,6 +6,8 @@
 
 /* LOGIN SHELL*/
 
+# define LOGIN_CONFIGS_NUM				6
+
 /* Original bash default configs paths */
 # define DEF_BASH_ETC_PROF_PATH			"/etc/profile"
 # define DEF_BASH_HOME_PROF_PATH		"~/.bash_profile"
@@ -30,6 +32,9 @@
 # define DEF_MSH_ETC_LOGOUT_PATH	"/etc/minishell.minishell_logout"
 
 /* NON-LOGIN SHELL */
+
+# define NONLOGIN_CONFIGS_NUM			2
+
 /* Original bash default configs paths */
 /* `/etc/bash.bashrc`	- also called system-wide initialization file;
  * `~/.bashrc`			- also called personal initialization file. */
@@ -42,18 +47,31 @@
 # define DEF_MSH_ETC_RC_PATH		"/etc/minishell.minishellrc"
 # define DEF_MSH_HOME_RC_PATH		"~/.minishellrc"
 
+typedef enum s_conf_type
+{
+	LOGIN_CONF,
+	NONLOGIN_CONF
+
+}	t_conf_type;
+
 typedef struct s_configs
 {
+	// Login
 	char	*etc_prof_path;
 	char	*home_prof_path;
 	char	*home_login_path;
 	char	*home_cmn_prof_path;
 	char	*home_logout_path;
 	char	*etc_logout_path;
-	char	*home_hist_path;
+	char	*login[LOGIN_CONFIGS_NUM];
+	// Non-login
 	char	*etc_rc_path;
 	char	*home_rc_path;
+	char	*nonlogin[NONLOGIN_CONFIGS_NUM];
 }	t_configs;
+
+void	configs_init(t_configs *cnf);
+void	configs_free(t_configs *cnf);
 
 /* minishell config files
  * etc_prof_path	  - DEF_MINISHL_ETC_PROF_PATH		="/etc/profile";

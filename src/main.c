@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <readline/readline.h>
-#include <readline/history.h>
-
 #include "libft.h"
-
 #include "shell.h"
 #include "engine.h"
-#include "builtin.h" // for exit
 
 int	main(int argc, char **argv, char **env)
 {
@@ -29,6 +21,11 @@ int	main(int argc, char **argv, char **env)
 		// that interrupted our minishell
 		shret = fret;
 	}
+	fret = msh_launch(&msh);
+	if (fret == COMMON_SYS_ERR) // -1
+		shret = SYS_ERR;
+	else
+		shret = fret;
 
 	// Read configs
 	

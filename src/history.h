@@ -3,6 +3,9 @@
 
 # include <stddef.h>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 # include "error.h"
 
 # define MAX_HIST_LINES_NUM	4096
@@ -42,19 +45,24 @@ typedef enum e_hist_type
 typedef struct e_hist_cmd
 {
 	t_hist_type	type;
-	size_t		line_num;
-	char		*cmd;
+	char		*cmd;// on heap
+	size_t		id;
 
 }	t_hist_cmd;
 
 typedef struct e_history
 {
 	t_hist_cmd	*lines;//on heap
+	size_t		lines_num;
+	char		*histfile_path;
 	int			histsize;
 	int			histfilesize;
 
 }	t_history;
 
-int	history_init(t_history *history);
+int		history_init(t_history *history);
+void	history_push(t_history *history, char *line, t_hist_type type);
+void	history_pop(t_history *history);
+void	history_free(t_history *history);
 
 #endif

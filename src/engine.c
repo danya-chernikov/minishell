@@ -7,12 +7,13 @@
  * only need to prompt the user to enter another command in the shell;
  *
  * If it returns 1, everything is fine.
- * The parser_engine() is recursive function!
- * */
+ * The parser_engine() is recursive function! */
 int	shell_engine(char *prompt, int *ret_code)
 {
 	t_parser_data	pdata;
 
+	if (!prompt || ft_strlen(prompt) == 0)
+		return (COMMON_SUCCESS);
 	if (!parser_init(&pdata, prompt)) // Non-critial parser error
 		return (0);
 	if (!quotes_parser(&pdata))
@@ -20,9 +21,9 @@ int	shell_engine(char *prompt, int *ret_code)
 	if (!parser_engine(&pdata)) // If we got non-critical parser error
 		return (0); // Just prompt user to enter another command(s)
 
-	#ifndef DEBUG
-		print_all(&pdata);
-	#endif
+#if DEBUG == 1
+	print_all(&pdata);
+#endif
 
 	if (!exec_ops(&pdata, ret_code))
 		return (-1);
@@ -31,5 +32,5 @@ int	shell_engine(char *prompt, int *ret_code)
 	if (!close_pipes(&pdata))
 		return (-1);
 
-	return (1);
+	return (COMMON_SUCCESS);
 }

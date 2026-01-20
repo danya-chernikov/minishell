@@ -1,5 +1,41 @@
 #include "debug.h"
 
+void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
+{
+	int	i;
+
+	i = 0;
+	if (ctype == LOGIN_CONF)	
+	{
+		while (i < LOGIN_CONFIGS_NUM)
+		{
+			printf("%s\n", cnf->login[i]);
+			++i;
+		}
+	}
+	else
+	{
+		while (i < NONLOGIN_CONFIGS_NUM)
+		{
+			printf("%s\n", cnf->nonlogin[i]);
+			++i;
+		}
+	}
+}
+
+void	dbg_print_filehistory(t_history *history)
+{
+	size_t	i;
+
+	printf("\nHistory from file:\n");
+	i = 0;
+	while (i < history->lines_num)
+	{
+		printf("%s\n", history->lines[i].cmd);
+		++i;
+	}
+}
+
 void	print_all(t_parser_data *d)
 {
 	print_parsed_data(d);

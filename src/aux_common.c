@@ -3,6 +3,7 @@
 #include "env.h"
 #include "error.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 bool	strings_equal(char *str1, char *str2)
@@ -13,6 +14,65 @@ bool	strings_equal(char *str1, char *str2)
 		return (true);
 	}
 	return (false);
+}
+
+void	remove_newline(char *str)
+{
+	if (str[ft_strlen(str) - 1] == '\n')
+		str[ft_strlen(str) - 1] = '\0';
+}
+
+/* Concatenates the relative path `rel_path`
+ * with the current working directory to obtain
+ * the full path to the entity represented by
+ * `rel_path`. Allocates memory for the returned
+ * full path. Returns NULL on failure */
+char	*get_full_path(char *rel_path)
+{
+	char	*full_path;
+	char	cwd[PATH_MAX];
+	size_t	fp_len;
+
+	if (!getcwd(cwd, PATH_MAX))
+	{
+		perror("getcwd");
+		return (NULL);
+	}
+	fp_len = ft_strlen(cwd) + ft_strlen(rel_path) + 1;
+	full_path = (char *)malloc(fp_len * sizeof(char));
+	if (!full_path)
+	{
+		perror("malloc");
+		return (NULL);
+	}
+	ft_strlcpy(full_path, cwd, fp_len);
+	ft_strlcat(full_path, rel_path, fp_len);
+	return (full_path);
+}
+
+/* If ~ does not exist in `str` returns	a duplicate
+ * of `str` on heap. On error returns NULL */
+char	*expand_homedir(char *str, char *home)
+{
+	size_t		new_size;
+	char		*new_str;
+	char		*tilda;
+	ptrdiff_t	pdif;
+	
+	tilda = ft_strchr(str, '~');
+	if (!tilda)
+		return (ft_strdup(str));
+	// Minus one ~ symbol plus one null-byte annihilate each other
+	new_size = ft_strlen(str) + ft_strlen(home); // -1 + 1
+	new_str = (char *)malloc(new_size * sizeof(char));
+	if (!new_str)
+		return (NULL);
+	// plus 1 null-terminator	
+	pdif = ft_abs((ptrdiff_t)str - (ptrdiff_t)tilda);
+	ft_strlcpy(new_str, str, pdif + 1);
+	ft_strlcat(new_str, home, new_size);
+	ft_strlcat(new_str, str + pdif, new_size);
+	return (new_str);
 }
 
 /* Does the same as ft_split(), but only for two tokens, i.e. it splits `str`

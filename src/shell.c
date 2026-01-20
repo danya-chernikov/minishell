@@ -1,6 +1,5 @@
 #include "shell.h"
 #include "cmdargs_parser.h"
-
 #include "debug.h"
 
 #include <stdlib.h>
@@ -70,14 +69,19 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	res = msh_set_env_vars(&msh->env);
 	if (res != COMMON_SUCCESS)
 		return (res);
-//#ifdef DEBUG
+
+#if DEBUG == 1
 	printf("Local variables:\n");
 	env_print_locals(&msh->env);
 	printf("\n");
 	printf("Environment variables:\n");
 	env_print_env(&msh->env);
-//#endif
+#endif
 
+	// Read configs
+	if (msh_load_configs(msh) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+		
 	return (COMMON_SUCCESS);
 }
 
@@ -99,6 +103,8 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->opts.f_verbose = false;
 	msh->opts.f_norc = false;
 	msh->opts.f_c = false;
+	// Init configs
+	configs_init(&msh->configs);
 }
 
 void	msh_free_all_vars(t_env *env)
@@ -120,13 +126,13 @@ void	msh_free_all_vars(t_env *env)
 		}
 		++i;
 	}
+	if (env->vars)
+		free(env->vars);
 }
 
 void	msh_free(t_shell *msh)
 {
 	msh_free_all_vars(&msh->env);
-	if (msh->env.vars)
-		free(msh->env.vars);
-	if (msh->history.lines)
-		free(msh->history.lines);
+	history_free(&msh->history);
+	configs_free(&msh->configs);
 }

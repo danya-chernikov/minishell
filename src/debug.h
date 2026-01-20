@@ -7,7 +7,11 @@
 # include <stdio.h>
 
 # include "prompt_parser.h"
+# include "config.h"
+# include "history.h"
 
+void	dbg_print_configs(t_configs *cnf, t_conf_type ctype);
+void	dbg_print_filehistory(t_history *history);
 void	print_all(t_parser_data *d);
 void	print_quotes(t_parser_data *d);
 void	print_parsed_data(t_parser_data *d);

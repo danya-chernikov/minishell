@@ -4,25 +4,26 @@ LIBFT_PATH=Libft/
 LIBVECTOR_NAME=vector
 LIBVECTOR_PATH=vector/
 NAME=minishell
+DEBUG_LVL=1
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c \
-	 shell.c cmdargs_parser.c \
+	 shell.c shell_launcher.c shell_configs.c shell_history.c cmdargs_parser.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
-	 env.c history.c \
+	 env.c history.c config.c \
 	 prompt_parser.c aux_prompt_parser.c par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
 	 error.c aux_common.c debug.c test.c
 
 OBJS=main.o \
-	 shell.o cmdargs_parser.o \
+	 shell.o shell_launcher.o shell_configs.o shell_history.o cmdargs_parser.o \
 	 init_paramvars.o init_localvars.o init_localvars2.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
-	 env.o history.o \
+	 env.o history.o config.o \
 	 prompt_parser.o aux_prompt_parser.o par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
 	 error.o aux_common.o debug.o test.o
@@ -40,7 +41,6 @@ $(NAME) : $(OBJS)
 	$(OBJS) \
 	-l$(LIBFT_NAME) -l$(LIBVECTOR_NAME) -lreadline \
 	-no-pie \
-	-DDEBUG \
 	-o $(NAME)
 
 clean :
@@ -51,99 +51,142 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c shell.h engine.h builtin.h libft.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c main.c
+main.o : main.c shell.h libft.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c main.c
 
 # ========== Shell initialization and command line arguments parser ==========
-shell.o : shell.c shell.h cmdargs_parser.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c shell.c
+shell.o : shell.c shell.h cmdargs_parser.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell.c
 
-cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c cmdargs_parser.c
+shell_launcher.o : shell_launcher.c shell.h engine.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_launcher.c
+
+shell_configs.o : shell_configs.c shell.h engine.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_configs.c
+
+shell_history.o : shell_history.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_history.c
+
+cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c cmdargs_parser.c
 
 
 # ==================== Parameter-variables initialization ====================
-init_paramvars.o : init_paramvars.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_paramvars.c
+init_paramvars.o : init_paramvars.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_paramvars.c
 
 
 # ===================== Special variables initialization =====================
-init_localvars.o : init_localvars.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_localvars.c
+init_localvars.o : init_localvars.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_localvars.c
 
-init_localvars2.o : init_localvars2.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_localvars2.c
+init_localvars2.o : init_localvars2.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_localvars2.c
 
-init_localvars3.o : init_localvars3.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_localvars3.c
+init_localvars3.o : init_localvars3.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_localvars3.c
 
-init_localvars4.o : init_localvars4.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_localvars4.c
+init_localvars4.o : init_localvars4.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_localvars4.c
 
-init_localvars5.o : init_localvars5.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_localvars5.c
+init_localvars5.o : init_localvars5.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_localvars5.c
 
 
 # =================== Environment variables initialization ===================
-init_envars.o : init_envars.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_envars.c
+init_envars.o : init_envars.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_envars.c
 
-init_envars2.o : init_envars2.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_envars2.c
+init_envars2.o : init_envars2.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_envars2.c
 
-init_envars3.o : init_envars3.c shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c init_envars3.c
+init_envars3.o : init_envars3.c shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c init_envars3.c
 
-# ========================= Environment and history ==========================
-env.o : env.c env.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c env.c
+# ====================== Environment, history, configs =======================
+env.o : env.c env.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env.c
 
-history.o : history.c history.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c history.c
+history.o : history.c history.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c history.c
+
+config.o : config.c config.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c config.c
 
 
 # ============================== Prompt parser ===============================
-prompt_parser.o : prompt_parser.c prompt_parser.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c prompt_parser.c
+prompt_parser.o : prompt_parser.c prompt_parser.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser.c
 
-aux_prompt_parser.o : aux_prompt_parser.c aux_prompt_parser.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c aux_prompt_parser.c
+aux_prompt_parser.o : aux_prompt_parser.c aux_prompt_parser.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_prompt_parser.c
 
-par.o : par.c par.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c par.c
+par.o : par.c par.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c par.c
 
-quote.o : quote.c prompt_parser.h quote.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c quote.c
+quote.o : quote.c prompt_parser.h quote.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c quote.c
 
-token.o : token.c prompt_parser.h token.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c token.c
+token.o : token.c prompt_parser.h token.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c token.c
 
-operand.o : operand.c operand.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c operand.c
+operand.o : operand.c operand.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c operand.c
 
 
 # =========================== Engine and execution ===========================
-engine.o : engine.c engine.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c engine.c
+engine.o : engine.c engine.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c engine.c
 
-exec.o : exec.c exec.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c exec.c
+exec.o : exec.c exec.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec.c
 
-builtin.o : builtin.c builtin.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c builtin.c
+builtin.o : builtin.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin.c
 
 
 # ============================ Auxiliary services ============================
-error.o : error.c error.h shell.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c error.c
+error.o : error.c error.h shell.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c error.c
 
-aux_common.o : aux_common.c aux_common.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c aux_common.c
+aux_common.o : aux_common.c aux_common.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_common.c
 
 debug.o : debug.c debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c debug.c
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c debug.c
 
-test.o : test.c test.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -c test.c
+test.o : test.c test.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c test.c
 
 .PHONY: all clean fclean re libft libvector

@@ -123,6 +123,21 @@ int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 void	msh_free(t_shell *msh);
 void	msh_free_all_vars(t_env *env);
 
+/* shell_launcher.c */
+int		msh_launch(t_shell *msh);
+int		launch_script(t_shell *msh);
+int		launch_cmd(t_shell *msh);
+int		launch_stdin_cmd(t_shell *msh);
+int		launch_int_session(t_shell *msh);
+
+/* shell_configs.c */
+int		msh_load_configs(t_shell *msh);
+int		load_login_configs(t_shell *msh);
+int		load_nonlogin_configs(t_shell *msh);
+
+/* shell_history.c */
+int		msh_load_history(t_shell *msh);
+
 /* init_paramvars.c  */
 int		msh_init_param_vars(t_env *env);
 
