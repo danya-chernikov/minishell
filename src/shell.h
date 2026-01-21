@@ -25,6 +25,9 @@
 # define VERBOSE_SHORT_OPT	"-v"
 # define C_SHORT_OPT		"-c"
 
+# define PROMPT_INV_LEN		512	// Maximum length of user's prompt invitation string
+# define MAX_SUBDOMAIN_LEN	64
+
 /* minishell options 
  * f_login:		-l, --login;
  * f_verbose:	-v, --verbose;
@@ -112,9 +115,9 @@ typedef struct e_shell
 	t_env			env;
 	int				argc;
 	char			**argv;
-	char			*prompt_inv;
-	char			*script;//on stack
-	char			*c_cmd;// on stack
+	char			*prompt_inv;	// on heap
+	char			*script;		// on stack
+	char			*c_cmd;			// on stack
 
 }	t_shell;
 
@@ -129,6 +132,9 @@ int		launch_script(t_shell *msh);
 int		launch_cmd(t_shell *msh);
 int		launch_stdin_cmd(t_shell *msh);
 int		launch_int_session(t_shell *msh);
+
+/* aux_shell.c */
+int		gen_prompt_inv(t_shell *msh);
 
 /* shell_configs.c */
 int		msh_load_configs(t_shell *msh);

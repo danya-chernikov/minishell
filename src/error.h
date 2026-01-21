@@ -29,6 +29,8 @@
 # define CMD_NOT_FOUND_ERR_MSG	"command not found"
 # define HOME_NOT_SET_ERR_MSG	"HOME not set"
 # define NO_SUCH_FD_ERR_MSG		"No such file or directory"
+# define DOM_TOO_LONG_ERR_MSG	"(Sub)domain is too long"
+# define PROMPT_TOO_LONG		"Prompt is too long"
 
 # define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
 # define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"

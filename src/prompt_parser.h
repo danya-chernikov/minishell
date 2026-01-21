@@ -14,10 +14,9 @@
 # include "aux_prompt_parser.h"
 # include "error.h"
 
-# define MAX_FORMAT_STR_LEN	64
-# define PROMPT_INV_LEN		64	// Maximum length of user's prompt invitation string
-# define MAX_PIPES_NUM		128
-# define MAX_PROGRAM_PATH	256
+# define MAX_FORMAT_STR_LEN	256
+# define MAX_PIPES_NUM		256
+# define MAX_PROGRAM_PATH	4096
 # define NONE_INDEX			-1
 # define NONE_PIPE			-1
 

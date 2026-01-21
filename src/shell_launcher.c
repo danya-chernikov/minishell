@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "engine.h"
 #include "debug.h"
+#include "builtin.h" // for exit command
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -35,13 +36,7 @@ int	msh_launch(t_shell *msh)
 	}
 	else if (msh->mode == INT_MODE)
 	{
-		ret_code = launch_int_session(msh);
-		// Load history	
-		if (msh_load_history(msh) == COMMON_SYS_ERR)
-			return (COMMON_SYS_ERR);
-
-		// Form prompt
-		
+		ret_code = launch_int_session(msh);	
 	}
 
 	if (ret_code == COMMON_SYS_ERR)
@@ -90,7 +85,7 @@ int	launch_script(t_shell *msh)
 		remove_newline(line);
 		if (msh->opts.f_verbose)
 			printf("%s\n", line);
-		shell_engine(NULL, &ret_code);
+		shell_engine(line, &ret_code);
 		line = get_next_line(fd, &gnlerr);
 	}
 	if (!line && gnlerr)
@@ -107,29 +102,87 @@ int	launch_script(t_shell *msh)
 	return (ret_code);
 }
 
+/* Just execute the command 
+ * that goes after -c and exit */
 int	launch_cmd(t_shell *msh)
 {
 	int	ret_code;
 
-	(void)msh;
 	ret_code = 0;
+	shell_engine(msh->c_cmd, &ret_code);
 	return (ret_code);
 }
 
+/* Read commands from stdin and 
+ * exexute them */
 int	launch_stdin_cmd(t_shell *msh)
 {
-	int	ret_code;
+	int		ret_code;
+	int		gnlerr;
+	char	*line;
 
-	(void)msh;
 	ret_code = 0;
+	line = get_next_line(STDIN_FILENO, &gnlerr);
+	while (line)
+	{
+		remove_newline(line);
+		if (msh->opts.f_verbose)
+			printf("%s\n", line);
+		shell_engine(line, &ret_code);
+		line = get_next_line(STDIN_FILENO, &gnlerr);
+	}
+	if (!line && gnlerr)
+	{
+		print_shell_error(NULL, GNL_ERR_MSG);
+		gnl_finish(STDIN_FILENO);
+		return (COMMON_SYS_ERR);
+	}
 	return (ret_code);
 }
 
+/* Create an interactive shell session
+ * and ask user for commands showing
+ * prompt invitation */
 int	launch_int_session(t_shell *msh)
 {
-	int	ret_code;
+	int		ret_code;	// Shell return code
+	int		fres;		// Function return code
+	char	*rline_buf;
 
-	(void)msh;
+	// Load history	
+	if (msh_load_history(msh) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+
+	// Form prompt invitation
+	fres = gen_prompt_inv(msh);
+	if (fres != COMMON_SUCCESS)
+		return (fres);
+
 	ret_code = 0;
+	rline_buf = NULL;
+	while (1)
+	{
+		rline_buf = readline(msh->prompt_inv);
+		if (ft_strlen(rline_buf) == 0)
+		{
+			free(rline_buf);
+			rline_buf = NULL;
+			continue;
+		}
+		add_history(rline_buf);
+		if (strings_equal(rline_buf, EXIT_CMD))
+		{
+			free(rline_buf);
+			rline_buf = NULL;
+			break;
+		}
+		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR) // Critial system error occured
+			return (COMMON_SYS_ERR);
+		// In case if non-critial parser error occured
+		// we just free `rline_buf` and prompt user again
+		free(rline_buf);
+		rline_buf = NULL;
+	}
+
 	return (ret_code);
 }

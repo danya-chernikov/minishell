@@ -92,6 +92,7 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->mode = INT_MODE;
 	msh->env.vars = NULL;
 	msh->history.lines = NULL;
+	msh->prompt_inv = NULL;
 	msh->script = NULL;
 	msh->c_cmd = NULL;
 	// Assign arguments of main()
@@ -132,6 +133,8 @@ void	msh_free_all_vars(t_env *env)
 
 void	msh_free(t_shell *msh)
 {
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
 	msh_free_all_vars(&msh->env);
 	history_free(&msh->history);
 	configs_free(&msh->configs);

@@ -9,7 +9,8 @@ DEBUG_LVL=1
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c \
-	 shell.c shell_launcher.c shell_configs.c shell_history.c cmdargs_parser.c \
+	 shell.c shell_launcher.c aux_shell.c shell_configs.c shell_history.c \
+	 cmdargs_parser.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
@@ -19,7 +20,8 @@ SRCS=main.c \
 	 error.c aux_common.c debug.c test.c
 
 OBJS=main.o \
-	 shell.o shell_launcher.o shell_configs.o shell_history.o cmdargs_parser.o \
+	 shell.o shell_launcher.o aux_shell.o shell_configs.o shell_history.o \
+	 cmdargs_parser.o \
 	 init_paramvars.o init_localvars.o init_localvars2.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
@@ -63,6 +65,10 @@ shell.o : shell.c shell.h cmdargs_parser.h debug.h
 shell_launcher.o : shell_launcher.c shell.h engine.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_launcher.c
+
+aux_shell.o : aux_shell.c shell.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_shell.c
 
 shell_configs.o : shell_configs.c shell.h engine.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \

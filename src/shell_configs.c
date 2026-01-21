@@ -116,6 +116,8 @@ int	load_login_configs(t_shell *msh)
 	return (COMMON_SUCCESS);
 }
 
+/* If --norc option is set we do NOT
+ * read ~/.bashrc config */
 int	load_nonlogin_configs(t_shell *msh)
 {
 	int		fd;
