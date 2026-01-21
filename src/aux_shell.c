@@ -46,5 +46,11 @@ int	gen_prompt_inv(t_shell *msh)
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
+	ft_strlcpy(msh->prompt_inv, username, inv_len);
+	ft_strlcat(msh->prompt_inv, "@", inv_len);
+	ft_strlcat(msh->prompt_inv, subdomain, inv_len);
+	ft_strlcat(msh->prompt_inv, ":", inv_len);
+	ft_strlcat(msh->prompt_inv, pwd, inv_len);
+	ft_strlcat(msh->prompt_inv, "$", inv_len);
 	return (COMMON_SUCCESS);
 }

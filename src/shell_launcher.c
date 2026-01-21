@@ -153,15 +153,15 @@ int	launch_int_session(t_shell *msh)
 	if (msh_load_history(msh) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 
-	// Form prompt invitation
-	fres = gen_prompt_inv(msh);
-	if (fres != COMMON_SUCCESS)
-		return (fres);
-
 	ret_code = 0;
 	rline_buf = NULL;
 	while (1)
 	{
+		// Form prompt invitation
+		fres = gen_prompt_inv(msh);
+		if (fres != COMMON_SUCCESS)
+			return (fres);
+
 		rline_buf = readline(msh->prompt_inv);
 		if (ft_strlen(rline_buf) == 0)
 		{
