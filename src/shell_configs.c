@@ -69,6 +69,13 @@ int	msh_load_configs(t_shell *msh)
 	return (COMMON_SUCCESS);
 }
 
+/* Always opens /etc/profile. Then,
+ * consecutively tries to open:
+ *     ~/.minishell_profile
+ *     ~/.minishell_login
+ *     ~/.profile
+ * Commands are executed from the first
+ * file that is successfully opened */
 int	load_login_configs(t_shell *msh)
 {
 	int		fd;
@@ -78,14 +85,22 @@ int	load_login_configs(t_shell *msh)
 	char	*line;
 
 	cnf_i = 0;
-	while (cnf_i < LOGIN_CONFIGS_NUM)
+	while (cnf_i < LOGIN_CONFIGS_NUM - 2)
 	{
+		// Check if config exist
+		if (access(msh->configs.login[cnf_i], F_OK) == -1) // If not exists
+		{
+			// Go to the next config
+			++cnf_i;
+			continue;
+		}
 		fd = open(msh->configs.login[cnf_i], O_RDONLY);
 		if (fd == -1)
 		{
 			perror("open");
 			return (COMMON_SYS_ERR);
 		}
+		gnlerr = 0;
 		line = get_next_line(fd, &gnlerr);
 		while (line)
 		{
@@ -93,6 +108,7 @@ int	load_login_configs(t_shell *msh)
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
 			shell_engine(NULL, &ret_code);
+			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);
 		}
 		if (!line && gnlerr)
@@ -106,11 +122,11 @@ int	load_login_configs(t_shell *msh)
 			perror("close");
 			return (COMMON_SYS_ERR);
 		}
-		if (cnf_i > 0 && cnf_i < 4)
-		{
-			cnf_i = 4;
-			continue;
-		}
+		// If we successfully opened one
+		// of the three filed menioned,
+		// we just skip all others..
+		if (cnf_i > 0) // If we already processed /etc/profile
+			break;
 		++cnf_i;
 	}
 	return (COMMON_SUCCESS);
@@ -129,12 +145,19 @@ int	load_nonlogin_configs(t_shell *msh)
 	cnf_i = 0;
 	while (cnf_i < NONLOGIN_CONFIGS_NUM)
 	{
+		if (access(msh->configs.nonlogin[cnf_i], F_OK) == -1) // If not exists
+		{
+			// Go to the next config
+			++cnf_i;
+			continue;
+		}
 		fd = open(msh->configs.nonlogin[cnf_i], O_RDONLY);
 		if (fd == -1)
 		{
 			perror("open");
 			return (COMMON_SYS_ERR);
 		}
+		gnlerr = 0;
 		line = get_next_line(fd, &gnlerr);
 		while (line)
 		{
@@ -142,6 +165,7 @@ int	load_nonlogin_configs(t_shell *msh)
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
 			shell_engine(NULL, &ret_code);
+			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);
 		}
 		if (!line && gnlerr)

@@ -70,8 +70,8 @@ char	*expand_homedir(char *str, char *home)
 	// plus 1 null-terminator	
 	pdif = ft_abs((ptrdiff_t)str - (ptrdiff_t)tilda);
 	ft_strlcpy(new_str, str, pdif + 1);
-	ft_strlcat(new_str, home, new_size);
-	ft_strlcat(new_str, str + pdif, new_size);
+	ft_strlcat(new_str, home, new_size + 1);
+	ft_strlcat(new_str, str + pdif + 1, new_size + 1);
 	return (new_str);
 }
 

@@ -46,17 +46,21 @@ int msh_load_history(t_shell *msh)
 			perror("malloc");
 			return (COMMON_SYS_ERR);
 		}
+		if (access(msh->history.histfile_path, F_OK) == -1) // If not exists
+			return (COMMON_SUCCESS);
 		fd = open(msh->history.histfile_path, O_RDONLY);
 		if (fd == -1)
 		{
 			perror("open");
 			return (COMMON_SYS_ERR);
 		}
+		gnlerr = 0;
 		hline = get_next_line(fd, &gnlerr);
 		while (hline)
 		{
 			remove_newline(hline);
 			history_push(&msh->history, hline, FROM_FILE);
+			gnlerr = 0;
 			hline = get_next_line(fd, &gnlerr);
 		}
 		if (!hline && gnlerr)
