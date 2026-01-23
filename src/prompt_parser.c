@@ -35,7 +35,7 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 /* Parses the user's prompt string by connecting all
  * operands with pipes and launching or exiting subshells
  * when encountering '(' or ')' parentheses, respectively */
-bool parser_engine(t_parser_data *d)
+bool	parser_engine(t_parser_data *d)
 {
 	size_t	prompt_len;
 	bool	f_noerr;	// Parsing error flag
@@ -52,8 +52,10 @@ bool parser_engine(t_parser_data *d)
 		if (d->pi == prompt_len)
 			break ;
 
-		// If it's letter
-		if (ft_isalpha(d->prompt[d->pi]))
+		// If it's not special character
+		// or a special character but that is located inside a quotes interval
+		if (!is_special_char(d->prompt[d->pi]) ||
+			(is_special_char(d->prompt[d->pi]) && is_inside_quotes(d, d->pi)))
 		{
 			// Letter-operand can go only after pipe,
 			// '(', &&, || or be the first token
@@ -63,17 +65,20 @@ bool parser_engine(t_parser_data *d)
 				d->tokens[d->token_cnt - 1].type != OR &&
 				d->tokens[d->token_cnt - 1].type != NONE) // not the first token
 			{
-				parser_error(&f_noerr);
+				handle_prompt_parser_error(&f_noerr);
 				break ;
 			}
 
-			// Add this letter in the operators array
-			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
-			d->ops[d->op_cnt].name[1] = '\0';
+			// Traverse all symbols until the next operand or
+			// parenthesis, and add them to the operands array.
+			// All this symbols will represent a new operand
+			if (operand_push(d, d->pi) != COMMON_SUCCESS)
+			{
+				f_noerr = false;
+				break ;
+			}
 
 			token_push(d, OPERAND); // Add this operand into the tokens array
-
-			++d->op_cnt; // Order here is important!
 
 			++d->pi; // Move one symbol forward in prompt
 
@@ -100,7 +105,7 @@ bool parser_engine(t_parser_data *d)
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
-					parser_error(&f_noerr);
+					handle_prompt_parser_error(&f_noerr);
 					break ;
 				}
 
@@ -175,14 +180,15 @@ bool parser_engine(t_parser_data *d)
 				}
 				else // If after the letter goes neither '|' nor ')'
 				{
-					parser_error(&f_noerr);
+					handle_prompt_parser_error(&f_noerr);
 					break ;
 				}
 			}
 
-		} // if (ft_isalpha(prompt[pi]))
+		} // if (is_any_symbol(prompt[pi]))
 
-		else // If it's not a letter
+		// If it's a special character outside the parenthesis
+		else if (is_special_char(d->prompt[d->pi]) && !is_inside_quotes(d, d->pi))
 		{
 			// In case the first symbol going after ommitted spaces is '('
 			// Or in other words
@@ -217,7 +223,7 @@ bool parser_engine(t_parser_data *d)
 				if (d->tokens[d->token_cnt - 1].type != CLOSE_PAR &&
 					d->tokens[d->token_cnt - 1].type != OPERAND)
 				{
-					parser_error(&f_noerr);
+					handle_prompt_parser_error(&f_noerr);
 					break;
 				}
 
@@ -248,7 +254,7 @@ bool parser_engine(t_parser_data *d)
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
-					parser_error(&f_noerr);
+					handle_prompt_parser_error(&f_noerr);
 					break ;
 				}
 
@@ -264,7 +270,7 @@ bool parser_engine(t_parser_data *d)
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 					d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 				{
-					parser_error(&f_noerr);
+					handle_prompt_parser_error(&f_noerr);
 					break ;
 				}
 
@@ -275,7 +281,7 @@ bool parser_engine(t_parser_data *d)
 
 			else
 			{
-				parser_error(&f_noerr);
+				handle_prompt_parser_error(&f_noerr);
 				break;
 			}
 		} // else // If it's not a letter
@@ -301,7 +307,7 @@ void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr)
 		d->tokens[d->token_cnt - 1].type != OR &&
 		d->tokens[d->token_cnt - 1].type != NONE)
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return ;
 	}
 
@@ -327,7 +333,7 @@ void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr)
 	// When prompt like this "a | b | (" for example
 	if (d->pi == prompt_len)
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return ; // Go further by prompt
 	}
 
@@ -348,7 +354,7 @@ void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr)
 	// If the closing-parentheses array is empty
 	if (d->cpar_cnt == 0)
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return; // Go further by prompt
 	}
 
@@ -368,7 +374,7 @@ void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr)
 
 	if (i == (size_t)d->cpar_cnt) // We went out of the array border
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return ; // Go further by prompt
 	}
 
@@ -394,14 +400,14 @@ void	handle_close_par(t_parser_data *d, bool *f_noerr)
 	if (d->tokens[d->token_cnt - 1].type != OPERAND &&
 		d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return ;
 	}
 
 	// If the array of opening-parenthesis is empty
 	if (d->opar_cnt == 0)
 	{
-		parser_error(f_noerr);
+		handle_prompt_parser_error(f_noerr);
 		return ;
 	}
 

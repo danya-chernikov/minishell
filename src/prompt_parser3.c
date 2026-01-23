@@ -20,12 +20,3 @@ bool	its_PIPE(char *prompt, size_t plen, size_t pi)
 		return (true);
 	return (false);	
 }
-
-void	token_push(t_parser_data *d, t_token_type type)
-{
-	d->tokens[d->token_cnt].type = type;
-	if (type == OPERAND)
-		d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
-	d->tokens[d->token_cnt].start_pi = d->pi;
-	++d->token_cnt;
-}

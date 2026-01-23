@@ -47,7 +47,7 @@ typedef struct s_parser_data
 	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
 	
 	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
-	size_t		qpair_cnt;					// Counter off quote pairs
+	size_t		qpair_cnt;					// Counter of quote pairs
 
 }	t_parser_data;
 
@@ -58,18 +58,22 @@ void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr);
 void	handle_close_par(t_parser_data *d, bool *f_noerr);
 void	parser_free(t_parser_data *d);
 
-/* aux_prompt_parser.c */
-void	remove_right_spaces(char *prompt);
+/* prompt_parser2.c */
+void	token_push(t_parser_data *d, t_token_type type);
+int		operand_push(t_parser_data *d, size_t pi);
 bool	check_empty_par(char *prompt);
 int		later_goes_open_par(char *str, size_t ind);
-void	skip_spaces(char *prompt, size_t *pi);
 
-/* aux_prompt_parser2.c */
+/* prompt_parser3.c */
 bool	its_logical_AND(char *prompt, size_t plen, size_t pi);
 bool	its_logical_OR(char *prompt, size_t plen, size_t pi);
 bool	its_PIPE(char *prompt, size_t plen, size_t pi);
-void	token_push(t_parser_data *d, t_token_type type);
 
-
+/* prompt_parser4.c */
+void	skip_spaces(char *prompt, size_t *pi);
+bool	is_special_char(char sym);
+bool	is_inside_quotes(t_parser_data *d, size_t pi);
+bool	is_special_char_outside_quotes(t_parser_data *d, size_t pi);
+void	remove_right_spaces(char *prompt);
 
 #endif

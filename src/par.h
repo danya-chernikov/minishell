@@ -15,6 +15,7 @@ typedef enum e_par_type
 {
 	OPENING_PAR,
 	CLOSING_PAR
+
 }	t_par_type;
 
 void	pars_init(t_pair *pars);

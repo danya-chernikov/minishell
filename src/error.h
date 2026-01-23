@@ -20,6 +20,10 @@
 # define ERR_BUF_SIZE			256
 
 # define PARSER_ERR_MSG			"parsing error"
+# define TOO_LONG_OP_ERR_MSG	"operand is too long"
+# define TOO_MANY_OPS_ERR_MSG	"too many operands"
+# define UNMATCH_QUOTES_ERR_MSG	"unmatched quotes"
+
 # define SYNTAX_ERR_MSG			"syntax error"
 # define INV_OPT_ERR_MSG		"invalid option"
 # define C_OPT_ERR_MSG			"option requires an argument"
@@ -56,7 +60,9 @@ typedef enum e_exit_code
 	CMD_NOT_LOCATED_ERR = 127
 }	t_exit_code;
 
-void	parser_error(bool *f_noerr);
+void	handle_prompt_parser_error(bool *f_noerr);
+void	handle_prompt_parser_ext_error(bool *f_noerr, char *msg);
+void	print_prompt_parser_ext_error(char *msg);
 void	print_sys_error(char *msg);
 void	print_shell_error(char *culprit, char *msg);
 

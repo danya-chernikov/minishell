@@ -26,6 +26,7 @@ typedef enum e_token_type
 	AND,
 	OR,
 	NONE // No tokens were found yet
+	
 }   t_token_type;
 
 /* If this token's type is OPERAND we store
@@ -40,6 +41,7 @@ typedef struct s_token
 	t_token_type	type;
 	t_operand		*op;
 	size_t			start_pi;
+
 }	t_token;
 
 void	tokens_init(t_parser_data *d);

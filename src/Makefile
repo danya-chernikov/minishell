@@ -15,7 +15,7 @@ SRCS=main.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
 	 env.c history.c config.c \
-	 prompt_parser.c aux_prompt_parser.c aux_prompt_parser2.c \
+	 prompt_parser.c prompt_parser2.c prompt_parser3.c prompt_parser4.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
 	 aux_common.c error.c debug.c test.c
@@ -27,7 +27,7 @@ OBJS=main.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
 	 env.o history.o config.o \
-	 prompt_parser.o aux_prompt_parser.o aux_prompt_parser2.o \
+	 prompt_parser.o prompt_parser2.o prompt_parser3.o prompt_parser4.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
 	 aux_common.o error.o debug.o test.o
@@ -145,13 +145,21 @@ prompt_parser.o : prompt_parser.c prompt_parser.h libft.h vector.h error.h debug
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser.c
 
-aux_prompt_parser.o : aux_prompt_parser.c prompt_parser.h libft.h vector.h error.h debug.h
+prompt_parser.o : prompt_parser.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c aux_prompt_parser.c
+	-c prompt_parser.c
 
-aux_prompt_parser2.o : aux_prompt_parser2.c prompt_parser.h libft.h vector.h error.h debug.h
+prompt_parser2.o : prompt_parser2.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c aux_prompt_parser2.c
+	-c prompt_parser2.c
+
+prompt_parser3.o : prompt_parser3.c prompt_parser.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser3.c
+
+prompt_parser4.o : prompt_parser4.c prompt_parser.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser4.c
 
 par.o : par.c par.h prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
