@@ -18,7 +18,6 @@ int	shell_engine(char *prompt, int *ret_code)
 	fres = COMMON_SUCCESS;
 	while (try < 1)
 	{
-		fres = COMMON_SUCCESS;
 		if (!prompt || ft_strlen(prompt) == 0)
 			break ;
 
@@ -30,8 +29,12 @@ int	shell_engine(char *prompt, int *ret_code)
 		if (fres != COMMON_SUCCESS)
 			break ;
 
-		// May be launch only after quote intervals will be parsed
+		// May be launched only after quote intervals will be parsed
 		fres = comments_parser(&pdata);
+
+		fres = check_empty_par(&pdata);
+		if (fres != COMMON_SUCCESS)
+			break ;
 
 		fres = parser_engine(&pdata);
 		if (fres != COMMON_SUCCESS) // If we got non-critical parser error
@@ -60,7 +63,7 @@ int	shell_engine(char *prompt, int *ret_code)
  * interval and truncates `prompt`
  * buffer of `s_parser_data` structure
  * eliminating all what goes after this
- * comment symbol.  May be launch only
+ * comment symbol.  May be launched only
  * after quote intervals will be parsed
  * calling quotes_parser() */
 int	comments_parser(t_parser_data *d)

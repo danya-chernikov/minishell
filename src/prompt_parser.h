@@ -61,7 +61,7 @@ void	parser_free(t_parser_data *d);
 /* prompt_parser2.c */
 void	token_push(t_parser_data *d, t_token_type type);
 int		operand_push(t_parser_data *d, size_t pi);
-bool	check_empty_par(char *prompt);
+bool	check_empty_par(t_parser_data *d);
 int		later_goes_open_par(char *str, size_t ind);
 
 /* prompt_parser3.c */

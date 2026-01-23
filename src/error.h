@@ -23,6 +23,7 @@
 # define TOO_LONG_OP_ERR_MSG	"operand is too long"
 # define TOO_MANY_OPS_ERR_MSG	"too many operands"
 # define UNMATCH_QUOTES_ERR_MSG	"unmatched quotes"
+# define EMPTY_PARS_ERR_MSG		"empty parentheses are not permitted"
 
 # define SYNTAX_ERR_MSG			"syntax error"
 # define INV_OPT_ERR_MSG		"invalid option"

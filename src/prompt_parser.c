@@ -24,11 +24,6 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 	tokens_init(d);
 	pars_init(d->pars);
 
-	if (!check_empty_par(d->prompt))
-	{
-		write(STDERR_FILENO, PARSER_ERR_MSG, ft_strlen(PARSER_ERR_MSG));
-		return (COMMON_FAILURE);
-	}
 	return (COMMON_SUCCESS);
 }
 
@@ -43,6 +38,10 @@ bool	parser_engine(t_parser_data *d)
 	
 	f_noerr = true; // Let's assume there are no errors at first
 	prompt_len = ft_strlen(d->prompt);
+
+	if (!d->prompt || prompt_len == 0)
+		return f_noerr;
+
 	while (d->pi < prompt_len) // Going through the entered prompt string
 	{
 		if (d->prompt[d->pi] == ' ')
@@ -72,7 +71,7 @@ bool	parser_engine(t_parser_data *d)
 			// Traverse all symbols until the next operand or
 			// parenthesis, and add them to the operands array.
 			// All this symbols will represent a new operand
-			if (operand_push(d, d->pi) != COMMON_SUCCESS)
+			if (operand_push(d, prompt_len) != COMMON_SUCCESS)
 			{
 				f_noerr = false;
 				break ;

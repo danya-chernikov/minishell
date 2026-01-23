@@ -25,7 +25,6 @@ int		operand_push(t_parser_data *d, size_t plen)
 	size_t	i;
 
 	i = 0;
-	++d->pi;
 	while (d->pi < plen && !is_special_char_outside_quotes(d, d->prompt[d->pi]))
 	{
 		if (i > MAX_OP_LEN - 1)
@@ -47,29 +46,32 @@ int		operand_push(t_parser_data *d, size_t plen)
 	return (COMMON_SUCCESS);
 }
 
-/* CORRECT THIS! WE SHOULD SEARCH FOR EMPTY PARENTHESES
- * ONLY OUTSIDE QUOTES INTERVALS! */
 /* Checks for existance of empty parentheses
  * outside any quotes intervals.
  * Sequences like: (), (( )), (((  ))), and etc.
  * Returns true if there are no empty sequences*/
-bool	check_empty_par(char *prompt)
+bool	check_empty_par(t_parser_data *d)
 {
-	size_t	i;
+	size_t	pi;
+	size_t	plen;
 
-	i = 0;
-	while (i < ft_strlen(prompt))
+	pi = 0;
+	plen = ft_strlen(d->prompt);
+	while (pi < plen)
 	{
-		if (prompt[i] == '(' )
+		if (d->prompt[pi] == '(' && !is_inside_quotes(d, pi))
 		{
-			++i;
-			skip_spaces(prompt, &i);
-			if (i == ft_strlen(prompt)) // Parsing error
+			++pi;
+			skip_spaces(d->prompt, &pi);
+			// Parsing error
+			if (pi == plen ||
+				(d->prompt[pi] == ')' && !is_inside_quotes(d, pi)))
+			{
+				print_prompt_parser_ext_error(EMPTY_PARS_ERR_MSG);
 				return false;
-			if (prompt[i] == ')')
-				return false;
+			}
 		}
-		++i;
+		++pi;
 	}
 	return true;
 }
