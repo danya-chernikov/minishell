@@ -139,7 +139,7 @@ int	exec_ops(t_parser_data *d, int *ret_code)
 			"the execution, parent is done\n");*/
 	}
 	close(fd_log);
-	return (1);
+	return (COMMON_SUCCESS);
 }
 
 int	close_pipes(t_parser_data *d)
@@ -151,15 +151,15 @@ int	close_pipes(t_parser_data *d)
 	{
 		if (close(d->pipes[i][READ_END]) == -1)
 		{
-			perror("close()");
-			return 0;
+			perror("close");
+			return (COMMON_SYS_ERR);
 		}
 		if (close(d->pipes[i][WRITE_END]) == -1)
 		{
-			perror("close()");
-			return 0;
+			perror("close");
+			return (COMMON_SYS_ERR);
 		}
 		++i;
 	}
-	return 1;
+	return (COMMON_SUCCESS);
 }

@@ -1,11 +1,22 @@
 #include "operand.h"
+#include "libft.h"
+#include "error.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Assign the default value to
  * the pipes of all operators */
-void	init_ops(t_operand *ops)
+int		ops_init(t_operand *ops)
 {
 	size_t	i;
 
+	ops->name = (char *)ft_calloc(MAX_OP_LEN, sizeof (char));
+	if (!ops->name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	i = 0;
 	while (i < MAX_OPS_NUM)
 	{
@@ -13,4 +24,11 @@ void	init_ops(t_operand *ops)
 		ops[i].read_end = DEFAULT_FD;
 		++i;
 	}
+	return (COMMON_SUCCESS);
+}
+
+void	ops_free(t_operand *ops)
+{
+	if (ops->name)
+		free(ops->name);
 }

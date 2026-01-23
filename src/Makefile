@@ -4,7 +4,7 @@ LIBFT_PATH=Libft/
 LIBVECTOR_NAME=vector
 LIBVECTOR_PATH=vector/
 NAME=minishell
-DEBUG_LVL=0
+DEBUG_LVL=1
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
@@ -18,7 +18,7 @@ SRCS=main.c \
 	 prompt_parser.c aux_prompt_parser.c aux_prompt_parser2.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
-	 error.c aux_common.c debug.c test.c
+	 aux_common.c error.c debug.c test.c
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o shell_configs.o shell_history.o \
@@ -30,7 +30,7 @@ OBJS=main.o \
 	 prompt_parser.o aux_prompt_parser.o aux_prompt_parser2.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
-	 error.o aux_common.o debug.o test.o
+	 aux_common.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -55,149 +55,150 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c shell.h libft.h debug.h
+main.o : main.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c main.c
 
 # ========== Shell initialization and command line arguments parser ==========
-shell.o : shell.c shell.h cmdargs_parser.h debug.h
+shell.o : shell.c shell.h cmdargs_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell.c
 
-shell_launcher.o : shell_launcher.c shell.h engine.h debug.h
+shell_launcher.o : shell_launcher.c shell.h engine.h libft.h error.h vector.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_launcher.c
 
-aux_shell.o : aux_shell.c shell.h
+aux_shell.o : aux_shell.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell.c
 
-shell_configs.o : shell_configs.c shell.h engine.h debug.h
+shell_configs.o : shell_configs.c shell.h engine.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_configs.c
 
-shell_history.o : shell_history.c shell.h debug.h
+shell_history.o : shell_history.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_history.c
 
-cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h debug.h
+cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c cmdargs_parser.c
 
 
 # ==================== Parameter-variables initialization ====================
-init_paramvars.o : init_paramvars.c shell.h debug.h
+init_paramvars.o : init_paramvars.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_paramvars.c
 
 
 # ===================== Special variables initialization =====================
-init_localvars.o : init_localvars.c shell.h debug.h
+init_localvars.o : init_localvars.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars.c
 
-init_localvars2.o : init_localvars2.c shell.h debug.h
+init_localvars2.o : init_localvars2.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars2.c
 
-init_localvars3.o : init_localvars3.c shell.h debug.h
+init_localvars3.o : init_localvars3.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars3.c
 
-init_localvars4.o : init_localvars4.c shell.h debug.h
+init_localvars4.o : init_localvars4.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars4.c
 
-init_localvars5.o : init_localvars5.c shell.h debug.h
+init_localvars5.o : init_localvars5.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars5.c
 
 
 # =================== Environment variables initialization ===================
-init_envars.o : init_envars.c shell.h debug.h
+init_envars.o : init_envars.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_envars.c
 
-init_envars2.o : init_envars2.c shell.h debug.h
+init_envars2.o : init_envars2.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_envars2.c
 
-init_envars3.o : init_envars3.c shell.h debug.h
+init_envars3.o : init_envars3.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_envars3.c
 
 # ====================== Environment, history, configs =======================
-env.o : env.c env.h debug.h
+env.o : env.c env.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c env.c
 
-history.o : history.c history.h debug.h
+history.o : history.c history.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c history.c
 
-config.o : config.c config.h debug.h
+config.o : config.c config.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c config.c
 
 
 # ============================== Prompt parser ===============================
-prompt_parser.o : prompt_parser.c prompt_parser.h debug.h
+prompt_parser.o : prompt_parser.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser.c
 
-aux_prompt_parser.o : aux_prompt_parser.c prompt_parser.h debug.h
+aux_prompt_parser.o : aux_prompt_parser.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_prompt_parser.c
 
-aux_prompt_parser2.o : aux_prompt_parser2.c prompt_parser.h debug.h
+aux_prompt_parser2.o : aux_prompt_parser2.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_prompt_parser2.c
 
-par.o : par.c par.h prompt_parser.h debug.h
+par.o : par.c par.h prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c par.c
 
-quote.o : quote.c prompt_parser.h quote.h debug.h
+quote.o : quote.c prompt_parser.h quote.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c quote.c
 
-token.o : token.c prompt_parser.h token.h debug.h
+token.o : token.c prompt_parser.h token.h libft.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c token.c
 
-operand.o : operand.c operand.h debug.h
+operand.o : operand.c operand.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c operand.c
 
 
 # =========================== Engine and execution ===========================
-engine.o : engine.c engine.h debug.h
+engine.o : engine.c engine.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c
 
-exec.o : exec.c exec.h debug.h
+exec.o : exec.c exec.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec.c
 
-builtin.o : builtin.c builtin.h debug.h
+builtin.o : builtin.c builtin.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin.c
 
 
 # ============================ Auxiliary services ============================
-error.o : error.c error.h shell.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c error.c
 
-aux_common.o : aux_common.c aux_common.h debug.h
+aux_common.o : aux_common.c aux_common.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_common.c
 
-debug.o : debug.c debug.h
+error.o : error.c error.h shell.h libft.h vector.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c error.c
+
+debug.o : debug.c libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c debug.c
 
-test.o : test.c test.h debug.h
+test.o : test.c test.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c test.c
 

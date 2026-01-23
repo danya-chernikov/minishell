@@ -56,6 +56,7 @@ int		parser_init(t_parser_data *d, char *rline_buf);
 bool	parser_engine(t_parser_data *d);
 void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr);
 void	handle_close_par(t_parser_data *d, bool *f_noerr);
+void	parser_free(t_parser_data *d);
 
 /* aux_prompt_parser.c */
 void	remove_right_spaces(char *prompt);

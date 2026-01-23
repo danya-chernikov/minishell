@@ -4,8 +4,9 @@ void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
 {
 	int	i;
 
+	printf("\nConfiguration files:\n");
 	i = 0;
-	if (ctype == LOGIN_CONF)	
+	if (ctype == LOGIN_CONF)
 	{
 		while (i < LOGIN_CONFIGS_NUM)
 		{
@@ -36,15 +37,15 @@ void	dbg_print_filehistory(t_history *history)
 	}
 }
 
-void	print_all(t_parser_data *d)
+void	dbg_prompt_parser_print_all(t_parser_data *d)
 {
-	print_parsed_data(d);
-	print_tokens(d);
-	print_parentheses(d);
-	print_quotes(d);
+	dbg_prompt_parser_print_parsed_data(d);
+	dbg_prompt_parser_print_tokens(d);
+	dbg_prompt_parser_print_parentheses(d);
+	dbg_prompt_parser_print_quotes(d);
 }
 
-void	print_quotes(t_parser_data *d)
+void	dbg_prompt_parser_print_quotes(t_parser_data *d)
 {
 	size_t	i;
 	char	quote;
@@ -66,7 +67,7 @@ void	print_quotes(t_parser_data *d)
 	}
 }
 
-void	print_parsed_data(t_parser_data *d)
+void	dbg_prompt_parser_print_parsed_data(t_parser_data *d)
 {
 	size_t	i;
 
@@ -93,7 +94,7 @@ void	print_parsed_data(t_parser_data *d)
 	printf("\n");
 }
 
-void	print_tokens(t_parser_data *d)
+void	dbg_prompt_parser_print_tokens(t_parser_data *d)
 {
 	char	format[MAX_FORMAT_STR_LEN];
 	size_t	i;
@@ -120,7 +121,7 @@ void	print_tokens(t_parser_data *d)
 	printf("\n");
 }
 
-void	print_parentheses(t_parser_data *d)
+void	dbg_prompt_parser_print_parentheses(t_parser_data *d)
 {	
 	size_t	i;
 

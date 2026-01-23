@@ -17,7 +17,8 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 
 	remove_right_spaces(d->prompt);
 
-	init_ops(d->ops); // Initialize operators array
+	if (ops_init(d->ops) == -1) // Initialize operators array
+		return (COMMON_SYS_ERR);
 	init_open_par(d);
 	init_close_par(d);
 	init_tokens(d);
@@ -26,9 +27,9 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 	if (!check_empty_par(d->prompt))
 	{
 		write(STDERR_FILENO, PARSER_ERR_MSG, ft_strlen(PARSER_ERR_MSG));
-		return 0;
+		return (COMMON_FAILURE);
 	}
-	return 1;
+	return (COMMON_SUCCESS);
 }
 
 /* Parses the user's prompt string by connecting all
@@ -436,4 +437,9 @@ void	handle_close_par(t_parser_data *d, bool *f_noerr)
 
 	// Mark the matched opening-parenthesis as closed
 	d->all_open_pars[pair_opar_ind][1] = CLOSED_PAR;
+}
+
+void	parser_free(t_parser_data *d)
+{
+	ops_free(d->ops);
 }

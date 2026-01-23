@@ -2,8 +2,7 @@
 
 #include <stdlib.h>
 
-/* Generates prompt invitation
- * user@host:pwd$ */
+/* Generates prompt invitation user@host:pwd$ */
 int	gen_prompt_inv(t_shell *msh)
 {
 	size_t	inv_len;
