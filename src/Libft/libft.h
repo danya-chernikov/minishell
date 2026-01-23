@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/20 15:11:15 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/23 16:21:42 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,40 +18,39 @@
 # include <dirent.h>
 
 /* ==================== get_next_line() DEFINITIONS  ==================== */
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+# ifndef GNL_BUFFER_SIZE
+#  define GNL_BUFFER_SIZE 42
 # endif
 
-/* ADD GNL_ PREFIXES TO EACH DEFINITION!!! */
-# define EXIT			0
-# define READ			1
-# define ALLOC			2
-# define END			3
-# define AGAIN			4
+# define GNL_EXIT		0
+# define GNL_READ		1
+# define GNL_ALLOC		2
+# define GNL_END		3
+# define GNL_AGAIN		4
 
-/* FD		  - a file descriptor;
- * RLEN		  - bytes read from `fd` (FD);
- * I		  - an auxiliary coutner variable;
- * RES		  - result of a function execution;
- * PRIV_MEM_S - previously allocated memory size. */
-# define FD				0
-# define BUF_POS		1
-# define LINE_POS		2
-# define RLEN			3
-# define LINE_LEN		4
-# define I				5
-# define RES			6
-# define PRIV_MEM_S		7
-# define ERR			8
+/* GNL_FD		  - a file descriptor;
+ * GNL_RLEN		  - bytes read from `fd` (FD);
+ * GNL_I		  - an auxiliary coutner variable;
+ * GNL_RES		  - result of a function execution;
+ * GNL_PRIV_MEM_S - previously allocated memory size. */
+# define GNL_FD				0
+# define GNL_BUF_POS		1
+# define GNL_LINE_POS		2
+# define GNL_RLEN			3
+# define GNL_LINE_LEN		4
+# define GNL_I				5
+# define GNL_RES			6
+# define GNL_PRIV_MEM_S		7
+# define GNL_ERR			8
 
-/* NORM  - normal execution. Means to do nothing;
- * RET   - indicate that the `line` must be returned;
- * BREAK - break from the main loop must be performed;
- * CONT  - continue must be applied on the main loop. */
-# define NORM			0
-# define RET			1
-# define BREAK			2
-# define CONT			3
+/* GNL_NORM  - normal execution. Means to do nothing;
+ * GNL_RET   - indicate that the `line` must be returned;
+ * GNL_BREAK - break from the main loop must be performed;
+ * GNL_CONT  - continue must be applied on the main loop. */
+# define GNL_NORM			0
+# define GNL_RET			1
+# define GNL_BREAK			2
+# define GNL_CONT			3
 
 /* get_next_line.c */
 char	*get_next_line(int fd, int *err);
