@@ -42,7 +42,7 @@ typedef struct s_token
 	size_t			start_pi;
 }	t_token;
 
-void	init_tokens(t_parser_data *d);
+void	tokens_init(t_parser_data *d);
 t_ll	get_token_by_prompt_ind(t_parser_data *d, size_t prompt_ind);
 
 #endif

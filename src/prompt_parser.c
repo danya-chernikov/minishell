@@ -19,10 +19,10 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 
 	if (ops_init(d->ops) == -1) // Initialize operators array
 		return (COMMON_SYS_ERR);
-	init_open_par(d);
-	init_close_par(d);
-	init_tokens(d);
-	init_pars(d->pars);
+	open_par_init(d);
+	close_par_init(d);
+	tokens_init(d);
+	pars_init(d->pars);
 
 	if (!check_empty_par(d->prompt))
 	{

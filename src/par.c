@@ -1,6 +1,22 @@
 #include "prompt_parser.h"
 
-void	init_open_par(t_parser_data *d)
+/* Let's say the first element of the
+ * pair is the opening parenthesis,
+ * and the second is the closing one */
+void	pars_init(t_pair *pars)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < MAX_PAR_NUM)
+	{
+		pars->first = NONE_PAR_IND;
+		pars->second = NONE_PAR_IND;
+		++i;
+	}
+}
+
+void	open_par_init(t_parser_data *d)
 {
 	size_t	i;
 
@@ -24,7 +40,7 @@ void	init_open_par(t_parser_data *d)
 }
 
 /* Counts all closing parentheses and remembers their indexes */
-void	init_close_par(t_parser_data *d)
+void	close_par_init(t_parser_data *d)
 {
 	size_t	i;
 
@@ -37,22 +53,6 @@ void	init_close_par(t_parser_data *d)
 			d->close_par[d->cpar_cnt][1] = NOT_CLOSED_PAR;
 			++d->cpar_cnt;
 		}
-		++i;
-	}
-}
-
-/* Let's say the first element of the
- * pair is the opening parenthesis,
- * and the second is the closing one */
-void	init_pars(t_pair *pars)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < MAX_PAR_NUM)
-	{
-		pars->first = NONE_PAR_IND;
-		pars->second = NONE_PAR_IND;
 		++i;
 	}
 }

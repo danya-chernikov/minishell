@@ -1,7 +1,7 @@
 #include "token.h"
 #include "prompt_parser.h"
 
-void	init_tokens(t_parser_data *d)
+void	tokens_init(t_parser_data *d)
 {
 	size_t	i;
 

@@ -17,9 +17,9 @@ typedef enum e_par_type
 	CLOSING_PAR
 }	t_par_type;
 
-void	init_open_par(t_parser_data *d);
-void	init_close_par(t_parser_data *d);
-void	init_pars(t_pair *pars);
+void	pars_init(t_pair *pars);
+void	open_par_init(t_parser_data *d);
+void	close_par_init(t_parser_data *d);
 t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t pind, t_par_type ptype);
 
 #endif
