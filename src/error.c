@@ -6,6 +6,7 @@ void	parser_error(bool *f_noerr)
 {
 	*f_noerr = false;
 	write(STDERR_FILENO, PARSER_ERR_MSG, ft_strlen(PARSER_ERR_MSG));
+	write(STDERR_FILENO, "\n", 1);
 }
 
 void	print_sys_error(char *msg)

@@ -70,18 +70,13 @@ bool parser_engine(t_parser_data *d)
 			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
 			d->ops[d->op_cnt].name[1] = '\0';
 
-			// Add this operand into the tokens array
-			d->tokens[d->token_cnt].type = OPERAND;
-			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
-			d->tokens[d->token_cnt].start_pi = d->pi;
-			++d->token_cnt;
+			token_push(d, OPERAND); // Add this operand into the tokens array
 
-			++d->op_cnt;
+			++d->op_cnt; // Order here is important!
 
 			++d->pi; // Move one symbol forward in prompt
 
-			// Let's see what goes next
-			skip_spaces(d->prompt, &d->pi);
+			skip_spaces(d->prompt, &d->pi); // Let's see what goes next
 
 			// Here we should check whether this is the end of the current pipeline
 
@@ -98,9 +93,7 @@ bool parser_engine(t_parser_data *d)
 			}
 			// Let's see what goes after the letter
 			// After the letter goes a pipe
-			if (d->prompt[d->pi] == '|' &&
-				d->pi + 1 < prompt_len &&
-				d->prompt[d->pi + 1] != '|') // If further goes pipe
+			if (its_PIPE(d->prompt, prompt_len, d->pi)) // If further goes pipe
 			{
 				// A pipe can go only after an operand or after a ')'
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
@@ -110,10 +103,7 @@ bool parser_engine(t_parser_data *d)
 					break ;
 				}
 
-				// Add this operand into the tokens array
-				d->tokens[d->token_cnt].type = PIPE;
-				d->tokens[d->token_cnt].start_pi = d->pi;
-				++d->token_cnt;
+				token_push(d, PIPE); // Add this operand into the tokens array
 
 				// Let's create a pipe
 				if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
@@ -167,26 +157,18 @@ bool parser_engine(t_parser_data *d)
 					break ;
 				}
 				// If after the letter goes &&
-				else if (d->pi + 1 < prompt_len &&
-						 d->prompt[d->pi] == '&' &&
-						 d->prompt[d->pi + 1] == '&')
+				else if (its_logical_AND(d->prompt, prompt_len, d->pi))
 				{
 					// Add this operator into the tokens array
-					d->tokens[d->token_cnt].type = AND;
-					d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
-					++d->token_cnt;	
+					token_push(d, AND);
 					d->pi += 2;
 					continue ; // Go further by prompt
 				}
 				// If after the letter goes ||
-				else if (d->pi + 1 < prompt_len &&
-						 d->prompt[d->pi] == '|' &&
-						 d->prompt[d->pi + 1] == '|')
+				else if (its_logical_OR(d->prompt, prompt_len, d->pi))
 				{
 					// Add this operator into the tokens array
-					d->tokens[d->token_cnt].type = OR;
-					d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
-					++d->token_cnt;	
+					token_push(d, OR);
 					d->pi += 2;
 					continue ; // Go further by prompt
 				}
@@ -228,9 +210,7 @@ bool parser_engine(t_parser_data *d)
 				break ;
 			}
 
-			if (d->prompt[d->pi] == '|' &&
-				d->pi + 1 < prompt_len &&
-				d->prompt[d->pi + 1] != '|') // If it's pipe
+			if (its_PIPE(d->prompt, prompt_len, d->pi)) // If it's pipe
 			{
 				// Pipe can go only after a ')' or after an operand
 				if (d->tokens[d->token_cnt - 1].type != CLOSE_PAR &&
@@ -240,10 +220,7 @@ bool parser_engine(t_parser_data *d)
 					break;
 				}
 
-				// Add this operand into the tokens array
-				d->tokens[d->token_cnt].type = PIPE;
-				d->tokens[d->token_cnt].start_pi = d->pi;
-				++d->token_cnt;
+				token_push(d, PIPE); // Add this operand into the tokens array
 
 				// Let's create a pipe
 				if (pipe(&d->pipes[d->pipe_cnt][0]) == -1)
@@ -264,9 +241,7 @@ bool parser_engine(t_parser_data *d)
 
 			} // else if (d->prompt[d->pi] == '|') // If it's pipe 	
 			
-			else if (d->pi + 1 < prompt_len &&
-					 d->prompt[d->pi] == '&' &&
-					 d->prompt[d->pi + 1] == '&') // If it's &&
+			else if (its_logical_AND(d->prompt, prompt_len, d->pi)) // If it's &&
 			{
 				// && can go after an operand of a ')'
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
@@ -276,18 +251,13 @@ bool parser_engine(t_parser_data *d)
 					break ;
 				}
 
-				// Add this operator into the tokens array
-				d->tokens[d->token_cnt].type = AND;
-				d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
-				++d->token_cnt;	
+				token_push(d, AND);
 				d->pi += 2;
 				continue ; // Go further by prompt
 			}
 
 			// If after the letter goes ||
-			else if (d->pi + 1 < prompt_len &&
-					 d->prompt[d->pi] == '|' &&
-					 d->prompt[d->pi + 1] == '|') // If it's ||
+			else if (its_logical_OR(d->prompt, prompt_len, d->pi)) // If it's ||
 			{
 				// || can go after an operand of a ')'
 				if (d->tokens[d->token_cnt - 1].type != OPERAND &&
@@ -297,10 +267,7 @@ bool parser_engine(t_parser_data *d)
 					break ;
 				}
 
-				// Add this operator into the tokens array
-				d->tokens[d->token_cnt].type = OR;
-				d->tokens[d->token_cnt].start_pi = d->pi; // Do we really need this here?
-				++d->token_cnt;	
+				token_push(d, OR);
 				d->pi += 2;
 				continue ; // Go further by prompt
 			}

@@ -11,7 +11,7 @@
 # include "quote.h"
 # include "token.h"
 # include "operand.h"
-# include "aux_prompt_parser.h"
+# include "aux_common.h"
 # include "error.h"
 
 # define MAX_FORMAT_STR_LEN	256
@@ -51,9 +51,24 @@ typedef struct s_parser_data
 
 }	t_parser_data;
 
+/* prompt_parser.c */
 int		parser_init(t_parser_data *d, char *rline_buf);
 bool	parser_engine(t_parser_data *d);
 void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr);
 void	handle_close_par(t_parser_data *d, bool *f_noerr);
+
+/* aux_prompt_parser.c */
+void	remove_right_spaces(char *prompt);
+bool	check_empty_par(char *prompt);
+int		later_goes_open_par(char *str, size_t ind);
+void	skip_spaces(char *prompt, size_t *pi);
+
+/* aux_prompt_parser2.c */
+bool	its_logical_AND(char *prompt, size_t plen, size_t pi);
+bool	its_logical_OR(char *prompt, size_t plen, size_t pi);
+bool	its_PIPE(char *prompt, size_t plen, size_t pi);
+void	token_push(t_parser_data *d, t_token_type type);
+
+
 
 #endif

@@ -4,7 +4,7 @@ LIBFT_PATH=Libft/
 LIBVECTOR_NAME=vector
 LIBVECTOR_PATH=vector/
 NAME=minishell
-DEBUG_LVL=1
+DEBUG_LVL=0
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
@@ -15,7 +15,8 @@ SRCS=main.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
 	 env.c history.c config.c \
-	 prompt_parser.c aux_prompt_parser.c par.c quote.c token.c operand.c \
+	 prompt_parser.c aux_prompt_parser.c aux_prompt_parser2.c \
+	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
 	 error.c aux_common.c debug.c test.c
 
@@ -26,7 +27,8 @@ OBJS=main.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
 	 env.o history.o config.o \
-	 prompt_parser.o aux_prompt_parser.o par.o quote.o token.o operand.o \
+	 prompt_parser.o aux_prompt_parser.o aux_prompt_parser2.o \
+	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
 	 error.o aux_common.o debug.o test.o
 
@@ -143,11 +145,15 @@ prompt_parser.o : prompt_parser.c prompt_parser.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser.c
 
-aux_prompt_parser.o : aux_prompt_parser.c aux_prompt_parser.h debug.h
+aux_prompt_parser.o : aux_prompt_parser.c prompt_parser.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_prompt_parser.c
 
-par.o : par.c par.h debug.h
+aux_prompt_parser2.o : aux_prompt_parser2.c prompt_parser.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_prompt_parser2.c
+
+par.o : par.c par.h prompt_parser.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c par.c
 

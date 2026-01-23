@@ -1,0 +1,1 @@
+main.c shell.c aux_shell.c shell_launcher.c shell.h prompt_parser.c prompt_parser.h aux_prompt_parser.c aux_prompt_parser.h exec.c exec.h token.c token.h operand.c operand.h par.c par.h quote.c quote.h error.c error.h debug.c debug.h test.c test.h

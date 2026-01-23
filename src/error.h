@@ -20,7 +20,7 @@
 # define ERR_BUF_SIZE			256
 
 # define PARSER_ERR_MSG			"parsing error"
-# define SYNTAX_ERR_MSG			"synxtax error"
+# define SYNTAX_ERR_MSG			"syntax error"
 # define INV_OPT_ERR_MSG		"invalid option"
 # define C_OPT_ERR_MSG			"option requires an argument"
 # define READONLY_VAR_ERR_MSG	"readonly variable"

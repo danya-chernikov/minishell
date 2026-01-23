@@ -62,10 +62,9 @@ void	init_pars(t_pair *pars)
  * `d->pars`. If there is no parenthesis with such a token
  * index in `d->pars`, returns -1
  *
- *     prompt_ind	- index of token in prompt
- *     pars_i		- index in `d->pars`
- * */
-t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t prompt_ind, t_par_type ptype)
+ *     pind   - index of token in prompt
+ *     pars_i - index in `d->pars` */
+t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t pind, t_par_type ptype)
 {
 	t_ll	pars_ind;
 
@@ -75,13 +74,13 @@ t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t prompt_ind, t_par_type ptype
 		// Go through opening-parentheses `d->pars[i].first`
 		if (ptype == OPENING_PAR)
 		{
-			if (prompt_ind == (size_t)d->pars[pars_ind].first)
+			if (pind == (size_t)d->pars[pars_ind].first)
 				return (pars_ind);
 		}
 		else if (ptype == CLOSING_PAR)
 		{
 			// Go through closing-parentheses `d->pars[i].second`
-			if (prompt_ind == (size_t)d->pars[pars_ind].second)
+			if (pind == (size_t)d->pars[pars_ind].second)
 				return (pars_ind);
 		}
 		++pars_ind;
