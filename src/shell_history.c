@@ -60,13 +60,17 @@ int msh_load_history(t_shell *msh)
 		{
 			remove_newline(hline);
 			history_push(&msh->history, hline, FROM_FILE);
-			gnlerr = 0;
 			hline = get_next_line(fd, &gnlerr);
 		}
 		if (!hline && gnlerr)
 		{
 			print_shell_error(NULL, GNL_ERR_MSG);
 			gnl_finish(fd);
+			if (close(fd) == -1)
+			{
+				perror("close");
+				return (COMMON_SYS_ERR);
+			}
 			return (COMMON_SYS_ERR);
 		}
 		if (close(fd) == -1)

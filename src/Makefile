@@ -9,24 +9,28 @@ DEBUG_LVL=1
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c \
-	 shell.c shell_launcher.c aux_shell.c shell_configs.c shell_history.c \
+	 shell.c shell_launcher.c aux_shell.c \
 	 cmdargs_parser.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
-	 env.c history.c config.c \
+	 env.c env_setters.c env_getters.c env_printers.c env_service.c \
+	 history.c shell_history.c \
+	 config.c shell_configs.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c prompt_parser4.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
 	 aux_common.c error.c debug.c test.c
 
 OBJS=main.o \
-	 shell.o shell_launcher.o aux_shell.o shell_configs.o shell_history.o \
+	 shell.o shell_launcher.o aux_shell.o \
 	 cmdargs_parser.o \
 	 init_paramvars.o init_localvars.o init_localvars2.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
-	 env.o history.o config.o \
+	 env.o env_setters.o env_getters.o env_printers.o env_service.o \
+	 history.o shell_history.o \
+	 config.o shell_configs.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o prompt_parser4.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
@@ -59,7 +63,7 @@ main.o : main.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c main.c
 
-# ========== Shell initialization and command line arguments parser ==========
+# ============================== Shell launcher  =============================
 shell.o : shell.c shell.h cmdargs_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell.c
@@ -72,14 +76,8 @@ aux_shell.o : aux_shell.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell.c
 
-shell_configs.o : shell_configs.c shell.h engine.h libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c shell_configs.c
 
-shell_history.o : shell_history.c shell.h libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c shell_history.c
-
+# ====================== Command line arguments parser =======================
 cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c cmdargs_parser.c
@@ -91,7 +89,7 @@ init_paramvars.o : init_paramvars.c shell.h libft.h vector.h error.h debug.h
 	-c init_paramvars.c
 
 
-# ===================== Special variables initialization =====================
+# ================= Special local variables initialization ===================
 init_localvars.o : init_localvars.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_localvars.c
@@ -126,18 +124,47 @@ init_envars3.o : init_envars3.c shell.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c init_envars3.c
 
-# ====================== Environment, history, configs =======================
+
+# ============================== Environment =================================
 env.o : env.c env.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c env.c
 
+env_setters.o : env_setters.c env.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env_setters.c
+
+env_getters.o : env_getters.c env.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env_getters.c
+
+env_printers.o : env_printers.c env.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env_printers.c
+
+env_service.o : env_service.c env.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env_service.c
+
+
+# ================================ History ===================================
 history.o : history.c history.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c history.c
 
+shell_history.o : shell_history.c shell.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_history.c
+
+
+# ================================= Configs ==================================
 config.o : config.c config.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c config.c
+
+shell_configs.o : shell_configs.c shell.h engine.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_configs.c
 
 
 # ============================== Prompt parser ===============================
@@ -193,7 +220,6 @@ builtin.o : builtin.c builtin.h libft.h vector.h error.h debug.h
 
 
 # ============================ Auxiliary services ============================
-
 aux_common.o : aux_common.c aux_common.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_common.c

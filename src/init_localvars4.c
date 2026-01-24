@@ -28,6 +28,7 @@ char	*get_hostname(void)
 		perror("open");
 		return (NULL);
 	}
+	gnlerr = 0;
 	hostname = get_next_line(fd, &gnlerr);
 	if (!hostname && gnlerr)
 	{	
@@ -53,7 +54,7 @@ int	set_local_hostname(t_env *env)
 	if (!hostname)
 		return (COMMON_SYS_ERR);
 	env->vars[SL_HOSTNAME].name = ft_strdup("HOSTNAME");
-	env->vars[SL_HOSTNAME].value = ft_strdup(hostname);
+	env->vars[SL_HOSTNAME].value = hostname;
 	return (COMMON_SUCCESS);
 }
 
@@ -77,6 +78,6 @@ int	set_local_hostmach(t_env *env)
 	ft_strlcat(machtype, "-pc-", mt_len);
 	ft_strlcat(machtype, MSH_OSTYPE, mt_len);
 	env->vars[SL_MACHTYPE].name = ft_strdup("MACHTYPE");
-	env->vars[SL_MACHTYPE].value = ft_strdup(machtype);
+	env->vars[SL_MACHTYPE].value = machtype;
 	return (COMMON_SUCCESS);
 }

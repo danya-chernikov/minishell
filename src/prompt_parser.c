@@ -4,16 +4,16 @@
  * we always check previous token value */
 int	parser_init(t_parser_data *d, char *rline_buf)
 {
-	d->pi			= 0;
-	d->op_cnt		= 0;
-	d->pipe_cnt		= 0;
-	d->opar_num		= 0;
-	d->opar_cnt		= 0;
-	d->cpar_cnt		= 0;
-	d->par_cnt		= 0;
-	d->token_cnt	= 1;
-	d->qpair_cnt	= 0;
-	d->prompt		= rline_buf;
+	d->pi = 0;
+	d->op_cnt = 0;
+	d->pipe_cnt = 0;
+	d->opar_num = 0;
+	d->opar_cnt = 0;
+	d->cpar_cnt = 0;
+	d->par_cnt = 0;
+	d->token_cnt = 1;
+	d->qpair_cnt = 0;
+	d->prompt = rline_buf;
 
 	remove_right_spaces(d->prompt);
 

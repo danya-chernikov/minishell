@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 19:48:44 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/23 16:30:09 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/24 00:30:59 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,10 +106,11 @@ void	gnl_finish(int fd)
 	char	*line;
 	int		err;
 
+	err = 0;
 	line = get_next_line(fd, &err);
 	while (line)
 	{
-		line = get_next_line(fd, &err);
 		free(line);
+		line = get_next_line(fd, &err);
 	}
 }

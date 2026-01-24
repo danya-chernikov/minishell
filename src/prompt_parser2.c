@@ -25,7 +25,7 @@ int		operand_push(t_parser_data *d, size_t plen)
 	size_t	i;
 
 	i = 0;
-	while (d->pi < plen && !is_special_char_outside_quotes(d, d->prompt[d->pi]))
+	while (d->pi < plen && !is_special_char_outside_quotes(d, d->pi))
 	{
 		if (i > MAX_OP_LEN - 1)
 		{

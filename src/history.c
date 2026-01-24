@@ -57,4 +57,6 @@ void	history_free(t_history *history)
 	}
 	if (history->lines)
 		free(history->lines);
+	if (history->histfile_path)
+		free(history->histfile_path);
 }

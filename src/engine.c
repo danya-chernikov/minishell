@@ -16,6 +16,7 @@ int	shell_engine(char *prompt, int *ret_code)
 	
 	try = 0;
 	fres = COMMON_SUCCESS;
+	ft_bzero(&pdata, sizeof(pdata));
 	while (try < 1)
 	{
 		if (!prompt || ft_strlen(prompt) == 0)
@@ -70,6 +71,7 @@ int	comments_parser(t_parser_data *d)
 {
 	size_t	pi;
 
+	pi = 0;
 	while (pi < ft_strlen(d->prompt))
 	{
 		if (d->prompt[pi] == '#' && !is_inside_quotes(d, pi))

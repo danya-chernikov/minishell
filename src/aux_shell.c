@@ -19,7 +19,7 @@ int	gen_prompt_inv(t_shell *msh)
 	point = ft_strchr(hostname, '.');
 	if (point) // There is a point in the domain name
 	{
-		sd_len = ft_abs((ptrdiff_t)hostname - (ptrdiff_t)point);
+		sd_len = (ptrdiff_t)point - (ptrdiff_t)hostname;
 		if (sd_len > MAX_SUBDOMAIN_LEN - 1)
 		{
 			print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);

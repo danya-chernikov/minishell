@@ -22,6 +22,7 @@ void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
 			++i;
 		}
 	}
+	printf("\n");
 }
 
 void	dbg_print_filehistory(t_history *history)
@@ -35,6 +36,7 @@ void	dbg_print_filehistory(t_history *history)
 		printf("%s\n", history->lines[i].cmd);
 		++i;
 	}
+	printf("\n");
 }
 
 void	dbg_prompt_parser_print_all(t_parser_data *d)

@@ -68,10 +68,10 @@ char	*expand_homedir(char *str, char *home)
 	if (!new_str)
 		return (NULL);
 	// plus 1 null-terminator	
-	pdif = ft_abs((ptrdiff_t)str - (ptrdiff_t)tilda);
+	pdif = (ptrdiff_t)tilda - (ptrdiff_t)str;
 	ft_strlcpy(new_str, str, pdif + 1);
-	ft_strlcat(new_str, home, new_size + 1);
-	ft_strlcat(new_str, str + pdif + 1, new_size + 1);
+	ft_strlcat(new_str, home, new_size);
+	ft_strlcat(new_str, str + pdif + 1, new_size);
 	return (new_str);
 }
 
@@ -92,8 +92,6 @@ int div2_str_by_delim(char *str, char delim, char **part1, char **part2)
 		++i;
 	}
     (*part1)[i] = '\0';
-	if (!(*part2))
-		return (COMMON_SUCCESS);
 	++i;
     while (str[i])
 	{

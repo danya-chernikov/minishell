@@ -85,6 +85,15 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	return (COMMON_SUCCESS);
 }
 
+void	msh_free(t_shell *msh)
+{
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
+	env_free(&msh->env);
+	history_free(&msh->history);
+	configs_free(&msh->configs);
+}
+
 static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	// By default, let's think our
@@ -106,36 +115,4 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->opts.f_c = false;
 	// Init configs
 	configs_init(&msh->configs);
-}
-
-void	msh_free_all_vars(t_env *env)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < MAX_TOTAL_VARS_NUM)
-	{
-		if (env->vars[i].name)
-		{
-			free(env->vars[i].name);
-			env->vars[i].name = NULL;
-		}
-		if (env->vars[i].value)
-		{
-			free(env->vars[i].value);
-			env->vars[i].value = NULL;
-		}
-		++i;
-	}
-	if (env->vars)
-		free(env->vars);
-}
-
-void	msh_free(t_shell *msh)
-{
-	if (msh->prompt_inv)
-		free(msh->prompt_inv);
-	msh_free_all_vars(&msh->env);
-	history_free(&msh->history);
-	configs_free(&msh->configs);
 }

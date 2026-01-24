@@ -46,6 +46,7 @@ static void	prelim_vars_init(t_env *env)
 	{
 		env->vars[vi].type = PARAM;
 		env->vars[vi].f_inherit = false;
+		env->vars[vi].name = NULL;
 		env->vars[vi].value = NULL;
 		++vi;
 	}
@@ -55,7 +56,8 @@ static void	prelim_vars_init(t_env *env)
 		env->vars[vi].type = PARAM;
 		env->vars[vi].f_readonly = true;
 		env->vars[vi].f_inherit = false;
-		env->vars[vi].value = NULL; // Do we need this?
+		env->vars[vi].name = NULL;
+		env->vars[vi].value = NULL;
 		++vi;
 	}
 }

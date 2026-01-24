@@ -108,6 +108,7 @@ int	load_login_configs(t_shell *msh)
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
 			shell_engine(NULL, &ret_code);
+			free(line);
 			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);
 		}
@@ -115,6 +116,11 @@ int	load_login_configs(t_shell *msh)
 		{
 			print_shell_error(NULL, GNL_ERR_MSG);
 			gnl_finish(fd);
+			if (close(fd) == -1)
+			{
+				perror("close");
+				return (COMMON_SYS_ERR);
+			}
 			return (COMMON_SYS_ERR);
 		}
 		if (close(fd) == -1)
@@ -165,6 +171,7 @@ int	load_nonlogin_configs(t_shell *msh)
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
 			shell_engine(NULL, &ret_code);
+			free(line);
 			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);
 		}
@@ -172,6 +179,11 @@ int	load_nonlogin_configs(t_shell *msh)
 		{
 			print_shell_error(NULL, GNL_ERR_MSG);
 			gnl_finish(fd);
+			if (close(fd) == -1)
+			{
+				perror("close");
+				return (COMMON_SYS_ERR);
+			}
 			return (COMMON_SYS_ERR);
 		}
 		if (close(fd) == -1)

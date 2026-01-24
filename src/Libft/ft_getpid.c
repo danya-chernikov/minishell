@@ -45,6 +45,7 @@ static int	alg(int fd, pid_t *pid)
 	char	*line;
 	int		err;
 
+	err = 0;
 	line = get_next_line(fd, &err);
 	while (line)
 	{

@@ -124,7 +124,6 @@ typedef struct e_shell
 /* shell.c */
 int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 void	msh_free(t_shell *msh);
-void	msh_free_all_vars(t_env *env);
 
 /* shell_launcher.c */
 int		msh_launch(t_shell *msh);

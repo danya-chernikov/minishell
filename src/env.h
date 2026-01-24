@@ -157,17 +157,27 @@ typedef struct s_env
 
 }	t_env;
 
+/* env.c */
 int			env_init(t_env *env);
-char		*env_get_val(t_env *env, char *name);
-t_env_var	*env_get_ptr(t_env *env, char *name);
-bool		env_exist(t_env *env, char *name);
+void		env_free(t_env *env);
+
+/* env_setters.c */
 int			env_set(t_env *env, char *name, char *value, t_var_type type);
 int			env_unset(t_env *env, char *name);
-int			env_export(t_env *env, char *name);
+
+/* env_getters.c */
+char		*env_get_val(t_env *env, char *name);
+t_env_var	*env_get_ptr(t_env *env, char *name);
+
+/* env_printers.c */
 void		env_print_value(t_env *env, char *name);
 void		env_print_env(t_env *env);
 void		env_print_all(t_env *env);
 void		env_print_locals(t_env *env);
+
+/* env_service.c */
+bool		env_exist(t_env *env, char *name);
+int			env_export(t_env *env, char *name);
 
 /* Each variable's number here corresponds to its index in the `vars`
  * array of the `s_shell` structure. In our minishell, we have the
