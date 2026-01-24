@@ -9,17 +9,20 @@
  * the pipes of all operators */
 int		ops_init(t_operand *ops)
 {
-	size_t	i;
+	int	i;
 
-	ops->name = (char *)ft_calloc(MAX_OP_LEN, sizeof (char));
-	if (!ops->name)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
 	i = 0;
 	while (i < MAX_OPS_NUM)
 	{
+		ops[i].name = (char *)ft_calloc(MAX_OP_LEN, sizeof (char));
+		if (!ops[i].name)
+		{
+			--i;
+			while (i >= 0)
+				free(ops[i--].name);
+			perror("malloc");
+			return (COMMON_SYS_ERR);
+		}
 		ops[i].write_end = DEFAULT_FD;
 		ops[i].read_end = DEFAULT_FD;
 		++i;
