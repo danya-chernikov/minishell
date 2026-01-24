@@ -14,6 +14,7 @@ int	shell_engine(char *prompt, int *ret_code)
 	int				fres; // Returned code from function
 	int				try;
 	
+	(void)ret_code;
 	try = 0;
 	fres = COMMON_SUCCESS;
 	ft_bzero(&pdata, sizeof(pdata));
@@ -49,12 +50,12 @@ int	shell_engine(char *prompt, int *ret_code)
 		if (fres != COMMON_SUCCESS)
 			break ;
 
-		fres = exec_ops(&pdata, ret_code);
+		/*fres = exec_ops(&pdata, ret_code);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
 		// Close all pipes of this prompt
-		fres = close_pipes(&pdata);
+		fres = close_pipes(&pdata);*/
 
 		++try;
 	} // End try block

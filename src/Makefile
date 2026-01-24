@@ -21,6 +21,7 @@ SRCS=main.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
+	 signals.c \
 	 aux_common.c error.c debug.c test.c
 
 OBJS=main.o \
@@ -36,6 +37,7 @@ OBJS=main.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
+	 signals.o \
 	 aux_common.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
@@ -223,6 +225,12 @@ exec.o : exec.c exec.h libft.h vector.h error.h debug.h
 builtin.o : builtin.c builtin.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin.c
+
+
+# ================================= Signals ==================================
+signals.o : signals.c signals.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c signals.c
 
 
 # ============================ Auxiliary services ============================

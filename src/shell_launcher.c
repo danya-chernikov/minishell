@@ -1,12 +1,13 @@
 #include "shell.h"
 #include "engine.h"
 #include "debug.h"
-#include "builtin.h" // for exit command
+#include "signals.h"
 
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
 
 /* If everything is OK, we return the exit code
  * of the last command executed by the shell
@@ -114,7 +115,9 @@ int	launch_cmd(t_shell *msh)
 }
 
 /* Read commands from stdin and 
- * exexute them */
+ * exexute them.
+ * DO WE NEED TO PROCESS Ctrl+C by
+ * ourselves here? */
 int	launch_stdin_cmd(t_shell *msh)
 {
 	int		ret_code;
@@ -149,6 +152,9 @@ int	launch_int_session(t_shell *msh)
 	int		fres;		// Function return code
 	char	*rline_buf;
 
+	// Set signals
+	signals_init();	
+
 	// Load history	
 	if (msh_load_history(msh) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
@@ -162,22 +168,29 @@ int	launch_int_session(t_shell *msh)
 		if (fres != COMMON_SUCCESS)
 			return (fres);
 
+		rl_done = 0;
 		rline_buf = readline(msh->prompt_inv);
-		if (ft_strlen(rline_buf) == 0)
+		if (!rline_buf)
+		{
+			write(1, "exit\n", 5);
+			break ;
+		}
+		if (g_got_sigint)
+		{
+			g_got_sigint = 0;
+			ret_code = 130; // 128 + SIGINT
+		}
+		if (rline_buf[0] == '\0')
 		{
 			free(rline_buf);
-			rline_buf = NULL;
-			continue;
+			continue ;
 		}
+
 		add_history(rline_buf);
-		if (strings_equal(rline_buf, EXIT_CMD))
-		{
-			free(rline_buf);
-			rline_buf = NULL;
-			break;
-		}
+
 		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR) // Critial system error occured
 			return (COMMON_SYS_ERR);
+
 		// In case if non-critial parser error occured
 		// we just free `rline_buf` and prompt user again
 		free(rline_buf);

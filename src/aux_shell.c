@@ -39,6 +39,8 @@ int	gen_prompt_inv(t_shell *msh)
 		print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
 		return (COMMON_FAILURE);
 	}
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
 	msh->prompt_inv = (char *)malloc(inv_len * sizeof(char));
 	if (!msh->prompt_inv)
 	{
