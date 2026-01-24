@@ -53,23 +53,25 @@ typedef struct s_parser_data
 
 /* prompt_parser.c */
 int		parser_init(t_parser_data *d, char *rline_buf);
-bool	parser_engine(t_parser_data *d);
-void	handle_open_par(t_parser_data *d, int opar_ind, bool *f_noerr);
-void	handle_close_par(t_parser_data *d, bool *f_noerr);
 void	parser_free(t_parser_data *d);
 
 /* prompt_parser2.c */
+int		parser_engine(t_parser_data *d);
+int		handle_open_par(t_parser_data *d, int opar_ind);
+int		handle_close_par(t_parser_data *d);
+
+/* prompt_parser3.c */
 void	token_push(t_parser_data *d, t_token_type type);
 int		operand_push(t_parser_data *d, size_t pi);
 bool	check_empty_par(t_parser_data *d);
 int		later_goes_open_par(char *str, size_t ind);
 
-/* prompt_parser3.c */
+/* prompt_parser4.c */
 bool	its_logical_AND(char *prompt, size_t plen, size_t pi);
 bool	its_logical_OR(char *prompt, size_t plen, size_t pi);
 bool	its_PIPE(char *prompt, size_t plen, size_t pi);
 
-/* prompt_parser4.c */
+/* prompt_parser5.c */
 void	skip_spaces(char *prompt, size_t *pi);
 bool	is_special_char(char sym);
 bool	is_inside_quotes(t_parser_data *d, size_t pi);

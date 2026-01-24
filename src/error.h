@@ -61,9 +61,6 @@ typedef enum e_exit_code
 	CMD_NOT_LOCATED_ERR = 127
 }	t_exit_code;
 
-void	handle_prompt_parser_error(bool *f_noerr);
-void	handle_prompt_parser_ext_error(bool *f_noerr, char *msg);
-void	print_prompt_parser_ext_error(char *msg);
 void	print_sys_error(char *msg);
 void	print_shell_error(char *culprit, char *msg);
 

@@ -45,6 +45,10 @@ int	shell_engine(char *prompt, int *ret_code)
 		dbg_prompt_parser_print_all(&pdata);
 #endif
 
+		fres = redirections_parser(&pdata);
+		if (fres != COMMON_SUCCESS)
+			break ;
+
 		fres = exec_ops(&pdata, ret_code);
 		if (fres != COMMON_SUCCESS)
 			break ;
@@ -81,5 +85,11 @@ int	comments_parser(t_parser_data *d)
 		}
 		++pi;
 	}
+	return (COMMON_SUCCESS);
+}
+
+int	redirections_parser(t_parser_data *d)
+{	
+	(void)d;
 	return (COMMON_SUCCESS);
 }

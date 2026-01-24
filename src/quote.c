@@ -3,14 +3,14 @@
 
 bool quotes_parser(t_parser_data *d)
 {
-	bool	f_noerr;
+	int		fret;
 	bool	f_dquote;	// Double quote found flag
 	bool	f_squote;	// Single quote found flag
 	size_t	prompt_len;
 	size_t	pi;			// Prompt index
 
 	pi = 0;
-	f_noerr = true;
+	fret = COMMON_SUCCESS;
 	f_dquote = false;
 	f_squote = false;
 	prompt_len = ft_strlen(d->prompt);
@@ -72,6 +72,9 @@ bool quotes_parser(t_parser_data *d)
 	// If after parsing there are any unmatched
 	// quotes (quotes without pairs) left 
 	if (f_squote || f_dquote)
-		handle_prompt_parser_ext_error(&f_noerr, UNMATCH_QUOTES_ERR_MSG);
-	return (f_noerr);
+	{
+		print_shell_error(NULL, UNMATCH_QUOTES_ERR_MSG);
+		fret = COMMON_FAILURE;
+	}
+	return (fret);
 }

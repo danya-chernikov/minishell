@@ -17,7 +17,8 @@ SRCS=main.c \
 	 env.c env_setters.c env_getters.c env_printers.c env_service.c \
 	 history.c shell_history.c \
 	 config.c shell_configs.c \
-	 prompt_parser.c prompt_parser2.c prompt_parser3.c prompt_parser4.c \
+	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
+	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
 	 aux_common.c error.c debug.c test.c
@@ -31,7 +32,8 @@ OBJS=main.o \
 	 env.o env_setters.o env_getters.o env_printers.o env_service.o \
 	 history.o shell_history.o \
 	 config.o shell_configs.o \
-	 prompt_parser.o prompt_parser2.o prompt_parser3.o prompt_parser4.o \
+	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
+	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
 	 aux_common.o error.o debug.o test.o
@@ -187,6 +189,10 @@ prompt_parser3.o : prompt_parser3.c prompt_parser.h libft.h vector.h error.h deb
 prompt_parser4.o : prompt_parser4.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser4.c
+
+prompt_parser5.o : prompt_parser5.c prompt_parser.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser5.c
 
 par.o : par.c par.h prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
