@@ -2,10 +2,17 @@
 
 void	token_push(t_parser_data *d, t_token_type type)
 {
+	t_operand	*op;
+
+	op = NULL;
 	d->tokens[d->token_cnt].type = type;
-	if (type == OPERAND)
-		d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt - 1];
 	d->tokens[d->token_cnt].start_pi = d->pi;
+	if (type == OPERAND)
+	{
+		op = (t_operand *)&d->ops[d->op_cnt - 1];
+		d->tokens[d->token_cnt].op = op;
+		d->tokens[d->token_cnt].start_pi = d->pi - ft_strlen(op->name);
+	}
 	++d->token_cnt;
 }
 
@@ -19,7 +26,6 @@ void	token_push(t_parser_data *d, t_token_type type)
  *
  *     plen	- promopt length;
  *     pi	- prompt index */
-
 int		operand_push(t_parser_data *d, size_t plen)
 {
 	size_t	i;

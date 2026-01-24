@@ -76,11 +76,7 @@ bool	parser_engine(t_parser_data *d)
 				f_noerr = false;
 				break ;
 			}
-
 			token_push(d, OPERAND); // Add this operand into the tokens array
-
-			++d->pi; // Move one symbol forward in prompt
-
 			skip_spaces(d->prompt, &d->pi); // Let's see what goes next
 
 			// Here we should check whether this is the end of the current pipeline
