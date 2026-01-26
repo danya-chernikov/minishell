@@ -11,6 +11,10 @@
 # define TOKEN_CLOSE_PAR	")"
 # define TOKEN_AND			"&&"
 # define TOKEN_OR			"||"
+# define TOKEN_REDIR_IN		"<"
+# define TOKEN_REDIR_OUT	">"
+# define TOKEN_REDIR_APP	">>"
+# define TOKEN_HEREDOC		"<<"
 
 # define MAX_TOKEN_LEN		512 // Maximum length of each token
 # define MAX_TOKENS_NUM		256 // Maximum number of tokens
@@ -25,6 +29,10 @@ typedef enum e_token_type
     CLOSE_PAR,
 	AND,
 	OR,
+	REDIR_WRITE,
+	REDIR_APPEND,
+	REDIR_READ,
+	HEREDOC,
 	NONE // No tokens were found yet
 	
 }   t_token_type;

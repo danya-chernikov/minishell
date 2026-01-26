@@ -57,15 +57,8 @@ int	parser_engine(t_parser_data *d)
 
 			// It means nothing is on the right (just spaces)
 			if (d->pi == prompt_len) // We reached the end of the prompt
-			{
-				if (d->pipe_cnt > 0) // If it's the last operand in the prompt
-				{
-					d->ops[d->op_cnt - 1].read_end = d->pipe_cnt - 1;
-					d->ops[d->op_cnt - 1].write_end = NONE_PIPE;
-				}
-				// Otherwise, it means our prompt contains only one letter-operand
 				break ;
-			}
+
 			// Let's see what goes after the letter
 			// After the letter goes a pipe
 			if (its_PIPE(d->prompt, prompt_len, d->pi)) // If further goes pipe

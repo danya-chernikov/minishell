@@ -19,12 +19,14 @@
 
 # define ERR_BUF_SIZE			256
 
+/* Errors of parsing stage */
 # define PARSER_ERR_MSG			"parsing error"
 # define TOO_LONG_OP_ERR_MSG	"operand is too long"
 # define TOO_MANY_OPS_ERR_MSG	"too many operands"
 # define UNMATCH_QUOTES_ERR_MSG	"unmatched quotes"
 # define EMPTY_PARS_ERR_MSG		"empty parentheses are not permitted"
 
+/* Bash-like errors specific for shell */
 # define SYNTAX_ERR_MSG			"syntax error"
 # define INV_OPT_ERR_MSG		"invalid option"
 # define C_OPT_ERR_MSG			"option requires an argument"
@@ -36,6 +38,10 @@
 # define NO_SUCH_FD_ERR_MSG		"No such file or directory"
 # define DOM_TOO_LONG_ERR_MSG	"(Sub)domain is too long"
 # define PROMPT_TOO_LONG		"Prompt is too long"
+# define HEREDOC_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+
+/* Warnings */
+# define HEREDOC_EOF_WARN_MSG	"here-document at line 46 delimited by end-of-file"
 
 # define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
 # define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"
@@ -63,5 +69,6 @@ typedef enum e_exit_code
 
 void	print_sys_error(char *msg);
 void	print_shell_error(char *culprit, char *msg);
+void	print_shell_warning(char *culprit, char *msg);
 
 #endif

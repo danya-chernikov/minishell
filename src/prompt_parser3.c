@@ -53,6 +53,7 @@ int		operand_push(t_parser_data *d, size_t plen)
 		++i;
 	}
 	opname[i] = '\0';
+	remove_right_spaces(opname); // DUCT TAPE! ( but works :3 )
 	opname_len = ft_strlen(opname);
 	d->ops[d->op_cnt].name = (char *)malloc((opname_len + 1) * sizeof (char));
 	if (!d->ops[d->op_cnt].name)

@@ -46,6 +46,10 @@ int	shell_engine(char *prompt, int *ret_code)
 		dbg_prompt_parser_print_all(&pdata);
 #endif
 
+		fres = heredocs_parser(&pdata);
+		if (fres != COMMON_SUCCESS)
+			break ;
+
 		fres = redirections_parser(&pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
@@ -89,8 +93,33 @@ int	comments_parser(t_parser_data *d)
 	return (COMMON_SUCCESS);
 }
 
+int	heredocs_parser(t_parser_data *d)
+{
+	t_operand	*op;
+	size_t		ti;
+	size_t		op_i;
+
+	ti = 0;
+	while (ti < d->token_cnt)
+	{
+		if (d->tokens[ti].type == OPERAND)
+		{
+			op = d->tokens[ti].op;
+			op_i = 0;
+			while (op_i < ft_strlen(op->name))
+			{
+				
+				++op_i;
+			}
+		}
+		++ti;
+	}
+	return (COMMON_SUCCESS);
+}
+
 int	redirections_parser(t_parser_data *d)
-{	
+{
 	(void)d;
+
 	return (COMMON_SUCCESS);
 }

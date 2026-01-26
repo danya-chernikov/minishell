@@ -29,3 +29,19 @@ void	print_shell_error(char *culprit, char *msg)
 	ft_strlcat(err_buf, "\n", ERR_BUF_SIZE);
 	write(STDERR_FILENO, err_buf, ft_strlen(err_buf));
 }
+
+void	print_shell_warning(char *culprit, char *msg)
+{
+	char	warn_buf[ERR_BUF_SIZE];
+
+	ft_strlcpy(warn_buf, MSH_NAME_SHORT, ERR_BUF_SIZE);
+	ft_strlcat(warn_buf, ": warning: ", ERR_BUF_SIZE);
+	if (culprit)
+	{
+		ft_strlcat(warn_buf, culprit, ERR_BUF_SIZE);
+		ft_strlcat(warn_buf, ": ", ERR_BUF_SIZE);
+	}
+	ft_strlcat(warn_buf, msg, ERR_BUF_SIZE);
+	ft_strlcat(warn_buf, "\n", ERR_BUF_SIZE);
+	write(STDERR_FILENO, warn_buf, ft_strlen(warn_buf));
+}

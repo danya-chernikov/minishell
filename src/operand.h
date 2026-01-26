@@ -1,6 +1,8 @@
 #ifndef OPERAND_H
 # define OPERAND_H
 
+# include "redirect.h"
+
 # include <stddef.h>
 
 # define READ_END		0
@@ -13,9 +15,13 @@
  * STDOUT_FILENO always must be bonded with write-end */
 typedef struct s_operand
 {
-	char	*name;		// Path to program with its arguments
-	int		read_end;	// stdin
-	int		write_end;	// stdout
+	char		*name;					// Path to program with its arguments
+	int			read_end;				// stdin
+	int			write_end;				// stdout
+	t_redir		redirs[MAX_REDIRS_NUM]; // Redirections of this operand-program
+	size_t		red_cnt;				// Redirections counter
+	pid_t		pid;
+	char		**argv;
 
 }	t_operand;
 
