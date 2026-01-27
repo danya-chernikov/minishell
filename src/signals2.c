@@ -1,19 +1,27 @@
 #include "signals.h"
 
-#include <stddef.h>
+#include <unistd.h>
+#include <readline/readline.h>
+
+void	heredoc_sigint_handler(int signo)
+{
+	(void)signo;
+	g_got_sigint = 1;
+	rl_done = 1;
+	write(1, "\n", 1);
+}
 
 void	child_set_heredoc_signals(void)
 {
 	struct sigaction	sa;	
 
-	sa.sa_handler = SIG_DFL;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
+
+	sa.sa_handler = heredoc_sigint_handler;
 	sigaction(SIGINT, &sa, NULL);
 
 	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
 	sigaction(SIGQUIT, &sa, NULL);
 }
 

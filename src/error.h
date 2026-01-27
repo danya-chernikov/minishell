@@ -47,7 +47,7 @@
 # define TOO_LONG_HD_CONTENT	"heredoc's content is too long"
 
 /* Warnings */
-# define HEREDOC_EOF_WARN_MSG	"here-document at line 46 delimited by end-of-file"
+# define HEREDOC_EOF_WARN_MSG	"here-document was delimited by end-of-file"
 
 # define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
 # define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"

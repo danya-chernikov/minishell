@@ -12,6 +12,7 @@ void	sigint_handler(int signo);
 void	sigwinch_handler(int signo);
 
 /* signals2.c */
+void	heredoc_sigint_handler(int signo);
 void	child_set_heredoc_signals(void);
 void	parent_ignore_sigint_sigquit(struct sigaction *old_int,
 		struct sigaction *old_quit);

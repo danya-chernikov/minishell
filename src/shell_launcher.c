@@ -169,6 +169,7 @@ int	launch_int_session(t_shell *msh)
 			return (fres);
 
 		rl_done = 0;
+		g_got_sigint = 0;
 		rline_buf = readline(msh->prompt_inv);
 		if (!rline_buf)
 		{

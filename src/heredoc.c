@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <termios.h>
 #include <readline/readline.h>
 
 /* Main function in this module.
@@ -44,27 +45,59 @@ int	read_one_heredoc(t_heredoc *hd)
 	int					ret_code;
 	pid_t				pid;
 	int					status;
+	bool				f_have_tty;
+	bool				f_restore_signals;
+	struct termios		saved;
 	struct sigaction	old_int;
 	struct sigaction	old_quit;
 
+	status = 0;
+	ret_code = COMMON_SUCCESS;
+	f_have_tty = false;
+	f_restore_signals = false;
+	if (isatty(STDIN_FILENO))
+	{
+		if (tcgetattr(STDIN_FILENO, &saved) == 0)
+			f_have_tty = 1;
+	}
 	if (pipe(p) != 0)
+	{
+		perror("pipe");
 		return (COMMON_SYS_ERR);
+	}
 	parent_ignore_sigint_sigquit(&old_int, &old_quit);
+	f_restore_signals = true;
 	pid = fork();
-	if (pid == 0)
+	if (pid < 0)
+	{
+		perror("fork");
+		close(p[HD_READ]);
+		close(p[HD_WRITE]);
+		if (f_restore_signals)
+			parent_restore_signals(&old_int, &old_quit);
+		if (f_have_tty)
+			tcsetattr(STDIN_FILENO, TCSANOW, &saved);
+		return (COMMON_SYS_ERR);
+	}
+	else if (pid == 0)
 	{
 		close(p[HD_READ]);
 		heredoc_child_loop(p[HD_WRITE], hd);
+		// heredoc_child_loop() has to be terminated via exit()
 	}
 	close(p[HD_WRITE]);
 	ret_code = heredoc_parent_collect(p[HD_READ], hd);
 	waitpid(pid, &status, 0);
-	parent_restore_signals(&old_int, &old_quit);
+	if (f_restore_signals)
+		parent_restore_signals(&old_int, &old_quit);
+	if (f_have_tty)
+		tcsetattr(STDIN_FILENO, TCSANOW, &saved);
+
+	if (WIFEXITED(status) && WEXITSTATUS(status) == (SIGNALED_CODE + SIGINT))
+		return (SIGNALED_CODE + SIGINT);
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 		return (SIGNALED_CODE + SIGINT); // 128 + 2
-	if (ret_code != COMMON_SUCCESS)
-		return (ret_code);
-	return (COMMON_SUCCESS);
+	return (ret_code);
 }
 
 void	heredoc_child_loop(int wfd, const t_heredoc *hd)
@@ -72,10 +105,17 @@ void	heredoc_child_loop(int wfd, const t_heredoc *hd)
 	char	*line;
 	size_t	len;
 
+	g_got_sigint = 0;
 	child_set_heredoc_signals();
 	while (1)
 	{
 		line = readline("> "); // Add here PS2
+		if (g_got_sigint)
+		{
+			free(line);
+			close(wfd);
+			exit(SIGNALED_CODE + SIGINT); // 128 + 2
+		}
 		if (!line)
 		{
 			print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG);
@@ -98,7 +138,7 @@ void	heredoc_child_loop(int wfd, const t_heredoc *hd)
 		free(line);
 	}
 	close(wfd);
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 /* Parent reads pipe into hd->content */
