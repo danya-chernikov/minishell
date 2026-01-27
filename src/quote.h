@@ -24,8 +24,7 @@ typedef struct s_quote_interval
 
 }	t_quote_int;
 
-bool	quotes_parser(t_parser_data *d);
-bool	operand_quotes_parser(t_operand *op);
+bool	quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt);
 bool	is_inside_op_quotes(t_operand *op, size_t op_i);
 
 #endif

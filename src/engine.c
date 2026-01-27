@@ -30,7 +30,7 @@ int	shell_engine(char *prompt, int *ret_code)
 			break ;
 
 		// Let's parse all quotes intervals for entered prompt
-		fres = quotes_parser(&pdata);
+		fres = quotes_parser(pdata.prompt, pdata.quotes, &pdata.qpair_cnt);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
@@ -117,7 +117,7 @@ int	operands_quotes_parser(t_parser_data *d)
 			op = d->tokens[ti].op;
 			remove_left_spaces(op->name);
 			remove_right_spaces(op->name);
-			if (!operand_quotes_parser(op))
+			if (!quotes_parser(op->name, op->quotes, &op->qpair_cnt))
 				return (COMMON_FAILURE);
 		}
 		++ti;
