@@ -15,6 +15,7 @@ int	redirections_parser(t_parser_data *d)
 	t_operand	*op;
 	size_t		ti;
 	size_t		op_i;
+	size_t		op_slen;
 	int			fret;
 
 	ti = 0;
@@ -25,7 +26,8 @@ int	redirections_parser(t_parser_data *d)
 		{
 			op = d->tokens[ti].op;
 			op_i = 0;
-			while (op_i < ft_strlen(op->name))
+			op_slen = ft_strlen(op->name);
+			while (op_i < op_slen)
 			{
 				// Order of condition here is important!
 				// Otherwise program may think '<<' is '<'
@@ -65,6 +67,7 @@ int	add_redir_in(t_operand *op, size_t *op_i)
 {
 	size_t	wi;
 	size_t	i;
+	size_t	op_slen;
 
 	// Overflow check
 	if (op->red_cnt == MAX_REDIRS_NUM - 1)
@@ -106,10 +109,11 @@ int	add_redir_in(t_operand *op, size_t *op_i)
 	}
 		
 	i = 0;
-	while (wi < ft_strlen(op->name))
+	op_slen = ft_strlen(op->name);
+	while (wi < op_slen)
 	{
 		// Overflow check
-		if (i > PATH_MAX - 1)
+		if (i >= PATH_MAX - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_REDIRECT_PATH);
 			return (COMMON_FAILURE);
@@ -133,6 +137,7 @@ int	add_redir_out(t_operand *op, size_t *op_i)
 {
 	size_t	wi;
 	size_t	i;
+	size_t	op_slen;
 
 	if (op->red_cnt == MAX_REDIRS_NUM - 1)
 	{
@@ -164,9 +169,10 @@ int	add_redir_out(t_operand *op, size_t *op_i)
 		return (COMMON_SYS_ERR);
 	}
 	i = 0;
-	while (wi < ft_strlen(op->name))
+	op_slen = ft_strlen(op->name);
+	while (wi < op_slen)
 	{
-		if (i > PATH_MAX - 1)
+		if (i >= PATH_MAX - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_REDIRECT_PATH);
 			return (COMMON_FAILURE);
@@ -189,6 +195,7 @@ int	add_redir_app(t_operand *op, size_t *op_i)
 {
 	size_t	wi;
 	size_t	i;
+	size_t	op_slen;
 
 	if (op->red_cnt == MAX_REDIRS_NUM - 1)
 	{
@@ -221,9 +228,10 @@ int	add_redir_app(t_operand *op, size_t *op_i)
 		return (COMMON_SYS_ERR);
 	}
 	i = 0;
-	while (wi < ft_strlen(op->name))
+	op_slen = ft_strlen(op->name);
+	while (wi < op_slen)
 	{
-		if (i > PATH_MAX - 1)
+		if (i >= PATH_MAX - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_REDIRECT_PATH);
 			return (COMMON_FAILURE);
@@ -246,6 +254,7 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 {
 	size_t	wi;
 	size_t	i;
+	size_t	op_slen;
 
 	if (op->red_cnt == MAX_REDIRS_NUM - 1)
 	{
@@ -261,6 +270,7 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 
 	op->redirs[op->red_cnt].type = REDIR_HEREDOC;
 	op->redirs[op->red_cnt].target_fd = STDIN_FILENO;
+	op->redirs[op->red_cnt].hd.cnt_len = 0;
 	wi = *op_i + 2; // Skip <<
 	skip_spaces(op->name, &wi);
 
@@ -279,9 +289,10 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 		return (COMMON_SYS_ERR);
 	}
 	i = 0;
-	while (wi < ft_strlen(op->name))
+	op_slen = ft_strlen(op->name);
+	while (wi < op_slen)
 	{
-		if (i > PATH_MAX - 1)
+		if (i >= MAX_HD_DELIM_LEN - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_HD_DELIM);
 			return (COMMON_FAILURE);

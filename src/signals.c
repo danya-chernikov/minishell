@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <readline/readline.h>
-#include <readline/history.h>
 
 volatile sig_atomic_t	g_got_sigint = 0;
 

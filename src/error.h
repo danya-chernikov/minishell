@@ -70,7 +70,8 @@ typedef enum e_exit_code
 	CMD_BUILTIN_ERR = 2,
 	SYNTAX_ERR = 2,
 	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
-	CMD_NOT_LOCATED_ERR = 127
+	CMD_NOT_LOCATED_ERR = 127,
+	SIGNALED_CODE = 128
 }	t_exit_code;
 
 void	print_sys_error(char *msg);

@@ -1,15 +1,7 @@
 #include "prompt_parser.h"
 
 /* The first token is always NONE because
- * we always check previous token value
-	d->pi = 0;
-	d->op_cnt = 0;
-	d->pipe_cnt = 0;
-	d->opar_num = 0;
-	d->opar_cnt = 0;
-	d->cpar_cnt = 0;
-	d->par_cnt = 0;
-	d->qpair_cnt = 0; */
+ * we always check previous token value */
 int	parser_init(t_parser_data *d, char *rline_buf)
 {
 	d->token_cnt = 1;

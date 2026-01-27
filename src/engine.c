@@ -1,4 +1,8 @@
 #include "engine.h"
+#include "heredoc.h"
+#include "exec.h"
+#include "quote.h"
+#include "debug.h"
 
 #include <linux/limits.h> // For PATH_MAX
 
@@ -56,6 +60,10 @@ int	shell_engine(char *prompt, int *ret_code)
 			break ;
 
 		fres = redirections_parser(&pdata);
+		if (fres != COMMON_SUCCESS)
+			break ;
+
+		fres = read_heredocs(&pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
@@ -122,22 +130,5 @@ int	operands_quotes_parser(t_parser_data *d)
 		}
 		++ti;
 	}
-	return (COMMON_SUCCESS);
-}
-
-int	read_heredocs(t_parser_data *d)
-{
-	/*	i = 0;
-	while (wi < ft_strlen(op->name))
-	{
-		if ((op->name[wi] == ' ' || op->name[wi] == '>' ||
-			op->name[wi] == '<') && !is_inside_op_quotes(op, wi))
-		{
-			break ;
-		}
-		op->redirs[op->red_cnt].path[i++] = op->name[wi++];
-	}
-	op->redirs[op->red_cnt].path[i] = '\0';*/
-	(void)d;
 	return (COMMON_SUCCESS);
 }

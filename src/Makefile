@@ -21,8 +21,8 @@ SRCS=main.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c exec.c redirect_parser.c redirect.c heredoc.c builtin.c \
-	 signals.c \
-	 aux_common.c error.c debug.c test.c
+	 signals.c signals2.c \
+	 aux_common.c aux_io.c error.c debug.c test.c
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o \
@@ -37,8 +37,8 @@ OBJS=main.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o exec.o redirect_parser.o redirect.o heredoc.o builtin.o \
-	 signals.o \
-	 aux_common.o error.o debug.o test.o
+	 signals.o signals2.o \
+	 aux_common.o aux_io.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -176,10 +176,6 @@ prompt_parser.o : prompt_parser.c prompt_parser.h libft.h vector.h error.h debug
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser.c
 
-prompt_parser.o : prompt_parser.c prompt_parser.h libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c prompt_parser.c
-
 prompt_parser2.o : prompt_parser2.c prompt_parser.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser2.c
@@ -214,7 +210,7 @@ operand.o : operand.c operand.h libft.h vector.h error.h debug.h
 
 
 # =========================== Engine and execution ===========================
-engine.o : engine.c engine.h libft.h vector.h error.h debug.h
+engine.o : engine.c engine.h heredoc.h exec.h quote.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c
 
@@ -230,7 +226,7 @@ redirect.o : redirect.c redirect.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c redirect.c
 
-heredoc.o : heredoc.c heredoc.h libft.h vector.h error.h debug.h
+heredoc.o : heredoc.c heredoc.h prompt_parser.h signals.h aux_io.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
 
@@ -244,11 +240,19 @@ signals.o : signals.c signals.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c signals.c
 
+signals2.o : signals2.c signals.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c signals2.c
+
 
 # ============================ Auxiliary services ============================
 aux_common.o : aux_common.c aux_common.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_common.c
+
+aux_io.o : aux_io.c aux_io.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_io.c
 
 error.o : error.c error.h shell.h libft.h vector.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \

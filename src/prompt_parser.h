@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-# define PARSER_H
+#ifndef PROMPT_PARSER_H
+# define PROMPT_PARSER_H
 
 #include <stdlib.h>
 

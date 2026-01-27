@@ -3,7 +3,6 @@
 
 # include <stddef.h>
 
-# include "operand.h"
 # include "aux_common.h"
 
 # define TOKEN_PIPE			"|"
@@ -16,6 +15,7 @@
 # define MAX_TOKENS_NUM		256 // Maximum number of tokens
 
 typedef struct s_parser_data	t_parser_data;
+typedef struct s_operand		t_operand;
 
 typedef enum e_token_type
 {
@@ -34,8 +34,7 @@ typedef enum e_token_type
  *
  *     start_pi - Index of the first character
  *				  in the prompt string with
- *				  which this operand starts
- * */
+ *				  which this operand starts */
 typedef struct s_token
 {
 	t_token_type	type;
