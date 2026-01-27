@@ -188,7 +188,7 @@ int	launch_int_session(t_shell *msh)
 
 		add_history(rline_buf);
 
-		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR) // Critial system error occured
+		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR)
 			return (COMMON_SYS_ERR);
 
 		// In case if non-critial parser error occured

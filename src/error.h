@@ -38,7 +38,13 @@
 # define NO_SUCH_FD_ERR_MSG		"No such file or directory"
 # define DOM_TOO_LONG_ERR_MSG	"(Sub)domain is too long"
 # define PROMPT_TOO_LONG		"Prompt is too long"
-# define HEREDOC_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+
+/* Redirection error */
+# define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+# define TOO_MANY_REDIRECTS		"too many redirections"
+# define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
+# define TOO_LONG_HD_DELIM		"heredoc's delimiter is too long"
+# define TOO_LONG_HD_CONTENT	"heredoc's content is too long"
 
 /* Warnings */
 # define HEREDOC_EOF_WARN_MSG	"here-document at line 46 delimited by end-of-file"

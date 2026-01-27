@@ -25,5 +25,7 @@ char	*get_full_path(char *rel_path);
 char	*expand_homedir(char *str, char *home);
 int		div2_str_by_delim(char *str, char delim, char **part1, char **part2);
 int		div2_str_by_delim_alloc(char **part1, char **part2);
+bool	is_surrounded_quotes(char *str);
+void	erase_quotes_no_check(char *str);
 
 #endif

@@ -20,7 +20,7 @@ SRCS=main.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
-	 engine.c exec.c redirect.c heredoc.c builtin.c \
+	 engine.c exec.c redirect_parser.c redirect.c heredoc.c builtin.c \
 	 signals.c \
 	 aux_common.c error.c debug.c test.c
 
@@ -36,7 +36,7 @@ OBJS=main.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
-	 engine.o exec.o redirect.o heredoc.o builtin.o \
+	 engine.o exec.o redirect_parser.o redirect.o heredoc.o builtin.o \
 	 signals.o \
 	 aux_common.o error.o debug.o test.o
 
@@ -221,6 +221,10 @@ engine.o : engine.c engine.h libft.h vector.h error.h debug.h
 exec.o : exec.c exec.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec.c
+
+redirect_parser.o : redirect_parser.c redirect_parser.h libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c redirect_parser.c
 
 redirect.o : redirect.c redirect.h libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \

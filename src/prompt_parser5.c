@@ -40,7 +40,11 @@ void	remove_right_spaces(char *prompt)
 {
 	int	i;
 
-	i = ft_strlen(prompt) - 1;
+    if (!prompt || prompt[0] == '\0')
+	{
+        return ;
+	}
+	i = (int)ft_strlen(prompt) - 1;
 	if (prompt[i] == ' ')
 	{
 		while (i >= 0 && prompt[i] == ' ')
@@ -49,4 +53,24 @@ void	remove_right_spaces(char *prompt)
 			--i;
 		}
 	}
+}
+
+void	remove_left_spaces(char *prompt)
+{
+	int	i;
+	int	j;
+	
+	if (!prompt || prompt[0] == '\0')
+	{
+		return ;
+	}
+	j = 0;
+	while (prompt[j] == ' ')
+		++j;
+	if (j == 0) // No leading spaces
+		return ;
+	i = 0;
+	while (prompt[j] != '\0')
+		prompt[i++] = prompt[j++];
+	prompt[i] = '\0';
 }

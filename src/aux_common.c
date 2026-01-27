@@ -115,3 +115,30 @@ int	div2_str_by_delim_alloc(char **part1, char **part2)
     }
 	return (COMMON_SUCCESS);
 }
+
+bool	is_surrounded_quotes(char *str)
+{
+	if ((str[0] == '\'' && str[ft_strlen(str) - 1] == '\'') ||
+		(str[0] == '"' && str[ft_strlen(str) - 1] == '"'))
+	{
+		return (true);
+	}
+	return (false);
+}
+
+void	erase_quotes_no_check(char *str)
+{
+	size_t	i;
+	size_t	len;
+
+	i = 0;
+	len = ft_strlen(str);
+	if (!str || len < 2)
+		return ;
+	while (i < len - 2)
+	{
+		str[i] = str[i + 1];
+		++i;
+	}
+	str[len - 2] = '\0';
+}

@@ -144,3 +144,63 @@ void	dbg_prompt_parser_print_parentheses(t_parser_data *d)
 		printf("\n");
 	}
 }
+
+void	dbg_print_redirs(t_parser_data *d)
+{
+	t_redir	*r;
+	size_t	op_i;
+	size_t	ri;
+
+	printf("\nRedirections:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		printf("%zu. %s\n", op_i, d->ops[op_i].name);
+
+		if (d->ops[op_i].red_cnt == 0)
+		{
+			printf("----------\n");
+		}
+		else
+		{
+			ri = 0;
+			while (ri < d->ops[op_i].red_cnt)
+			{
+				r = &d->ops[op_i].redirs[ri];
+
+				printf("\t%zu\n", ri);
+
+				if (r->type == REDIR_IN)
+					printf("\tREDIR_IN\n");
+				else if (r->type == REDIR_OUT)
+					printf("\tREDIR_OUT\n");
+				else if (r->type == REDIR_APP)
+					printf("\tREDIR_APP\n");
+				else if (r->type == REDIR_HEREDOC)
+					printf("\tREDIR_HEREDOC\n");
+
+				printf("\tTarget FD: %d\n", r->target_fd);
+
+				if (r->type == REDIR_HEREDOC)
+				{
+					if (r->hd.content)
+						printf("\tContent: %s\n", r->hd.content);
+					if (r->hd.delim)
+						printf("\tDelimiter: %s\n", r->hd.delim);
+					if (r->hd.f_expand_body)
+						printf("\tExpand body?: YES\n");
+					else	
+						printf("\tExpand body?: NO\n");
+				}
+				else
+				{
+					printf("\tOperand-path: %s\n", r->path);
+				}
+
+				++ri;
+			}
+		}
+		++op_i;
+	}
+	printf("\n");
+}

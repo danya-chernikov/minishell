@@ -12,10 +12,13 @@
 
 void	dbg_print_configs(t_configs *cnf, t_conf_type ctype);
 void	dbg_print_filehistory(t_history *history);
+
 void	dbg_prompt_parser_print_all(t_parser_data *d);
 void	dbg_prompt_parser_print_quotes(t_parser_data *d);
 void	dbg_prompt_parser_print_parsed_data(t_parser_data *d);
 void	dbg_prompt_parser_print_tokens(t_parser_data *d);
 void	dbg_prompt_parser_print_parentheses(t_parser_data *d);
+
+void	dbg_print_redirs(t_parser_data *d);
 
 #endif

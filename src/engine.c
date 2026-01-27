@@ -1,5 +1,7 @@
 #include "engine.h"
 
+#include <linux/limits.h> // For PATH_MAX
+
 /* If the function returns -1, it means a critical error occurred,
  * and the caller should react by calling exit(EXIT_FAILURE);
  *
@@ -27,6 +29,7 @@ int	shell_engine(char *prompt, int *ret_code)
 		if (fres != COMMON_SUCCESS) // Non-critial parser error
 			break ;
 
+		// Let's parse all quotes intervals for entered prompt
 		fres = quotes_parser(&pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
@@ -46,13 +49,19 @@ int	shell_engine(char *prompt, int *ret_code)
 		dbg_prompt_parser_print_all(&pdata);
 #endif
 
-		fres = heredocs_parser(&pdata);
+		// Let's parser all quotes intervals for each
+		// operand-program, i.e. we're kinda updating them
+		fres = operands_quotes_parser(&pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
 		fres = redirections_parser(&pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
+
+#if DEBUG == 1
+		dbg_print_redirs(&pdata);
+#endif
 
 		/*fres = exec_ops(&pdata, ret_code);
 		if (fres != COMMON_SUCCESS)
@@ -93,11 +102,12 @@ int	comments_parser(t_parser_data *d)
 	return (COMMON_SUCCESS);
 }
 
-int	heredocs_parser(t_parser_data *d)
+/* Upates quote indexes for
+ * each operand */
+int	operands_quotes_parser(t_parser_data *d)
 {
 	t_operand	*op;
 	size_t		ti;
-	size_t		op_i;
 
 	ti = 0;
 	while (ti < d->token_cnt)
@@ -105,21 +115,29 @@ int	heredocs_parser(t_parser_data *d)
 		if (d->tokens[ti].type == OPERAND)
 		{
 			op = d->tokens[ti].op;
-			op_i = 0;
-			while (op_i < ft_strlen(op->name))
-			{
-				
-				++op_i;
-			}
+			remove_left_spaces(op->name);
+			remove_right_spaces(op->name);
+			if (!operand_quotes_parser(op))
+				return (COMMON_FAILURE);
 		}
 		++ti;
 	}
 	return (COMMON_SUCCESS);
 }
 
-int	redirections_parser(t_parser_data *d)
+int	read_heredocs(t_parser_data *d)
 {
+	/*	i = 0;
+	while (wi < ft_strlen(op->name))
+	{
+		if ((op->name[wi] == ' ' || op->name[wi] == '>' ||
+			op->name[wi] == '<') && !is_inside_op_quotes(op, wi))
+		{
+			break ;
+		}
+		op->redirs[op->red_cnt].path[i++] = op->name[wi++];
+	}
+	op->redirs[op->red_cnt].path[i] = '\0';*/
 	(void)d;
-
 	return (COMMON_SUCCESS);
 }

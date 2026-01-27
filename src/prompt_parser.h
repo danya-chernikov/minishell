@@ -73,5 +73,6 @@ bool	is_special_char(char sym);
 bool	is_inside_quotes(t_parser_data *d, size_t pi);
 bool	is_special_char_outside_quotes(t_parser_data *d, size_t pi);
 void	remove_right_spaces(char *prompt);
+void	remove_left_spaces(char *prompt);
 
 #endif

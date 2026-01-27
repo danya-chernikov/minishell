@@ -2,6 +2,7 @@
 # define OPERAND_H
 
 # include "redirect.h"
+# include "quote.h"
 
 # include <stddef.h>
 
@@ -20,6 +21,8 @@ typedef struct s_operand
 	int			write_end;				// stdout
 	t_redir		redirs[MAX_REDIRS_NUM]; // Redirections of this operand-program
 	size_t		red_cnt;				// Redirections counter
+	t_quote_int quotes[MAX_QUOTES_NUM];	// All quotes pairs found in `name`
+	size_t		qpair_cnt;				// Counter of quote pairs
 	pid_t		pid;
 	char		**argv;
 

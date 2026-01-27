@@ -7,6 +7,7 @@
 # define MAX_QUOTES_NUM	256
 
 typedef struct s_parser_data	t_parser_data;
+typedef struct s_operand		t_operand;
 
 typedef enum e_quote_type
 {
@@ -24,5 +25,7 @@ typedef struct s_quote_interval
 }	t_quote_int;
 
 bool	quotes_parser(t_parser_data *d);
+bool	operand_quotes_parser(t_operand *op);
+bool	is_inside_op_quotes(t_operand *op, size_t op_i);
 
 #endif
