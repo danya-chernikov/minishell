@@ -14,61 +14,62 @@
  *
  * If it returns 1, everything is fine.
  * The parser_engine() is recursive function! */
-int	shell_engine(char *prompt, int *ret_code)
+int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 {
-	t_parser_data	pdata;
+	t_parser_data	*pdata;
 	int				fres; // Returned code from function
 	int				try;
 	
 	(void)ret_code;
 	try = 0;
 	fres = COMMON_SUCCESS;
-	ft_bzero(&pdata, sizeof(pdata));
+	ft_bzero(&pdata, sizeof(pdata)); // We don't need it anymore..
+	pdata = msh->pd;
 	while (try < 1)
 	{
 		if (!prompt || ft_strlen(prompt) == 0)
 			break ;
 
-		fres = parser_init(&pdata, prompt);
+		fres = parser_init(pdata, prompt);
 		if (fres != COMMON_SUCCESS) // Non-critial parser error
 			break ;
 
 		// Let's parse all quotes intervals for entered prompt
-		fres = quotes_parser(pdata.prompt, pdata.quotes, &pdata.qpair_cnt);
+		fres = quotes_parser(pdata->prompt, pdata->quotes, &pdata->qpair_cnt);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
 		// May be launched only after quote intervals will be parsed
-		fres = comments_parser(&pdata);
+		fres = comments_parser(pdata);
 
-		fres = check_empty_par(&pdata);
+		fres = check_empty_par(pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
-		fres = parser_engine(&pdata);
+		fres = parser_engine(pdata);
 		if (fres != COMMON_SUCCESS) // If we got non-critical parser error
 			break ; // Just prompt user to enter another command(s)
 
 #if DEBUG == 1
-		dbg_prompt_parser_print_all(&pdata);
+		dbg_prompt_parser_print_all(pdata);
 #endif
 
 		// Let's parser all quotes intervals for each
 		// operand-program, i.e. we're kinda updating them
-		fres = operands_quotes_parser(&pdata);
+		fres = operands_quotes_parser(pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
-		fres = redirections_parser(&pdata);
+		fres = redirections_parser(pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
-		fres = read_heredocs(&pdata);
+		fres = read_heredocs(msh);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
 #if DEBUG == 1
-		dbg_print_redirs(&pdata);
+		dbg_print_redirs(pdata);
 #endif
 
 		/*fres = exec_ops(&pdata, ret_code);
@@ -81,7 +82,7 @@ int	shell_engine(char *prompt, int *ret_code)
 		++try;
 	} // End try block
 
-	parser_free(&pdata);
+	parser_free(pdata);
 	return (fres);
 }
 

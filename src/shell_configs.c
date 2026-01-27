@@ -107,7 +107,7 @@ int	load_login_configs(t_shell *msh)
 			remove_newline(line);
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
-			shell_engine(NULL, &ret_code);
+			shell_engine(msh, NULL, &ret_code);
 			free(line);
 			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);
@@ -170,7 +170,7 @@ int	load_nonlogin_configs(t_shell *msh)
 			remove_newline(line);
 			if (msh->opts.f_verbose)
 				printf("%s\n", line);
-			shell_engine(NULL, &ret_code);
+			shell_engine(msh, NULL, &ret_code);
 			free(line);
 			gnlerr = 0;
 			line = get_next_line(fd, &gnlerr);

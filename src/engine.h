@@ -3,7 +3,7 @@
 
 # include "prompt_parser.h"
 
-int	shell_engine(char *prompt, int *ret_code);
+int	shell_engine(t_shell *msh, char *prompt, int *ret_code);
 int	comments_parser(t_parser_data *d);
 int	operands_quotes_parser(t_parser_data *d);
 

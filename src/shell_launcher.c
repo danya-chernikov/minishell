@@ -86,7 +86,7 @@ int	launch_script(t_shell *msh)
 		remove_newline(line);
 		if (msh->opts.f_verbose)
 			printf("%s\n", line);
-		shell_engine(line, &ret_code);
+		shell_engine(msh, line, &ret_code);
 		line = get_next_line(fd, &gnlerr);
 	}
 	if (!line && gnlerr)
@@ -110,7 +110,7 @@ int	launch_cmd(t_shell *msh)
 	int	ret_code;
 
 	ret_code = 0;
-	shell_engine(msh->c_cmd, &ret_code);
+	shell_engine(msh, msh->c_cmd, &ret_code);
 	return (ret_code);
 }
 
@@ -131,7 +131,7 @@ int	launch_stdin_cmd(t_shell *msh)
 		remove_newline(line);
 		if (msh->opts.f_verbose)
 			printf("%s\n", line);
-		shell_engine(line, &ret_code);
+		shell_engine(msh, line, &ret_code);
 		line = get_next_line(STDIN_FILENO, &gnlerr);
 	}
 	if (!line && gnlerr)
@@ -179,7 +179,7 @@ int	launch_int_session(t_shell *msh)
 		if (g_got_sigint)
 		{
 			g_got_sigint = 0;
-			ret_code = 130; // 128 + SIGINT
+			ret_code = SIGNALED_CODE + SIGINT; // 128 + 2 (SIGINT)
 		}
 		if (rline_buf[0] == '\0')
 		{
@@ -189,7 +189,7 @@ int	launch_int_session(t_shell *msh)
 
 		add_history(rline_buf);
 
-		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR)
+		if (shell_engine(msh, rline_buf, &ret_code) == COMMON_SYS_ERR)
 			return (COMMON_SYS_ERR);
 
 		// In case if non-critial parser error occured

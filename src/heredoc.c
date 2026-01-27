@@ -1,5 +1,6 @@
 #include "heredoc.h"
 #include "prompt_parser.h"
+#include "shell.h"
 #include "signals.h"
 #include "aux_io.h"
 
@@ -12,34 +13,37 @@
 #include <readline/readline.h>
 
 /* Main function in this module.
- * Asks user for all heredocs */
-int	read_heredocs(t_parser_data *d)
+ * Asks user for all heredocs.
+ *     rc - return code */
+int	read_heredocs(t_shell *msh)
 {
-	size_t	op_i;
-	size_t	red_i;
-	int		ret_code;
+	t_parser_data	*pd;
+	size_t			op_i;
+	size_t			red_i;
+	int				rc;
 
 	op_i = 0;
-	ret_code = COMMON_SUCCESS;
-	while (op_i < d->op_cnt)
+	pd = msh->pd;
+	rc = COMMON_SUCCESS;
+	while (op_i < pd->op_cnt)
 	{
 		red_i = 0;
-		while (red_i < d->ops[op_i].red_cnt)
+		while (red_i < pd->ops[op_i].red_cnt)
 		{
-			if (d->ops[op_i].redirs[red_i].type == REDIR_HEREDOC)
+			if (pd->ops[op_i].redirs[red_i].type == REDIR_HEREDOC)
 			{
-				ret_code = read_one_heredoc(&d->ops[op_i].redirs[red_i].hd);
-				if (ret_code != COMMON_SUCCESS)
-					return (ret_code);
+				rc = read_one_heredoc(msh, &pd->ops[op_i].redirs[red_i].hd);
+				if (rc != COMMON_SUCCESS)
+					return (rc);
 			}
 			++red_i;
 		}
 		++op_i;
 	}
-	return (ret_code);
+	return (rc);
 }
 
-int	read_one_heredoc(t_heredoc *hd)
+int	read_one_heredoc(t_shell *msh, t_heredoc *hd)
 {
 	int					p[2];
 	int					ret_code;
@@ -82,7 +86,7 @@ int	read_one_heredoc(t_heredoc *hd)
 	else if (pid == 0)
 	{
 		close(p[HD_READ]);
-		heredoc_child_loop(p[HD_WRITE], hd);
+		heredoc_child_loop(msh, p[HD_WRITE], hd);
 		// heredoc_child_loop() has to be terminated via exit()
 	}
 	close(p[HD_WRITE]);
@@ -100,7 +104,9 @@ int	read_one_heredoc(t_heredoc *hd)
 	return (ret_code);
 }
 
-void	heredoc_child_loop(int wfd, const t_heredoc *hd)
+/* env_get_val(msh->env, "PS1") will never return NULL! Cause if we
+ * haven't inherited it we set the default value */
+void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
 {
 	char	*line;
 	size_t	len;
@@ -109,7 +115,7 @@ void	heredoc_child_loop(int wfd, const t_heredoc *hd)
 	child_set_heredoc_signals();
 	while (1)
 	{
-		line = readline("> "); // Add here PS2
+		line = readline(env_get_val(&msh->env, "PS2"));
 		if (g_got_sigint)
 		{
 			free(line);

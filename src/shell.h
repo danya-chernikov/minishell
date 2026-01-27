@@ -53,7 +53,7 @@ typedef enum e_shell_mode
 
 }	t_shell_mode;
 
-typedef struct e_shell
+typedef struct s_shell
 {
 	t_parser_data	*pd;
 	t_shell_mode	mode;

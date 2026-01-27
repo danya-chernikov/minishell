@@ -15,6 +15,7 @@
 # define HD_WRITE			1
 
 typedef struct s_parser_data	t_parser_data;
+typedef struct s_shell			t_shell;
 
 /* Describes heredoc.
  *     cnt_len - current content length */
@@ -27,9 +28,9 @@ typedef struct s_heredoc
 
 }	t_heredoc;
 
-int		read_heredocs(t_parser_data *d);
-int		read_one_heredoc(t_heredoc *hd);
-void	heredoc_child_loop(int wfd, const t_heredoc *hd);
+int		read_heredocs(t_shell *msh);
+int		read_one_heredoc(t_shell *msh, t_heredoc *hd);
+void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd);
 int		heredoc_parent_collect(int rfd, t_heredoc *hd);
 
 #endif

@@ -17,8 +17,8 @@
  * this later */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # define DEF_PS1			"\\s-\\v\\$"
-# define DEF_PS2			">"
-# define DEF_PS4			"+"
+# define DEF_PS2			"> "
+# define DEF_PS4			"+ "
 # define DEF_LANGUAGE		"en"
 # define DEF_LANG			"en_US.UTF-8"
 # define UNKNOWN_VALUE		"?"

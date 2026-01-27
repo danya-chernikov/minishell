@@ -1,10 +1,12 @@
 #include "shell.h"
 #include "cmdargs_parser.h"
+#include "prompt_parser.h"
 #include "debug.h"
+#include "libft.h"
 
 #include <stdlib.h>
 
-static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
 
 /* Initializes the `t_shell` structure, which represents our
  * minishell and stores all its settings.
@@ -33,7 +35,8 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	int	res;
 
-	prelim_struct_init(msh, argc, argv, env);
+	if (prelim_struct_init(msh, argc, argv, env) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
 
 	// Allocate environmental variables
 	if (env_init(&msh->env) == COMMON_SYS_ERR)
@@ -87,6 +90,8 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 
 void	msh_free(t_shell *msh)
 {
+	if (msh->pd)
+		free(msh->pd);
 	if (msh->prompt_inv)
 		free(msh->prompt_inv);
 	env_free(&msh->env);
@@ -94,7 +99,7 @@ void	msh_free(t_shell *msh)
 	configs_free(&msh->configs);
 }
 
-static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	// By default, let's think our
 	// shell will be interactive
@@ -115,4 +120,12 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->opts.f_c = false;
 	// Init configs
 	configs_init(&msh->configs);
+	// Init t_parser_data
+	msh->pd = (t_parser_data *)ft_calloc(1, sizeof(t_parser_data));
+	if (!msh->pd)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	return (COMMON_SUCCESS);
 }

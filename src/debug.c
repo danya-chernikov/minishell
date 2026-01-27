@@ -54,6 +54,12 @@ void	dbg_prompt_parser_print_quotes(t_parser_data *d)
 
 	i = 0;
 	printf("\nQuote intervals:\n");
+	if (d->qpair_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
+
 	while (i < d->qpair_cnt)
 	{
 		if (d->quotes[i].type == DOUBLE_QUOTE)
@@ -67,6 +73,7 @@ void	dbg_prompt_parser_print_quotes(t_parser_data *d)
 			d->quotes[i].ri);
 		++i;
 	}
+	printf("\n");
 }
 
 void	dbg_prompt_parser_print_parsed_data(t_parser_data *d)
@@ -76,6 +83,11 @@ void	dbg_prompt_parser_print_parsed_data(t_parser_data *d)
 	// Let's output the pipes we found
 	i = 0; 
 	printf("\nPipes:\n");
+	if (d->pipe_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->pipe_cnt)
 	{
 		printf("%lu: [%d] [%d]\n", i + 1,
@@ -87,6 +99,11 @@ void	dbg_prompt_parser_print_parsed_data(t_parser_data *d)
 	// Let's output the operands we found
 	i = 0; 
 	printf("\nOperands:\n");
+	if (d->op_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->op_cnt)
 	{
 		printf("%lu: [%s] [%d] [%d]\n", i + 1,
@@ -104,6 +121,11 @@ void	dbg_prompt_parser_print_tokens(t_parser_data *d)
 	strncpy(format, "%d\t%s\t%lu\n", MAX_FORMAT_STR_LEN);
 	i = 0;
 	printf("\nTokens:\n");
+	if (d->token_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->token_cnt)
 	{
 		if (d->tokens[i].type == OPERAND)
@@ -130,9 +152,7 @@ void	dbg_prompt_parser_print_parentheses(t_parser_data *d)
 	i = 0;
 	printf("\nParentheses:\n");
 	if (d->par_cnt == 0)
-	{
 		printf("----------\n\n");
-	}
 	else
 	{
 		printf("#\t(\t)\n");
@@ -153,6 +173,11 @@ void	dbg_print_redirs(t_parser_data *d)
 
 	printf("\nRedirections:\n");
 	op_i = 0;
+	if (d->op_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (op_i < d->op_cnt)
 	{
 		printf("%zu. %s\n", op_i, d->ops[op_i].name);
