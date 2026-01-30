@@ -90,7 +90,6 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 		split_free(&ptokens);
 		return (-1);
 	}
-	split_free(&ptokens);
 	gnl_finish(fd); // And here
 	return (0);
 }

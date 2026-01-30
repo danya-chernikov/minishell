@@ -20,7 +20,7 @@ SRCS=main.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
-	 engine.c exec.c redirect_parser.c redirect.c heredoc.c builtin.c \
+	 engine.c redirect_parser.c redirect.c heredoc.c exec.c wildcards.c builtin.c \
 	 signals.c signals2.c \
 	 aux_common.c aux_io.c error.c debug.c test.c
 
@@ -36,7 +36,7 @@ OBJS=main.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
-	 engine.o exec.o redirect_parser.o redirect.o heredoc.o builtin.o \
+	 engine.o redirect_parser.o redirect.o heredoc.o exec.o wildcards.o builtin.o \
 	 signals.o signals2.o \
 	 aux_common.o aux_io.o error.o debug.o test.o
 
@@ -242,15 +242,10 @@ operand.o : operand.c operand.h \
 
 
 # =========================== Engine and execution ===========================
-engine.o : engine.c engine.h heredoc.h exec.h quote.h \
+engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c
-
-exec.o : exec.c exec.h \
-	libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c exec.c
 
 redirect_parser.o : redirect_parser.c redirect_parser.h \
 	libft.h vector.h error.h debug.h
@@ -266,6 +261,16 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
+
+exec.o : exec.c exec.h shell.h operand.h token.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec.c
+
+wildcards.o : wildcards.c wildcards.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards.c
 
 builtin.o : builtin.c builtin.h \
 	libft.h vector.h error.h debug.h

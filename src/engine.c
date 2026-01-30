@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "shell.h"
 #include "heredoc.h"
 #include "exec.h"
 #include "quote.h"
@@ -20,11 +21,10 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 	int				fres; // Returned code from function
 	int				try;
 	
-	(void)ret_code;
 	try = 0;
 	fres = COMMON_SUCCESS;
-	ft_bzero(&pdata, sizeof(pdata)); // We don't need it anymore..
 	pdata = msh->pd;
+	ft_bzero(pdata, sizeof(pdata)); // We don't need it anymore..
 	while (try < 1)
 	{
 		if (!prompt || ft_strlen(prompt) == 0)
@@ -72,12 +72,12 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		dbg_print_redirs(pdata);
 #endif
 
-		/*fres = exec_ops(&pdata, ret_code);
+		fres = exec_ops(msh, ret_code);
 		if (fres != COMMON_SUCCESS)
 			break ;
 
 		// Close all pipes of this prompt
-		fres = close_pipes(&pdata);*/
+		//fres = close_pipes(&pdata);
 
 		++try;
 	} // End try block

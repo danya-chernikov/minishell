@@ -1,21 +1,5 @@
-# Each operand-program may have multiple heredocs.
-# For example:
-#     $ cat << EOF > heredoc_file << 'DELIM 1' > heredoc_file
-#
-# We could try to save starting prompt index of each heredoc,
-# but the thing is, after variables and wildcards expansion
-# the indexes will be cahanged, so it wouldn't work..
-# So, instead, let's just store for each operand-program
-# its own array of t_heredoc! At the begining, before
-# execution stage we'll read ALL heredocs. On execution stage,
-# after expansion variables and wildcards for each operand-program
-# we'll expand heredocs traversing from left to right array
-# of heredocs for this i-th operand-program.
-
 PREPARE_HEREDOCS()
-    Traverse all tokens
-	    1. IF i-th token is an operand-program
-		    1.1. 
+	We already have it implemented in code :D
 
 EXEC_OPS()
     Traverse all tokens
@@ -23,50 +7,60 @@ EXEC_OPS()
 		2. IF this i-th token is operand-program
 		3. Let's see the next token after i-th
 		    3.1. IF the next token (i-th + 1) is && or ||
-			    3.1.1. Expand wildcards
-			    3.1.2. Expand and assign variables
-				3.1.3. Determine program name and its arguments
-				3.1.4. Parse redirections and heredocs
-				3.1.5. Do fork() for this operand-program
-				3.1.6. Assign redirections and heredocs (open all files and bound their FDs with program STDIN/STDOUT using dup())
-				3.1.7. Do execve() for this program passing to it parsed arguments and environment
-				3.1.8. Wait until program will be finished
-				3.1.9. Get this program's returned value
-				3.1.10. IF the program's returned value is SUCCESS
+			    3.1.1. Expand and assign variables
+				3.1.2. Update quotes
+			    3.1.3. Expand wildcards
+				3.1.4. Update quotes
+				3.1.5. Update redirections (after path and variables expansion new redirection-operands may appear)
+				3.1.6. Determine program's name and its arguments
+				3.1.7. IF program's name contains /
+				    3.1.7.1. Launch execve withtout changing program's name
+				3.1.8. ELSE (does not contain /)
+				    3.1.8.1. IF program is built-in
+					    3.1.8.1.1. Run built-in
+						3.1.8.1.2. Go to 3.1.11
+					3.1.8.2. ELSE (not built-in)
+					    3.1.8.2.2. Search in PATH
+				3.1.8.  Do fork() for this operand-program
+				3.1.9.  Assign redirections and heredocs (open all files and bound their FDs with program STDIN/STDOUT using dup())
+				3.1.10. Do execve() for this program passing to it parsed arguments and environment
+				3.1.11. Wait until program will be finished
+				3.1.12. Get this program's returned value
+				3.1.13. IF the program's returned value is SUCCESS
 
-				    3.1.10.1. IF the next token is && (and returned value is SUCCESS)
-						3.1.10.1.1. IF the next token after && (i-th + 2) is operand
-						    3.1.10.1.1.1. Move to this token
-						    3.1.10.1.1.2. Go to step 3.1.1
-					    3.1.10.1.2. IF the next token after && (i-th + 2) is '('
-						    3.1.10.1.2.1. Launch a subshell
-							3.1.10.1.2.2. Call EXEC_OPS() in the subshell
+				    3.1.13.1. IF the next token is && (and returned value is SUCCESS)
+						3.1.13.1.1. IF the next token after && (i-th + 2) is operand
+						    3.1.13.1.1.1. Move to this token
+						    3.1.13.1.1.2. Go to step 3.1.1
+					    3.1.13.1.2. IF the next token after && (i-th + 2) is '('
+						    3.1.13.1.2.1. Launch a subshell
+							3.1.13.1.2.2. Call EXEC_OPS() in the subshell
 
-					3.1.10.2. IF the next token is || (and returned value is SUCCESS) 
-						3.1.10.2.1. IF the next token after || (i-th + 2) is operand
-						    3.1.10.2.1.1. Skip this || and this next (i-th + 2) operand
-						    3.1.10.2.1.2. Continue
-					    3.1.10.2.2. IF the next token after || (i-th + 2) is '('
-						    3.1.10.2.2.1. Skip all inside this parentheses block
-							3.1.10.2.2.2. Continue
+					3.1.13.2. IF the next token is || (and returned value is SUCCESS) 
+						3.1.13.2.1. IF the next token after || (i-th + 2) is operand
+						    3.1.13.2.1.1. Skip this || and this next (i-th + 2) operand
+						    3.1.13.2.1.2. Continue
+					    3.1.13.2.2. IF the next token after || (i-th + 2) is '('
+						    3.1.13.2.2.1. Skip all inside this parentheses block
+							3.1.13.2.2.2. Continue
 
-				3.1.11. IF the program's returned value is FAILURE
+				3.1.14. IF the program's returned value is FAILURE
 		
-				    3.1.11.1. IF the next token is && (and returned value is FAILURE)
-						3.1.11.1.1. IF the next token after && (i-th + 2) is operand
-						    3.1.11.2.1.1. Skip this && and this next (i-th + 2) operand
-						    3.1.11.2.1.2. Continue
-					    3.1.10.1.2. IF the next token after && (i-th + 2) is '('
-						    3.1.11.2.2.1. Skip all inside this parentheses block
-							3.1.11.2.2.2. Continue
+				    3.1.14.1. IF the next token is && (and returned value is FAILURE)
+						3.1.14.1.1. IF the next token after && (i-th + 2) is operand
+						    3.1.14.2.1.1. Skip this && and this next (i-th + 2) operand
+						    3.1.14.2.1.2. Continue
+					    3.1.14.1.2. IF the next token after && (i-th + 2) is '('
+						    3.1.14.2.2.1. Skip all inside this parentheses block
+							3.1.14.2.2.2. Continue
 
-					3.1.10.2. IF the next token is || (and returned value is FAILURE) 
-						3.1.10.2.1. IF the next token after || (i-th + 2) is operand
-						    3.1.11.1.1.1. Move to this token
-						    3.1.11.1.1.2. Go to step 3.1.1
-					    3.1.10.2.2. IF the next token after || (i-th + 2) is '('
-						    3.1.11.1.2.1. Launch a subshell
-							3.1.11.1.2.2. Call EXEC_OPS() in the subshell
+					3.1.14.2. IF the next token is || (and returned value is FAILURE) 
+						3.1.14.2.1. IF the next token after || (i-th + 2) is operand
+						    3.1.14.1.1.1. Move to this token
+						    3.1.14.1.1.2. Go to step 3.1.1
+					    3.1.14.2.2. IF the next token after || (i-th + 2) is '('
+						    341.14.1.2.1. Launch a subshell
+							3.1.14.1.2.2. Call EXEC_OPS() in the subshell
 
 		    3.2. IF the next token (i-th + 1) is | (we have to reach the end of this pipeline meanwhile connecting its componenets together via pipes)
 			    3.2.1. Go one token forward
@@ -122,6 +116,3 @@ EXEC_OPS()
 				3.2.6. Wait for all launched operand-programs in the processed pipeline
 				3.2.7. Get the returned code of the last operand-program executed in the processed pipeline
 				
-
-
-
