@@ -11,12 +11,13 @@
 # define TOKEN_AND			"&&"
 # define TOKEN_OR			"||"
 
-# define MAX_TOKEN_LEN		512 // Maximum length of each token
-# define MAX_TOKENS_NUM		256 // Maximum number of tokens
+# define MAX_TOKEN_LEN		2048 // Maximum length of each token
+# define MAX_TOKENS_NUM		8192 // Maximum number of tokens
 
 typedef struct s_parser_data	t_parser_data;
 typedef struct s_operand		t_operand;
 
+/* Add T_ prefixes */
 typedef enum e_token_type
 {
     OPERAND,

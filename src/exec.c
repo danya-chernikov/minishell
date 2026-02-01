@@ -16,7 +16,7 @@ int	exec_ops(t_shell *msh, int *ret_code)
 
 	int	fret = 1;
 
-	/*int				ti;
+	/*int			ti;
 	int				fret;
 	t_parser_data	*pd;
 	t_token			*token;

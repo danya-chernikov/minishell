@@ -1,1 +1,1 @@
-main.c shell.c shell_launcher.c shell.h prompt_parser.h engine.c engine.h exec.c exec.h wildcards.c wildcards.h error.h
+main.c shell.c shell_launcher.c shell.h prompt_parser.h engine.c engine.h prompt_parser.h operand.c operand.h exec.c exec.h env.c env.h token.h redirect.h quote.h wildcards.c wildcards.h error.h

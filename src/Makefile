@@ -235,7 +235,7 @@ token.o : token.c token.h prompt_parser.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c token.c
 
-operand.o : operand.c operand.h \
+operand.o : operand.c operand.h env.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c operand.c

@@ -153,7 +153,7 @@ typedef struct s_env
 {	
 	size_t		vars_num;
 	char		**inh_env;
-	t_env_var	*vars;// on heap
+	t_env_var	*vars;		// on heap
 
 }	t_env;
 

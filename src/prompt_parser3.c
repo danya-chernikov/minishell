@@ -32,6 +32,7 @@ void	token_push(t_parser_data *d, t_token_type type)
 int		operand_push(t_parser_data *d, size_t plen)
 {
 	size_t	i;
+	int		fret;
 	size_t	opname_len;
 	char	opname[MAX_OPS_NUM];
 
@@ -62,6 +63,9 @@ int		operand_push(t_parser_data *d, size_t plen)
 		return (COMMON_SYS_ERR);
 	}
 	ft_strlcpy(d->ops[d->op_cnt].name, opname, opname_len + 1);
+	fret = op_token_init(&d->ops[d->op_cnt]);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
 	++d->op_cnt;
 	return (COMMON_SUCCESS);
 }
