@@ -51,28 +51,64 @@ Now the updated algorithm.
    (which are located outside any quote intervals of course).
    During initialization we store on heap in `cnt` token's content;
 
-2. Update quote intervals for each token and and allocate memory for
-   qmask[] filling it with IND_QNONE;
+2. Update quote intervals for each token
 
 3. LOOP traversing all these tokens;
 
-    3.1. IF token is an assignment (we found = outside any
-	     quotes, on the left from = there are some symbols
-		 and we haven't found any argument yet);
+    3.1. IF token is an assignment (we found = outside any quotes, on the left
+		 from = there are some symbols and we haven't found any argument yet);
+
 	    3.1.1. Check LHS (variable's name) for correctness;
-		3.1.2. IF variable's name is not correct;
-		    Return error;
-		3.1.3. IF there is a ~ at the beginning located outside any quote intervals;
-		    3.1.3.1. Expand ~;
-			3.1.3.2. Update quote intervals for this token;
-			3.1.3.3. LOOP through all token symbols;
-			    3.1.3.3.1. IF we found $ outside single quotes;
-			        3.1.3.3.1.1. Expand this variable (we don't use qmask[] here
-								 because we're not gonna expand any wildcards);
-				3.1.3.3.2. Remove all syntax quote pairs;
-				3.1.3.3.3. Create local environment variable and add it into
-						   the array of variables of this operand `vars`;
-			3.1.3.4. END of token symbols LOOP;
+
+		3.1.2. IF variable's name is NOT correct;
+			(We're gonna treat this token as an argument)
+		    3.1.2.1. GOTO 3.3
+
+		(We're gonna treat this token as an assignment)
+		3.1.3. state = IND_QNONE
+
+		3.1.4. LOOP through token symbols
+
+			3.1.4.1. IF current symbol is a double syntax quote
+				3.1.4.1.1. IF state is IND_QNONE
+					3.1.4.1.1.1. state = IND_QDOUBLE (We do NOT copy anything)
+					3.1.4.1.1.2. Continue
+				3.1.4.1.2. IF state is IND_QDOUBLE
+					3.1.4.1.2.1. state = IND_QNONE (We do NOT copy anything)
+					3.1.4.1.2.2. Continue
+				3.1.4.1.3. IF state is IND_QSINGLE
+					3.1.4.1.3.1. Copy this quote (cause it's just a regular symbol)
+					3.1.4.1.3.2. Mark the corresponding index in qmask[] as IND_QSINGLE
+					3.1.4.1.3.3. Continue
+
+			3.1.4.2. IF current symbol is a single syntax quote
+				3.1.4.2.1. IF state is IND_QNONE
+					3.1.4.2.1.1. state = IND_QSINGLE (We do NOT copy anything)
+					3.1.4.2.1.2. Continue
+				3.1.4.2.2. IF state is IND_QSINGLE
+					3.1.4.2.2.1. state = IND_QNONE (We do NOT copy anything)
+					3.1.4.2.2.2. Continue
+				3.1.4.2.3. IF state is IND_QDOUBLE
+					3.1.4.2.3.1. Copy this quote (cause it's just a regular symbol)
+					3.1.4.2.3.2. Mark the corresponding index in qmask[] as IND_QDOUBLE
+					3.1.4.2.3.3. Continue
+
+			3.1.4.3. IF current symbol is ~ that goes after = AND state is IND_QNONE AND the next symbol is / (outside any qutoes) OR
+					 IF current symbol is ~ that goes after = AND state is IND_QNONE and then token string terminates
+				3.1.4.3.1. Expand ~ by copying its value into the new array
+				3.1.4.3.2. Assign the corresponding indices in qmask[] the current `state` value
+
+			3.1.4.4. IF current symbol is $ AND state is NOT IND_QSINGLE
+				3.1.4.4.1. Expand variable by copying its value into the new array
+				3.1.4.4.2. Assign the corresponding indices in qmask[] the current `state` value
+
+			3.1.4.5. IF current symbol is just a regular symbol
+				3.1.4.5.1. Copy it into the new array
+				3.1.4.5.2. Assign the corresponding qmask[] index the current `state` value
+
+		3.1.5. END of token symbols LOOP;
+
+		3.1.6. Create a local environment variable and add it into the array of variables of this operand `vars`
 
 	3.2. ELSE IF token is <, <<, > or >> ;
 	    3.2.1. Just skip it;
@@ -80,37 +116,68 @@ Now the updated algorithm.
 	3.3. ELSE (Means current token is a regular argument or a redirection operand);
 	    3.3.1. IF the previous token was << (means current token is a heredoc delimiter)
 		    3.3.1.1. Just skip it (cause we have already processed it on preliminary parsing stage);
-		3.3.2. IF there is a ~ at the beginning and next next symbol is / OR if ~ is the only
-			   one in the token (needless to say all these simbols have to be located
-			   outside any quotes);
-		    3.3.2.1. Expand ~;
-			3.3.2.2. Update quote intervals for this token;
 
-			3.3.2.3. LOOP through all token symbols;
-			    3.3.2.3.1. Mark all indices inside double quote intervals as IND_QDOUBLE in qmask[];
-			    3.3.2.3.2. Mark all indices inside single quote intervals as IND_QSINGLE in qmask[];
-			3.3.2.4. END of token symbols LOOP;
+		3.3.2. state = IND_QNONE
 
-			3.3.2.5. LOOP through all token symbols;
-			    3.3.2.5.1. IF a $ was found on the index which is marked as IND_QDOBLE
-				           OR IND_QNONE in qmask[];
-					Expand variable assigning all symbols the same quote state as $ had;
-			3.3.2.6. END of token symbols LOOP;
+		3.3.3. LOOP through token symbols
 
-			3.3.2.7. LOOP through all token symbols;
-			    3.3.2.7.1. IF a * was found on the index which is marked as IND_QNONE in qmask[];
-				(means the entire token is globbing mask)
-				    3.3.2.7.1.1. Unite all consequtive * in one
-					3.3.2.7.1.2. Expand this wildcard pattern passing the mask into expand_wildcards();
-					3.3.2.8.1.3. Break;
-			3.3.2.6. END of token symbols LOOP;
+			3.3.3.1. IF current symbol is a double syntax quote
+				3.3.3.1.1. IF state is IND_QNONE
+					3.3.3.1.1.1. state = IND_QDOUBLE (We do NOT copy anything)
+					3.3.3.1.1.2. Continue
+				3.3.3.1.2. IF state is IND_QDOUBLE
+					3.3.3.1.2.1. state = IND_QNONE (We do NOT copy anything)
+					3.3.3.1.2.2. Continue
+				3.3.3.1.3. IF state is IND_QSINGLE
+					3.3.3.1.3.1. Copy this quote (cause it's just a regular symbol)
+					3.3.3.1.3.2. Mark the corresponding index in qmask[] as IND_QSINGLE
+					3.3.3.1.3.3. Continue
 
-			3.3.2.7. IF the previous token was <, <<, or > (means we were handling redirection operand)
-				3.3.2.7.1. Update the corresponding redirection's path
-			3.3.2.8 ELSE (means we were handling an argument)
-			    3.3.2.8.1. Add this processed token into array of arguments `argv`;
-				3.3.2.8.2. Mark all variables created while parsing current operand as per-command
-						   variables (basically by setting `f_per_cmd`); It implyes we'll not
-						   be creating any more variables while parsing the current operand;
+			3.3.3.2. IF current symbol is a single syntax quote
+				3.3.3.2.1. IF state is IND_QNONE
+					3.3.3.2.1.1. state = IND_QSINGLE (We do NOT copy anything)
+					3.3.3.2.1.2. Continue
+				3.3.3.2.2. IF state is IND_QSINGLE
+					3.3.3.2.2.1. state = IND_QNONE (We do NOT copy anything)
+					3.3.3.2.2.2. Continue
+				3.3.3.2.3. IF state is IND_QDOUBLE
+					3.3.3.2.3.1. Copy this quote (cause it's just a regular symbol)
+					3.3.3.2.3.2. Mark the corresponding index in qmask[] as IND_QDOUBLE
+					3.3.3.2.3.3. Continue
+
+			3.3.3.3. IF current symbol is ~ that it's the only one in entire token AND state is IND_QNONE OR
+					 IF current symbol is ~ and it's the frist symbol in token AND state is IND_QNONE AND the next symbol is / (outside any quotes)
+				3.3.3.3.1. Expand ~ by copying its value into the new array
+				3.3.3.3.2. Assign the corresponding indices in qmask[] the current `state` value
+
+			3.3.3.4. IF current symbol is $ AND state is NOT IND_QSIGNLE
+				3.3.3.4.1. Expand variable by copying its value into the new array
+				3.3.3.4.2. Assign the corresponding indices in qmask[] the current `state` value
+
+			3.3.3.5. IF current symbol is just a regular symbol
+				3.3.3.5.1. Copy it into the new array
+				3.3.3.5.2. Assign the corresponding qmask[] index the current `state` value
+
+		3.3.5. END of token symbols LOOP;
+
+		3.3.6. LOOP through all new token's array symbols (it's length should be equal to qmask[]);
+			3.3.6.1. IF a * was found on the index which is marked as IND_QNONE in qmask[];
+			(means the entire token is globbing mask)
+				3.3.6.1.1. Unite all consequtive * in one
+				3.3.6.1.2. Expand this wildcard pattern passing the mask into expand_wildcards();
+				3.3.6.1.2. Break;
+		3.3.7. END of new token's array symbols LOOP;
+
+		3.3.8. IF the previous token was <, >>, or > (means we were handling redirection
+			   operand; we don't need to add heredoc here cause we have already processed
+			   it on the preliminary redirections pareser stage)
+			3.5.3.6.1. IF globbing gave us more than one coincidence
+				3.5.3.6.1.1. Error "ambiguous redirect"
+			3.5.3.6.2. Update the corresponding redirection's path
+		3.3.9. ELSE (means we were handling an argument)
+			3.3.9.1. Add this processed token into array of arguments `argv`;
+			3.3.9.2. Mark all variables created while parsing current operand as per-command
+					   variables (basically by setting `f_per_cmd`); It implyes we'll not
+					   be creating any more variables while parsing the current operand;
 
 4. END of token LOOP;
