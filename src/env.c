@@ -248,3 +248,80 @@ void	env_print_locals(t_env *env)
 		++vi;
 	}
 }
+
+#if 0
+[EN] Frees all strings in the table and the table itself in case of error.
+Returns NULL to be assigned to the pointer that called it.
+
+[ES] Libera todos los strings de la tabla y la tabla misma en caso de error.
+Devuelve NULL para ser asignado al puntero que la llamó.
+#endif
+static char	**free_tab_error(char **tab, size_t current_idx)
+{
+	size_t	idx;
+
+	idx = 0;
+	while (idx < current_idx)
+	{
+		free(tab[idx]);
+		idx++;
+	}
+	free(tab);
+	return (NULL);
+}
+
+#if 0
+[EN] Converts the environment linked list/structure into a NULL-terminated
+array of strings ("NAME=VALUE") for use with the execve system call.
+Returns the array on success, or NULL if memory allocation fails.
+
+[ES] Convierte la lista/estructura de entorno en un array de strings 
+terminado en NULL ("NOMBRE=VALOR") para su uso con la función execve.
+Devuelve el array si tiene éxito, o NULL si falla la reserva de memoria.
+#endif
+
+char	**env_to_tab(t_env *env)
+{
+	char	**tab;
+	size_t	env_idx;
+	size_t	tab_idx;
+	char	*temp;
+	size_t	count;
+
+	if (env == NULL)
+		return (NULL);
+	count = 0;
+	env_idx = 0;
+	while (env_idx < env->vars_num)
+	{
+		if (env->vars[env_idx].type == ENV &&
+			env->vars[env_idx].name != NULL &&
+			env->vars[env_idx].value != NULL)
+			count++;
+		env_idx++;
+	}
+	tab = malloc(sizeof(char *) * (count + 1));
+	if (tab == NULL)
+		return (NULL);
+	env_idx = 0;
+	tab_idx = 0;
+	while (env_idx < env->vars_num)
+	{
+		if (env->vars[env_idx].type == ENV &&
+			env->vars[env_idx].name != NULL &&
+			env->vars[env_idx].value != NULL)
+		{
+			temp = ft_strjoin(env->vars[env_idx].name, "=");
+			if (temp == NULL)
+				return (free_tab_error(tab, tab_idx));
+			tab[tab_idx] = ft_strjoin(temp, env->vars[env_idx].value);
+			free(temp);
+			if (tab[tab_idx] == NULL)
+				return (free_tab_error(tab, tab_idx));
+			tab_idx++;
+		}
+		env_idx++;
+	}
+	tab[tab_idx] = NULL;
+	return (tab);
+}

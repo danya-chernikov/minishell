@@ -1,5 +1,6 @@
 #include "exec.h"
 
+# if 0
 /* Now we have to launch all operand-programs.
  * On error returns 0. On success returns 1 */
 int	exec_ops(t_parser_data *d, int *ret_code)
@@ -141,6 +142,7 @@ int	exec_ops(t_parser_data *d, int *ret_code)
 	close(fd_log);
 	return (1);
 }
+#endif
 
 int	close_pipes(t_parser_data *d)
 {
@@ -162,4 +164,158 @@ int	close_pipes(t_parser_data *d)
 		++i;
 	}
 	return 1;
+}
+
+static int	ft_strcmp(char *str1, char *str2)
+{
+	while ((*str1 != '\0' || *str2 != '\0') && (*str1 == *str2))
+	{
+		str1++;
+		str2++;
+	}
+	return (*str1 - *str2);
+}
+
+static int	is_parent_builtin(char *cmd)
+{
+	if (cmd == NULL)
+		return (0);
+	if (ft_strcmp(cmd, CD_CMD) == 0)
+		return (1);
+	if (ft_strcmp(cmd, EXPORT_CMD) == 0)
+		return (1);
+	if (ft_strcmp(cmd, UNSET_CMD) == 0)
+		return (1);
+	if (ft_strcmp(cmd, EXIT_CMD) == 0)
+		return (1);
+	return (0);
+}
+
+static void	error_msg(void)
+{
+	const char	*error;
+
+	error = strerror(errno);
+	write(STDERR_FILENO, error, ft_strlen(error));
+	write(STDERR_FILENO, "\n", ft_strlen("\n"));
+}
+
+static void	free_cmd_args(char **args)
+{
+	int	idx;
+
+	if (args == NULL)
+		return ;
+	idx = 0;
+	while (args[idx])
+	{
+		free(args[idx]);
+		idx++;
+	}
+	free(args);
+}
+
+int	exec_ops(t_parser_data *d, t_shell *msh, int *ret_code)
+{
+	t_operand	*op;
+	pid_t		progs[MAX_OPS_NUM];
+	int		ti;
+	size_t		pi;
+	char		**cmd_args;
+	char		**env_tab;
+	char		*path;
+	char		*error_path;
+
+	*ret_code = 0;
+	pi = 0;
+	ti = (int)(d->token_cnt) - 1;
+	while (ti >= 0)
+	{
+		if (d->tokens[ti].type == OPERAND)
+		{
+			op = d->tokens[ti].op;
+			// Dividir cmds y args (ls -la -> {"ls", "-la", NULL})
+			cmd_args = ft_split(op->name, ' ');
+			if (cmd_args == NULL || cmd_args[0] == NULL)
+			{
+				free_cmd_args(cmd_args);
+				ti--;
+				continue ;
+			}
+			// Ejecución Built-ins de Padre (solo si no hay pipes)
+			if (d->pipe_cnt == 0 && is_parent_builtin(cmd_args[0]) == 1)
+			{
+				*ret_code = exec_builtin(cmd_args, &msh->env);
+				free_cmd_args(cmd_args);
+				ti--;
+				continue ;
+			}
+			// Proceso hijo
+			progs[pi] = fork();
+			if (progs[pi] == -1)
+			{
+				write(STDERR_FILENO, "fork error", ft_strlen("fork error"));
+				free_cmd_args(cmd_args);
+				return (0);
+			}
+			else if (progs[pi] == 0)
+			{
+				if (op->write_end != -1)
+				{
+					if (dup2(d->pipes[op->write_end][WRITE_END], STDOUT_FILENO) == -1)
+					{
+						error_msg();
+						close_pipes(d);
+						exit(1);
+					}
+				}
+				if (op->read_end != -1)
+				{
+					if (dup2(d->pipes[op->read_end][READ_END], STDIN_FILENO) == -1)
+					{
+						error_msg();
+						close_pipes(d);
+						exit(1);
+					}
+				}
+				// Cierre de pipes heredados posterior a dup2
+				close_pipes(d);
+				// Ejecución Built-ins de hijo
+				if (is_builtin(cmd_args[0]) == 1)
+					exit(exec_builtin(cmd_args, &msh->env));
+				// Ejecución comando externo
+				env_tab = env_to_tab(&msh->env);
+				path = get_cmd_path(cmd_args[0], env_tab);
+				if (path == NULL)
+				{
+					error_path = "minishell: command not found: ";
+					write(STDERR_FILENO, error_path, ft_strlen(error_path));
+					write(STDERR_FILENO, cmd_args[0], ft_strlen(cmd_args[0]));
+					write(STDERR_FILENO, "\n", ft_strlen("\n"));
+					exit(127);
+				}
+				execve(path, cmd_args, env_tab);
+				write(STDERR_FILENO, "execve", ft_strlen("execve"));
+				exit(126);
+			}
+			// En el padre: liberamos memoria y seguimos
+			free_cmd_args(cmd_args);
+			pi++;
+		}
+		else if (d->tokens[ti].type == PIPE)
+		{
+		}
+		else if (d->tokens[ti].type == CLOSE_PAR)
+		{
+		}
+		else if (d->tokens[ti].type == OPEN_PAR)
+		{
+			while (wait(NULL) > 0);
+		}
+		ti--;
+	}
+	close_pipes(d);
+	// Esperar a todos los hijos lanzados
+	while (wait(NULL) > 0);
+	return (1);
 }

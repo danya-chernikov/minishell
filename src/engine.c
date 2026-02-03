@@ -8,6 +8,7 @@
  *
  * If it returns 1, everything is fine.
  * The parser_engine() is recursive function! */
+#if 0
 int	shell_engine(char *prompt, int *ret_code)
 {
 	t_parser_data	pdata;
@@ -33,4 +34,16 @@ int	shell_engine(char *prompt, int *ret_code)
 		return (-1);
 
 	return (COMMON_SUCCESS);
+}
+#endif
+
+int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
+{
+	t_parser_data	d;
+
+	if (parser_init(&d, prompt) == 0)
+		return (0);
+	if (parser_engine(&d) != false)
+		exec_ops(&d, msh, ret_code);
+	return (1);
 }

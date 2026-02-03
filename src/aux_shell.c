@@ -34,7 +34,7 @@ int	gen_prompt_inv(t_shell *msh)
 	username = msh->env.vars[SE_USER].value;
 	// Get $PWD value
 	pwd = msh->env.vars[SE_PWD].value;
-	inv_len = ft_strlen(username) + ft_strlen(subdomain) + ft_strlen(pwd) + 4;
+	inv_len = ft_strlen(username) + ft_strlen(subdomain) + ft_strlen(pwd) + 5;
 	if (inv_len > PROMPT_INV_LEN - 1)
 	{
 		print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
@@ -51,6 +51,6 @@ int	gen_prompt_inv(t_shell *msh)
 	ft_strlcat(msh->prompt_inv, subdomain, inv_len);
 	ft_strlcat(msh->prompt_inv, ":", inv_len);
 	ft_strlcat(msh->prompt_inv, pwd, inv_len);
-	ft_strlcat(msh->prompt_inv, "$", inv_len);
+	ft_strlcat(msh->prompt_inv, "$ ", inv_len);
 	return (COMMON_SUCCESS);
 }

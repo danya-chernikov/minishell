@@ -17,7 +17,9 @@ SRCS=main.c \
 	 env.c history.c config.c \
 	 prompt_parser.c aux_prompt_parser.c par.c quote.c token.c operand.c \
 	 engine.c exec.c builtin.c \
-	 error.c aux_common.c debug.c test.c
+	 error.c aux_common.c debug.c test.c \
+	 ft_cd.c ft_echo.c ft_env.c ft_exit.c ft_pwd.c ft_export.c ft_unset.c \
+	 path_finder.c redirect.c signals.c \
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o shell_configs.o shell_history.o \
@@ -28,7 +30,9 @@ OBJS=main.o \
 	 env.o history.o config.o \
 	 prompt_parser.o aux_prompt_parser.o par.o quote.o token.o operand.o \
 	 engine.o exec.o builtin.o \
-	 error.o aux_common.o debug.o test.o
+	 error.o aux_common.o debug.o test.o \
+	 ft_cd.o ft_echo.o ft_env.o ft_exit.o ft_pwd.o ft_export.o ft_unset.o \
+	 path_finder.o redirect.o signals.o \
 
 all : libft libvector $(NAME)
 
@@ -177,6 +181,49 @@ builtin.o : builtin.c builtin.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin.c
 
+ft_cd.o : ft_cd.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_cd.c
+
+ft_echo.o : ft_echo.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_echo.c
+
+ft_env.o : ft_env.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_env.c
+
+ft_exit.o : ft_exit.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_exit.c
+
+ft_pwd.o : ft_pwd.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_pwd.c
+
+ft_export.o : ft_export.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_export.c
+
+ft_unset.o : ft_unset.c builtin.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c ft_unset.c
+
+path_finder.o : path_finder.c path_finder.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c path_finder.c
+
+redirect.o : redirect.c redirect.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c redirect.c
+
+#heredoc.o : heredoc.c heredoc.h debug.h
+	#$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	#-c heredoc.c
+
+signals.o : signals.c signals.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c signals.c
 
 # ============================ Auxiliary services ============================
 error.o : error.c error.h shell.h debug.h

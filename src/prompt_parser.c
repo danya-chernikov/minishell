@@ -39,7 +39,8 @@ bool parser_engine(t_parser_data *d)
 	size_t	prompt_len;
 	bool	f_noerr;	// Parsing error flag
 	int		opar_ind;	// Prompt index of the open-parenthesis that goes after pipe
-	
+	int	k;
+
 	f_noerr = true; // Let's assume there are no errors at first
 	prompt_len = ft_strlen(d->prompt);
 	while (d->pi < prompt_len) // Going through the entered prompt string
@@ -52,7 +53,8 @@ bool parser_engine(t_parser_data *d)
 			break ;
 
 		// If it's letter
-		if (ft_isalpha(d->prompt[d->pi]))
+		//if (ft_isalpha(d->prompt[d->pi]))
+		if (!ft_strchr("|&()<>" , d->prompt[d->pi]))
 		{
 			// Letter-operand can go only after pipe,
 			// '(', &&, || or be the first token
@@ -70,6 +72,15 @@ bool parser_engine(t_parser_data *d)
 			d->ops[d->op_cnt].name[0] = d->prompt[d->pi];
 			d->ops[d->op_cnt].name[1] = '\0';
 
+			k = 0;
+			while (d->pi < ft_strlen(d->prompt) && !ft_strchr("|&()<>", d->prompt[d->pi]))
+			{
+				if (k < MAX_TOKEN_LEN - 1)
+					d->ops[d->op_cnt].name[k++] = d->prompt[d->pi++];
+				else
+					d->pi++;
+			}
+			d->ops[d->op_cnt].name[k] = '\0';
 			// Add this operand into the tokens array
 			d->tokens[d->token_cnt].type = OPERAND;
 			d->tokens[d->token_cnt].op = (t_operand *)&d->ops[d->op_cnt];
@@ -78,7 +89,7 @@ bool parser_engine(t_parser_data *d)
 
 			++d->op_cnt;
 
-			++d->pi; // Move one symbol forward in prompt
+			//++d->pi; // Move one symbol forward in prompt
 
 			// Let's see what goes next
 			skip_spaces(d->prompt, &d->pi);

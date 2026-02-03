@@ -1,6 +1,15 @@
 #ifndef BUILTIN_H
 # define BUILTIN_H
 
+# include <unistd.h>
+# include <stdio.h>
+# include <limits.h>
+# include <errno.h>
+# include <string.h>
+# include <stdlib.h>
+# include "env.h"
+# include "libft.h"
+
 /* Just built-ins ._. Yeah.. nothing more.
  *
  *     LOCALS_CMD    - our own invention that prints
@@ -35,5 +44,16 @@
 # define FALSE_CMD		"false"
 # define TRUE_CMD		"true"
 # define NOP_CMD		":"
+
+
+int	is_builtin(char *cmd);
+int	exec_builtin(char **args, t_env *env);
+int	ft_echo(char **args);
+int	ft_cd(char **args, t_env *env);
+int	ft_pwd(void);
+int	ft_env(t_env *env);
+int	ft_exit(char **args);
+int	ft_export(char **args, t_env *env);
+int	ft_unset(char **args, t_env *env);
 
 #endif

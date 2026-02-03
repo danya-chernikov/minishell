@@ -85,7 +85,8 @@ int	launch_script(t_shell *msh)
 		remove_newline(line);
 		if (msh->opts.f_verbose)
 			printf("%s\n", line);
-		shell_engine(line, &ret_code);
+		//shell_engine(line, &ret_code);
+		shell_engine(msh, line, &ret_code);
 		line = get_next_line(fd, &gnlerr);
 	}
 	if (!line && gnlerr)
@@ -109,7 +110,8 @@ int	launch_cmd(t_shell *msh)
 	int	ret_code;
 
 	ret_code = 0;
-	shell_engine(msh->c_cmd, &ret_code);
+	//shell_engine(msh->c_cmd, &ret_code);
+	shell_engine(msh, msh->c_cmd, &ret_code);
 	return (ret_code);
 }
 
@@ -128,7 +130,8 @@ int	launch_stdin_cmd(t_shell *msh)
 		remove_newline(line);
 		if (msh->opts.f_verbose)
 			printf("%s\n", line);
-		shell_engine(line, &ret_code);
+		//shell_engine(line, &ret_code);
+		shell_engine(msh, line, &ret_code);
 		line = get_next_line(STDIN_FILENO, &gnlerr);
 	}
 	if (!line && gnlerr)
@@ -163,6 +166,22 @@ int	launch_int_session(t_shell *msh)
 			return (fres);
 
 		rline_buf = readline(msh->prompt_inv);
+		// Manejo de Ctrl+D (EOF) -> NULL
+		if (rline_buf == NULL)
+		{
+			write(STDERR_FILENO, "exit\n", ft_strlen("exit\n"));
+			break ;
+		}
+		if (ft_strlen(rline_buf) > 0)
+		{
+			add_history(rline_buf);
+			if (shell_engine(msh, rline_buf, &ret_code) == COMMON_SYS_ERR)
+			{
+				free(rline_buf);
+				return (COMMON_SYS_ERR);
+			}
+		}
+		#if 0
 		if (ft_strlen(rline_buf) == 0)
 		{
 			free(rline_buf);
@@ -178,11 +197,11 @@ int	launch_int_session(t_shell *msh)
 		}
 		if (shell_engine(rline_buf, &ret_code) == COMMON_SYS_ERR) // Critial system error occured
 			return (COMMON_SYS_ERR);
+		#endif
 		// In case if non-critial parser error occured
 		// we just free `rline_buf` and prompt user again
 		free(rline_buf);
 		rline_buf = NULL;
 	}
-
 	return (ret_code);
 }

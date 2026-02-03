@@ -3,6 +3,7 @@
 
 # include <stdbool.h>
 # include <stddef.h>
+# include "libft.h"
 
 # include "aux_common.h"
 
@@ -168,6 +169,7 @@ void		env_print_value(t_env *env, char *name);
 void		env_print_env(t_env *env);
 void		env_print_all(t_env *env);
 void		env_print_locals(t_env *env);
+char		**env_to_tab(t_env *env);
 
 /* Each variable's number here corresponds to its index in the `vars`
  * array of the `s_shell` structure. In our minishell, we have the

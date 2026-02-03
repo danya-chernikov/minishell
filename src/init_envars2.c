@@ -74,6 +74,8 @@ int	set_env_pwd_user_data(t_env *env)
 		// HOME	
 		env->vars[SE_HOME].name = ft_strdup("HOME");
 		env->vars[SE_HOME].value = ft_strdup(pwd.pw_dir);
+		// Let's also set ~ here
+		env->vars[PV_HOME].value = ft_strdup(env->vars[SE_HOME].value); // Intruder!
 		// USER
 		env->vars[SE_USER].name = ft_strdup("USER");
 		env->vars[SE_USER].value = ft_strdup(pwd.pw_name);
