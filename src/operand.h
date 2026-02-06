@@ -32,8 +32,8 @@ typedef enum e_ind_type
 typedef struct	s_op_token
 {
 	char		*cnt;
-	t_ind_type	*qmask;
 	t_quote_int	quotes[MAX_QUOTES_NUM];
+	size_t		qpair_cnt;
 
 }	t_op_token;
 
@@ -58,7 +58,7 @@ typedef struct s_operand
 	t_op_token	*tokens;				// Tokens of this operand-program
 	size_t		token_cnt;
 
-	t_env		vars;					// Variables we created parsing this operand-program
+	t_env		*my_env;				// Variables we created parsing this operand-program
 	bool		f_per_cmd;				// Per-command flag for our variables	
 
 	pid_t		pid;
@@ -67,6 +67,7 @@ typedef struct s_operand
 
 int		ops_init(t_operand *ops);
 int		op_token_init(t_operand *op);
+int		op_env_init(t_operand *op);
 void	ops_free(t_operand *ops);
 
 #endif

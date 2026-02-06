@@ -229,3 +229,50 @@ void	dbg_print_redirs(t_parser_data *d)
 	}
 	printf("\n");
 }
+
+void	dbg_print_operand_tokens(t_parser_data *d)
+{
+	size_t		ti;
+	size_t		op_i;
+	size_t		qi;
+	char		quote;
+	t_operand	*op;
+	t_op_token	*token;
+
+	printf("\nOperand's tokens:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu: %s\n", op_i, op->name);
+		if (op->token_cnt == 0)
+		{
+			printf("----------\n\n");
+			return ;
+		}
+		ti = 0;
+		while (ti < op->token_cnt)
+		{
+			token = &op->tokens[ti];
+			printf("\t%zu. %s\n", ti, token->cnt);
+			qi = 0;
+			while (qi < token->qpair_cnt)
+			{
+				if (token->quotes[qi].type == DOUBLE_QUOTE)
+					quote = '"';
+				else
+					quote = '\'';
+				printf("\t\t%zu\t%c\t%zu\t%zu\n",
+					qi,
+					quote,
+					token->quotes[qi].li,
+					token->quotes[qi].ri);
+				++qi;
+			}
+			++ti;
+		}
+		printf("\n");
+		++op_i;
+	}
+	printf("\n");
+}

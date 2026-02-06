@@ -158,25 +158,25 @@ Now the updated algorithm.
 				3.3.3.5.1. Copy it into the new array
 				3.3.3.5.2. Assign the corresponding qmask[] index the current `state` value
 
-		3.3.5. END of token symbols LOOP;
+		3.3.4. END of token symbols LOOP;
 
-		3.3.6. LOOP through all new token's array symbols (it's length should be equal to qmask[]);
-			3.3.6.1. IF a * was found on the index which is marked as IND_QNONE in qmask[];
+		3.3.5. LOOP through all new token's array symbols (it's length should be equal to qmask[]);
+			3.3.5.1. IF a * was found on the index which is marked as IND_QNONE in qmask[];
 			(means the entire token is globbing mask)
-				3.3.6.1.1. Unite all consequtive * in one
-				3.3.6.1.2. Expand this wildcard pattern passing the mask into expand_wildcards();
-				3.3.6.1.2. Break;
-		3.3.7. END of new token's array symbols LOOP;
+				3.3.5.1.1. Unite all consequtive * in one
+				3.3.5.1.2. Expand this wildcard pattern passing the mask into expand_wildcards();
+				3.3.5.1.2. Break;
+		3.3.6. END of new token's array symbols LOOP;
 
-		3.3.8. IF the previous token was <, >>, or > (means we were handling redirection
+		3.3.7. IF the previous token was <, >>, or > (means we were handling redirection
 			   operand; we don't need to add heredoc here cause we have already processed
 			   it on the preliminary redirections pareser stage)
-			3.5.3.6.1. IF globbing gave us more than one coincidence
-				3.5.3.6.1.1. Error "ambiguous redirect"
-			3.5.3.6.2. Update the corresponding redirection's path
-		3.3.9. ELSE (means we were handling an argument)
-			3.3.9.1. Add this processed token into array of arguments `argv`;
-			3.3.9.2. Mark all variables created while parsing current operand as per-command
+			3.3.7.1. IF globbing gave us more than one coincidence
+				3.3.7.1.1. Error "ambiguous redirect"
+			3.3.7.2. Update the corresponding redirection's path
+		3.3.8. ELSE (means we were handling an argument)
+			3.3.8.1. Add this processed token into array of arguments `argv`;
+			3.3.8.2. Mark all variables created while parsing current operand as per-command
 					   variables (basically by setting `f_per_cmd`); It implyes we'll not
 					   be creating any more variables while parsing the current operand;
 

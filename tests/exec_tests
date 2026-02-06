@@ -1,0 +1,2 @@
+ping 8.8.8.8 -c1 > ping_res && cat << EOF > file || VAR1=4 VAR2=5 ./script arg1 arg2 | wc -l 
+ping 8.'8'."8".'8' -c1 > 'ping res' && cat << E'O'"F" > '>file<' || VAR1=4 VAR2=' bla bla  keke' ./script arg1 ' arg2 ' "''a"r"g3''" | wc -l 

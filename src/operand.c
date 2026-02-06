@@ -20,7 +20,7 @@ int		ops_init(t_operand *ops)
 		ops[i].write_end = DEFAULT_FD;
 		ops[i].read_end = DEFAULT_FD;
 		ops[i].tokens = NULL;
-		env_init(ops[i].vars);
+		ops[i].my_env = NULL;
 		ops[i].f_per_cmd = false;
 		j = 0;
 		while (j < MAX_REDIRS_NUM)
@@ -35,6 +35,8 @@ int		ops_init(t_operand *ops)
 	return (COMMON_SUCCESS);
 }
 
+/* Allocates memory for tokens array
+ * of the operand `op` */
 int	op_token_init(t_operand *op)
 {
 	size_t	i;
@@ -49,8 +51,18 @@ int	op_token_init(t_operand *op)
 	while (i < MAX_OP_TOKENS_NUM)
 	{
 		op->tokens[i].cnt = NULL;
+		op->tokens[i].qpair_cnt = 0;
 		++i;
 	}
+	return (COMMON_SUCCESS);
+}
+
+int	op_env_init(t_operand *op)
+{
+	op->my_env = malloc(1 * sizeof *op->my_env);
+	if (!op->my_env)
+		return (COMMON_SYS_ERR);
+	env_init(op->my_env);
 	return (COMMON_SUCCESS);
 }
 
@@ -62,22 +74,30 @@ void	ops_free(t_operand *ops)
 	i = 0;
 	while (i < MAX_OPS_NUM)
 	{
+		// Free operand's string
 		if (ops[i].name)
 			free(ops[i].name);
-		env_free(ops[i].vars);
-		// Free tokens
-		j = 0;	
-		while (j < MAX_OP_TOKENS_NUM)
+
+		// Free operand's environment
+		if (ops[i].my_env)
 		{
-			if (&ops[i].tokens[j])
-			{
-				if (&ops[i].tokens[j].cnt)
-					free(&ops[i].tokens[j].cnt);
-				free(&ops[i].tokens[j]);
-			}
-			++j;
+			env_free(ops[i].my_env);
+			free(ops[i].my_env);
 		}
-		// Free redirections
+
+		// Free operand's tokens
+		if (ops[i].tokens)
+		{
+			j = 0;
+			while (j < MAX_OP_TOKENS_NUM)
+			{
+				if (ops[i].tokens[j].cnt)
+					free(ops[i].tokens[j].cnt);
+				++j;
+			}
+			free(ops[i].tokens);
+		}
+		// Free operands's redirections
 		j = 0;
 		while (j < MAX_REDIRS_NUM)
 		{

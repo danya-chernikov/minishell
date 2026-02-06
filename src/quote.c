@@ -1,7 +1,8 @@
 #include "quote.h"
 #include "prompt_parser.h"
 
-/* Quotes parser for prompt */
+/* Quotes parser for prompt.
+ * ADD OVERFLOW CHECK! */
 bool quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
 {
 	int		fret;

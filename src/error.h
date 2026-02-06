@@ -45,13 +45,17 @@
 # define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
 # define TOO_LONG_HD_DELIM		"heredoc's delimiter is too long"
 # define TOO_LONG_HD_CONTENT	"heredoc's content is too long"
+# define AMBIG_REDIRECT_ERR_MSG	"ambiguous redirect"
 
 /* Warnings */
 # define HEREDOC_EOF_WARN_MSG	"here-document was delimited by end-of-file"
 
+/* Overflow control */
 # define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
 # define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"
 # define MAX_ENV_VAL_ERR_MSG	"The variable value is too long"
+# define MAX_OP_TOK_LEN_ERR_MSG	"The operand's token is too long"
+# define MAX_OP_TOK_NUM_ERR_MSG	"Too many operand's tokens"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"

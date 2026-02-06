@@ -63,10 +63,17 @@ int		operand_push(t_parser_data *d, size_t plen)
 		return (COMMON_SYS_ERR);
 	}
 	ft_strlcpy(d->ops[d->op_cnt].name, opname, opname_len + 1);
+	// Initialize tokens of this operand
 	fret = op_token_init(&d->ops[d->op_cnt]);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
+	// Initialize local environment of this operand
+	fret = op_env_init(&d->ops[d->op_cnt]);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
+
 	++d->op_cnt;
+
 	return (COMMON_SUCCESS);
 }
 
