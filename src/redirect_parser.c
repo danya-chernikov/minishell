@@ -1,4 +1,5 @@
 #include "redirect_parser.h"
+#include "operand.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -252,9 +253,8 @@ int	add_redir_app(t_operand *op, size_t *op_i)
 
 int	add_heredoc(t_operand *op, size_t *op_i)
 {
+	int		fret;
 	size_t	wi;
-	size_t	i;
-	size_t	op_slen;
 
 	if (op->red_cnt == MAX_REDIRS_NUM - 1)
 	{
@@ -282,38 +282,9 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 	}
 
 	// Now let's get the delimiter
-	op->redirs[op->red_cnt].hd.delim = (char *)malloc(MAX_HD_DELIM_LEN * sizeof(char));
-	if (!op->redirs[op->red_cnt].hd.delim)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
-	i = 0;
-	op_slen = ft_strlen(op->name);
-	while (wi < op_slen)
-	{
-		if (i >= MAX_HD_DELIM_LEN - 1)
-		{
-			print_shell_error(NULL, TOO_LONG_HD_DELIM);
-			return (COMMON_FAILURE);
-		}
-		if ((op->name[wi] == ' ' || op->name[wi] == '>' ||
-			op->name[wi] == '<') && !is_inside_op_quotes(op, wi))
-		{
-			break ;
-		}
-		op->redirs[op->red_cnt].hd.delim[i++] = op->name[wi++];
-	}
-	op->redirs[op->red_cnt].hd.delim[i] = '\0';	
-	*op_i = --wi;
-	// Set f_expand_body flag
-	if (is_surrounded_quotes(op->redirs[op->red_cnt].hd.delim))
-	{
-		erase_quotes_no_check(op->redirs[op->red_cnt].hd.delim);
-		op->redirs[op->red_cnt].hd.f_expand_body = false;
-	}
-	else
-		op->redirs[op->red_cnt].hd.f_expand_body = true;
+	fret = get_hd_delimiter(op, &wi);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
 
 	// Allocate memory for heredoc's content
 	op->redirs[op->red_cnt].hd.content = (char *)malloc(MAX_HD_CONTENT_LEN * sizeof(char));
@@ -322,6 +293,65 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
+
+	*op_i = --wi;
 	++op->red_cnt;
 	return (COMMON_SUCCESS);
+}
+
+int	get_hd_delimiter(t_operand *op, size_t *wi)
+{
+	int			fret;
+	char		*delim;
+	size_t		i;
+	size_t		op_slen;
+	size_t		qpair_cnt;
+	t_quote_int	*quotes;
+
+	op->redirs[op->red_cnt].hd.delim = (char *)malloc(MAX_HD_DELIM_LEN * sizeof(char));
+	if (!op->redirs[op->red_cnt].hd.delim)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	i = 0;
+	op_slen = ft_strlen(op->name);
+	delim = op->redirs[op->red_cnt].hd.delim;
+	while (*wi < op_slen)
+	{
+		if (i >= MAX_HD_DELIM_LEN - 1)
+		{
+			print_shell_error(NULL, TOO_LONG_HD_DELIM);
+			return (COMMON_FAILURE);
+		}
+		if ((op->name[*wi] == ' ' || op->name[*wi] == '>' ||
+			op->name[*wi] == '<') && !is_inside_op_quotes(op, *wi))
+		{
+			break ;
+		}
+		delim[i++] = op->name[(*wi)++];
+	}
+	delim[i] = '\0';
+
+	// Set f_expand_body flag
+	if (contains_quote(delim))
+		op->redirs[op->red_cnt].hd.f_expand_body = false;
+	else
+		op->redirs[op->red_cnt].hd.f_expand_body = true;
+
+	quotes = malloc(MAX_QUOTES_NUM * sizeof *quotes);
+	if (!quotes)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	// Update syntax quote for the delimiter
+	fret = quotes_parser(delim, quotes, &qpair_cnt);
+	if (fret == COMMON_SUCCESS)
+	{
+		// Remove syntax quotes in the delimiter
+		fret = remove_syntax_quotes(delim, quotes, qpair_cnt);
+	}
+	free(quotes);
+	return (fret);
 }

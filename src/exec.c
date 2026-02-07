@@ -44,7 +44,6 @@ int	exec_ops(t_shell *msh, int *ret_code)
 				op_str = op->name;
 				opstr_len = ft_strlen(op_str);
 
-				
 				tcnt = (char *)malloc(MAX_OP_TOKEN_LEN * sizeof(char));
 				if (!tcnt)
 				{

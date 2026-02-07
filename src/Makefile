@@ -22,7 +22,7 @@ SRCS=main.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c exec.c wildcards.c builtin.c \
 	 signals.c signals2.c \
-	 aux_common.c aux_io.c error.c debug.c test.c
+	 aux_common.c aux_common2.c aux_io.c error.c debug.c test.c
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o \
@@ -38,7 +38,7 @@ OBJS=main.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o redirect_parser.o redirect.o heredoc.o exec.o wildcards.o builtin.o \
 	 signals.o signals2.o \
-	 aux_common.o aux_io.o error.o debug.o test.o
+	 aux_common.o aux_common2.o aux_io.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -247,7 +247,7 @@ engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c
 
-redirect_parser.o : redirect_parser.c redirect_parser.h \
+redirect_parser.o : redirect_parser.c operand.h redirect_parser.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c redirect_parser.c
@@ -295,6 +295,11 @@ aux_common.o : aux_common.c aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_common.c
+
+aux_common2.o : aux_common2.c aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_common2.c
 
 aux_io.o : aux_io.c aux_io.h \
 	libft.h vector.h error.h debug.h

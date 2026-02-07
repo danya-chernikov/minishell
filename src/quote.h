@@ -28,5 +28,6 @@ bool	quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt);
 bool	is_inside_op_quotes(t_operand *op, size_t op_i);
 bool	is_inside_op_quotes_single(t_operand *op, size_t op_i);
 bool	is_inside_op_quotes_double(t_operand *op, size_t op_i);
+int		remove_syntax_quotes(char *str,  t_quote_int *quotes, size_t qpair_cnt);
 
 #endif

@@ -1,6 +1,9 @@
 #include "quote.h"
 #include "prompt_parser.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /* Quotes parser for prompt.
  * ADD OVERFLOW CHECK! */
 bool quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
@@ -14,6 +17,7 @@ bool quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
 	i = 0;
 	f_dquote = false;
 	f_squote = false;
+	*qpair_cnt = 0;
 	fret = COMMON_SUCCESS;
 	slen = ft_strlen(str);
 	while (i < slen)
@@ -129,4 +133,51 @@ bool	is_inside_op_quotes_double(t_operand *op, size_t op_i)
 		++qi;
 	}
 	return (false);
+}
+
+/* If mark[i] == 1 we'll not include this symbol */
+int	remove_syntax_quotes(char *str,  t_quote_int *quotes, size_t qpair_cnt)
+{
+	size_t	slen;
+	size_t	i;
+	size_t	w;
+	size_t	qi;
+	char	*mark;
+
+	if (!str || !quotes || qpair_cnt == 0)
+		return (COMMON_SUCCESS);
+
+	slen = ft_strlen(str);
+	if (slen == 0)
+		return (COMMON_SUCCESS);
+	
+	mark = (char *)ft_calloc(slen, sizeof(char));
+	if (!mark)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (quotes[qi].li < slen)
+			mark[quotes[qi].li] = 1;
+		if (quotes[qi].ri < slen)
+			mark[quotes[qi].ri] = 1;
+		++qi;
+	}
+
+	w = 0;
+	i = 0;
+	while (i < slen)
+	{
+		if (!mark[i])
+			str[w++] = str[i];
+		++i;
+	}
+	str[w] = '\0';
+	
+	free(mark);
+	return (COMMON_SUCCESS);
 }
