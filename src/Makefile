@@ -267,7 +267,7 @@ exec.o : exec.c exec.h shell.h operand.h token.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec.c
 
-wildcards.o : wildcards.c wildcards.h \
+wildcards.o : wildcards.c operand.h wildcards.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards.c

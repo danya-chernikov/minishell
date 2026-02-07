@@ -85,6 +85,20 @@ bool quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
 	return (fret);
 }
 
+bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (ind > quotes[qi].li && ind < quotes[qi].ri)
+			return (true);
+		++qi;
+	}
+	return (false);
+}
+
 /* Check if index `op_i` belongs to any operand's `name`
  * quote interval (single or double quotes) */
 bool	is_inside_op_quotes(t_operand *op, size_t op_i)
@@ -130,6 +144,20 @@ bool	is_inside_op_quotes_double(t_operand *op, size_t op_i)
 			if (op_i > op->quotes[qi].li && op_i < op->quotes[qi].ri)
 				return (true);
 		}
+		++qi;
+	}
+	return (false);
+}
+
+bool	is_syntax_quote(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (ind == quotes[qi].li || ind == quotes[qi].ri)
+			return (true);
 		++qi;
 	}
 	return (false);

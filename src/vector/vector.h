@@ -13,7 +13,7 @@
 # include <stddef.h>
 # include <stdbool.h>
 
-# define DEFAULT_VEC_ENLARGER	128
+# define DEFAULT_VEC_ENLARGER	16
 
 typedef unsigned char       t_uchar;
 typedef unsigned short      t_ushort;

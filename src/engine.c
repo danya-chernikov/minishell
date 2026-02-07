@@ -76,6 +76,10 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		if (fres != COMMON_SUCCESS)
 			break ;
 
+#if DEBUG == 1
+		dbg_print_operand_tokens(pdata);
+#endif
+
 		// Close all pipes of this prompt
 		//fres = close_pipes(&pdata);
 

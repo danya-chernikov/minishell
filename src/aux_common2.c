@@ -44,6 +44,29 @@ bool	contains_quote(char *str)
 	return (false);
 }
 
+bool	is_variable_name_correct(char *var_name)
+{
+	size_t	i;
+
+	if (!var_name || var_name[0] == '\0')
+		return (false);
+
+	// First char
+	if (!(ft_isalpha(var_name[0]) || var_name[0] == '_'))
+		return (false);
+
+	// Remaining chars
+	i = 1;
+	while (var_name[i] != '\0')
+	{
+		if (!(ft_isalnum(var_name[i]) || var_name[i] == '_'))
+			return (false);
+		++i;
+	}
+
+	return (true);
+}
+
 /* We don't use it anymore, but let's keep it just in case */
 bool	is_surrounded_quotes(char *str)
 {
