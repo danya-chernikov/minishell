@@ -1,12 +1,15 @@
 #ifndef VECTOR_H
 # define VECTOR_H
 
-/* Basic slow and UNSAFE vector implementation
+/* Basic slow and UNSAFE vector implementation.
  * When we call vector_init() and pass it a capacity, it creates
  * a vector with that capacity. When adding new elements, if the
  * vector is about to overflow, it increases its current capacity
  * by DEFAULT_VEC_ENLARGER or by the value specified in the optional
- * third argument, enlarger, when overloading vector_init() */
+ * third argument, enlarger, when overloading vector_init().
+ *
+ * DO NOT USE IT WITH RAW VOID!!! It's now finished yet
+ * (and it's unlikely ot be of any use to us) */
 
 # include <stdio.h>
 # include <stdlib.h>
