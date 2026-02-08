@@ -24,6 +24,11 @@ int	vector_push_back(t_vector *v, void *val)
 	return (1);
 }
 
+int	vector_push_back_char(t_vector *v, char c)
+{
+	return (vector_push_back(v, &c));
+}
+
 /* On error returns NULL */
 void	*vector_pop_back(t_vector *v)
 {

@@ -20,7 +20,8 @@ SRCS=main.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
-	 engine.c redirect_parser.c redirect.c heredoc.c exec.c wildcards.c builtin.c \
+	 engine.c redirect_parser.c redirect.c heredoc.c wildcards.c builtin.c \
+	 exec.c exec2.c exec_expansions.c exec_service.c exec_service2.c \
 	 signals.c signals2.c \
 	 aux_common.c aux_common2.c aux_io.c error.c debug.c test.c
 
@@ -36,7 +37,8 @@ OBJS=main.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
-	 engine.o redirect_parser.o redirect.o heredoc.o exec.o wildcards.o builtin.o \
+	 engine.o redirect_parser.o redirect.o heredoc.o wildcards.o builtin.o \
+	 exec.o exec2.o exec_expansions.o exec_service.o exec_service2.o \
 	 signals.o signals2.o \
 	 aux_common.o aux_common2.o aux_io.o error.o debug.o test.o
 
@@ -241,7 +243,7 @@ operand.o : operand.c operand.h env.h \
 	-c operand.c
 
 
-# =========================== Engine and execution ===========================
+# ====================== Engine and redirections parser ======================
 engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
@@ -262,20 +264,46 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
 
-exec.o : exec.c exec.h shell.h operand.h token.h \
+
+# ================================ Execution =================================
+exec.o : exec.c exec.h shell.h prompt_parser.h operand.h token.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec.c
 
-wildcards.o : wildcards.c operand.h wildcards.h \
+exec2.o : exec2.c exec.h shell.h operand.h prompt_parser.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c wildcards.c
+	-c exec2.c
 
+exec_expansions.o : exec_expansions.c exec.h shell.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_expansions.c
+
+exec_service.o : exec_service.c exec.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_service.c
+
+exec_service2.o : exec_service2.c operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_service2.c
+
+
+# ================================ Built-ins =================================
 builtin.o : builtin.c builtin.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin.c
+
+
+# ================================ Wildcards =================================
+wildcards.o : wildcards.c operand.h wildcards.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards.c
 
 
 # ================================= Signals ==================================

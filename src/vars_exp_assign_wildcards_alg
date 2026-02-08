@@ -69,7 +69,7 @@ Now the updated algorithm.
 
 		3.1.4. LOOP through token symbols
 
-			3.1.4.1. IF current symbol is a double syntax quote
+			3.1.4.1. IF current symbol is a double quote
 				3.1.4.1.1. IF state is IND_QNONE
 					3.1.4.1.1.1. state = IND_QDOUBLE (We do NOT copy anything)
 					3.1.4.1.1.2. Continue
@@ -81,7 +81,7 @@ Now the updated algorithm.
 					3.1.4.1.3.2. Mark the corresponding index in qmask[] as IND_QSINGLE
 					3.1.4.1.3.3. Continue
 
-			3.1.4.2. IF current symbol is a single syntax quote
+			3.1.4.2. IF current symbol is a single quote
 				3.1.4.2.1. IF state is IND_QNONE
 					3.1.4.2.1.1. state = IND_QSINGLE (We do NOT copy anything)
 					3.1.4.2.1.2. Continue
@@ -93,8 +93,8 @@ Now the updated algorithm.
 					3.1.4.2.3.2. Mark the corresponding index in qmask[] as IND_QDOUBLE
 					3.1.4.2.3.3. Continue
 
-			3.1.4.3. IF current symbol is ~ that goes after = AND state is IND_QNONE AND the next symbol is / (outside any qutoes) OR
-					 IF current symbol is ~ that goes after = AND state is IND_QNONE and then token string terminates
+			3.1.4.3. IF current symbol is ~ that goes immediately after = AND state is IND_QNONE AND the next symbol is / (outside any qutoes) OR
+					 IF current symbol is ~ that goes immediately after = AND state is IND_QNONE and then token string terminates
 				3.1.4.3.1. Expand ~ by copying its value into the new array
 				3.1.4.3.2. Assign the corresponding indices in qmask[] the current `state` value
 
@@ -121,7 +121,7 @@ Now the updated algorithm.
 
 		3.3.3. LOOP through token symbols
 
-			3.3.3.1. IF current symbol is a double syntax quote
+			3.3.3.1. IF current symbol is a double quote
 				3.3.3.1.1. IF state is IND_QNONE
 					3.3.3.1.1.1. state = IND_QDOUBLE (We do NOT copy anything)
 					3.3.3.1.1.2. Continue
@@ -133,7 +133,7 @@ Now the updated algorithm.
 					3.3.3.1.3.2. Mark the corresponding index in qmask[] as IND_QSINGLE
 					3.3.3.1.3.3. Continue
 
-			3.3.3.2. IF current symbol is a single syntax quote
+			3.3.3.2. IF current symbol is a single quote
 				3.3.3.2.1. IF state is IND_QNONE
 					3.3.3.2.1.1. state = IND_QSINGLE (We do NOT copy anything)
 					3.3.3.2.1.2. Continue

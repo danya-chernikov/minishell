@@ -115,6 +115,7 @@ void	vector_msi(t_vector *v, size_t ri, size_t ci);
 
 /* vector_stack.c */
 int		vector_push_back(t_vector *v, void *val);
+int		vector_push_back_char(t_vector *v, char c);
 void	*vector_pop_back(t_vector *v);
 
 /* vector_settings.c
