@@ -1,6 +1,7 @@
-#include "exec.h"
-#include "operand.h"
+#include "expansion.h"
+#include "shell.h"
 #include "prompt_parser.h"
+#include "operand.h"
 
 #include "error.h"
 
@@ -10,7 +11,7 @@
 /* Divide operand's string 'name' on tokens by spaces
  * (which are located outside any quote intervals of
  * course). Each operand contains at least one token */
-int	exec_divide_op_str_on_tokens(t_operand *op)
+int	exp_divide_op_str_on_tokens(t_operand *op)
 {
 	size_t		op_i;
 	size_t		ti;
@@ -67,7 +68,7 @@ int	exec_divide_op_str_on_tokens(t_operand *op)
 }
 
 /* Updates quote intervals for each operand's token */
-int exec_update_op_tokens_quote_intervals(t_operand *op)
+int exp_update_op_tokens_quote_intervals(t_operand *op)
 {
 	int			fret;
 	size_t		ti;

@@ -1,4 +1,4 @@
-#include "exec.h"
+#include "expansion.h"
 #include "operand.h"
 
 #include "vector.h"
@@ -6,25 +6,31 @@
 #include "error.h"
 
 /* First we initialize `exp_res` and then `qmask` */
-int	exec_vectors_init(t_vector *vec_pair[], size_t cap)
+int	exp_vectors_init(t_vector *vec_pair[], size_t cap)
 {
-	if (!vector_init(vec_pair[EXEC_EXP_RES], CHAR, cap))
+	if (!vector_init(vec_pair[EXP_RES], CHAR, cap))
 	{
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	if (!vector_init(vec_pair[EXEC_QMASK], CHAR, cap))
+	if (!vector_init(vec_pair[QMASK], CHAR, cap))
 	{
 		perror("malloc");
-		vector_free(vec_pair[EXEC_EXP_RES]);
+		vector_free(vec_pair[EXP_RES]);
 		return (COMMON_SYS_ERR);
 	}
 	return (COMMON_SUCCESS);
 }
 
+void	exp_vectors_free(t_vector *vec_pair[])
+{
+	free(vec_pair[0]);
+	free(vec_pair[1]);
+}
+
 /* If state == IND_QNONE for index `i` then it's obvious
  * that tok_str[i + 1] will be unquoted or be a quote */
-bool	exec_tilde_found(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state)
+bool	exp_tilde_found(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state)
 {
 	if (tstr[i] == '~' &&
 		i - 1 == eqsign_ind &&
@@ -36,7 +42,7 @@ bool	exec_tilde_found(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state)
 	return (false);
 }
 
-bool	exec_token_is_assignment(t_operand *op, t_op_token *op_tok)
+bool	exp_token_is_assignment(t_operand *op, t_op_token *op_tok)
 {
 	size_t	i;
 	size_t	slen;
