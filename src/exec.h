@@ -10,8 +10,6 @@
 # define EXEC_CONTINUE	5
 # define EXEC_EXP_RES	0
 # define EXEC_QMASK		1
-# define EXEC_VAR_NAME	2
-# define EXEC_VAR_VALUE	3
 
 typedef struct s_shell		t_shell;
 typedef struct s_operand	t_operand;
@@ -22,8 +20,9 @@ typedef struct s_vector		t_vector;
 /* exec.c */
 int		exec_ops(t_shell *msh, int *ret_code);
 int		exec_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i);
-int		exec_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var[]);
-void	exec_expand_varname_loop(t_shell *msh, char *tok_str, char *var_name, t_vector *vec_pair[]);
+int		exec_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var_name);
+void	exec_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
+void	exec_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
 void	exec_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state);
 void	exec_process_single_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state);
 
@@ -45,5 +44,9 @@ bool	exec_token_is_assignment(t_operand *op, t_op_token *op_tok);
 
 /* exec_service2.c */
 bool	exec_token_is_redirect(t_op_token *op_tok);
+bool	exec_token_is_redir_in(t_op_token *op_tok);
+bool	exec_token_is_redir_out(t_op_token *op_tok);
+bool	exec_token_is_redir_app(t_op_token *op_tok);
+bool	exec_token_is_heredoc(t_op_token *op_tok);
 
 #endif

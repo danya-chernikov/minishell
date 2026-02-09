@@ -30,6 +30,7 @@ int		div2_str_by_delim_alloc(char **part1, char **part2);
 char	*expand_homedir(char *str, char *home);
 bool	contains_quote(char *str);
 bool	is_variable_name_correct(char *var_name);
+bool	is_varname_symbol_permitted(char symbol);
 bool	is_surrounded_quotes(char *str); // Obsolete
 void	erase_quotes_no_check(char *str); // Obsolete
 

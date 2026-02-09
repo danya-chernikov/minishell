@@ -67,6 +67,17 @@ bool	is_variable_name_correct(char *var_name)
 	return (true);
 }
 
+/* REVELATION: only variables we create cannot start
+ * with a digit, variables we expand actually can
+ * (for example $0, or $1, $2, ... , $9).
+ * So we call this function when we expand variables */
+bool	is_varname_symbol_permitted(char symbol)
+{
+	if (ft_isalnum(symbol) || symbol == '_')
+		return (true);
+	return (false);
+}
+
 /* We don't use it anymore, but let's keep it just in case */
 bool	is_surrounded_quotes(char *str)
 {

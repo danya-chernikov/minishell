@@ -38,7 +38,10 @@ int	env_set(t_env *env, char *name, char *value, t_var_type type)
 /* Unsets the variable named `name`. If no
  * variable with this name exists, or if it
  * has the read-only flag set, the function
- * returns an error */
+ * returns an error. There is no need to
+ * free variable's name here (that's an
+ * extra work). We don't care if `name`
+ * is on heap or static */
 int	env_unset(t_env *env, char *name)
 {
 	t_env_var	*var;
@@ -50,7 +53,7 @@ int	env_unset(t_env *env, char *name)
 		{
 			if (var->value)
 				free(var->value);
-			var->value = NULL;
+			var->value = NULL;	
 		}
 		else
 			return (COMMON_FAILURE);
@@ -64,9 +67,10 @@ static int	set_existing_var(t_env_var *var, char *name, char *value)
 {
 	if (!var->f_readonly)
 	{
-		if (ft_strlen(value) >= MAX_ENV_VAL_LEN)
+		if (ft_strlen(value) >= MAX_ENV_VAL_LEN - 1)
 		{
 			print_shell_error(NULL, MAX_ENV_VAL_ERR_MSG);
+			free(name); // IT WAS ADDED RECETLY. I'M NOT SURE WE NEED THIS
 			free(value); // We just leave variable's value unchanged
 			return (COMMON_FAILURE);
 		}
@@ -85,9 +89,10 @@ static int	set_existing_var(t_env_var *var, char *name, char *value)
 	return (COMMON_SUCCESS);
 }
 
+/* Checks for overflows */
 static int	check_bounds(t_env *env, char *name, char *value)
 {
-	if (env->vars_num == MAX_TOTAL_VARS_NUM)
+	if (env->vars_num == MAX_TOTAL_VARS_NUM - 1)
 	{
 		free(name);
 		free(value);
@@ -95,14 +100,14 @@ static int	check_bounds(t_env *env, char *name, char *value)
 		print_shell_error(NULL, MAX_ENV_NUM_ERR_MSG);
 		return (COMMON_FAILURE);
 	}
-	if (ft_strlen(name) >= MAX_ENV_NAME_LEN)
+	if (ft_strlen(name) >= MAX_ENV_NAME_LEN - 1)
 	{
 		print_shell_error(NULL, MAX_ENV_NAME_ERR_MSG);
 		free(name);
 		free(value);
 		return (COMMON_FAILURE);
 	}
-	if (ft_strlen(value) >= MAX_ENV_VAL_LEN)
+	if (ft_strlen(value) >= MAX_ENV_VAL_LEN - 1)
 	{
 		print_shell_error(NULL, MAX_ENV_VAL_ERR_MSG);
 		free(name);
