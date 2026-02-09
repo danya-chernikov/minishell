@@ -32,6 +32,7 @@ int	exec_ops(t_shell *msh, int *ret_code)
 		token = &pd->tokens[ti];
 		if (token->type == OPERAND)
 		{
+			int			fret;
 			size_t		opt_i; // Operand's token index
 			t_op_token	*op_tok;
 
@@ -58,128 +59,12 @@ int	exec_ops(t_shell *msh, int *ret_code)
 				}
 				else if (exec_token_is_assignment(op, op_tok)) // Assignment
 				{
-					// Split operand's token string by '='
-					char	*var_name;	
-					char	*var_value;
-					bool	f_varname_correct;
-
-					f_varname_correct = false;
-
-					// Here we consider only the first '=' found
-					// If '=' was located by token_is_assignment() it was the first '='
-					// VAR'='=1 in this case we'll get VAR' and '=1 but the variable name simply
-					// will not be considered as correct later! So it's fine
-					// VAR==1 we'll just get VAR and =1
-					fret = div2_str_by_delim(op_tok->cnt, '=', &var_name, &var_value);
-					if (fret != COMMON_SUCCESS)
-						return (fret);
-
-					// Check LHS (variable's name) for correctness
-					if (is_variable_name_correct(var_name)) // If correct
-					{
-						t_ind_type		state;			// State of the current operand's token symbol
-						size_t			i;				// Symbol index in operand's token
-						size_t			eqsign_ind;
-						size_t			tok_len;
-						char			*tok_str;		// Pointer to operand's token string
-						t_vector		qmask;			// Quote mask
-						t_vector		exp_res;		// Array that stores expansion results
-														// (the same as the index for `qmask`)
-						t_vector		*vec_pair[2];	// To pass our lovely friend Norminette
-							
-						tok_str = op_tok->cnt;
-
-						f_varname_correct = true;
-						// We're gonna treat this token as an assignment
-						
-						state = IND_QNONE;
-
-						tok_len = ft_strlen(tok_str);
-
-						// We do not have to expand anything in variable's name
-						// So let's start with the next symbol after '='	
-						// Always search for the first '=' occurence
-						eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
-						i = eqsign_ind + 1;
-
-						// If after '=' goes nothing ( things like "VAR=" )
-						if (i == tok_len)
-						{
-							// We don't have to expand anything
-							// Let's create a variable with an empty value
-							// We don't care about an error cause it can't be critical
-							env_set(op->my_env, var_name, var_value, LOCAL);
-							free(var_name);
-							free(var_value);
-							++opt_i;
-							continue ; // Go to the next operand's token
-						}
-
-						// Initialize `qmask` and `exp_res` vectors
-						if (!exec_vectors_init(&qmask, &exp_res, tok_len - i + 1))
-						{
-							free(var_name);
-							free(var_value);
-							return (COMMON_SYS_ERR);
-						}
-
-						vec_pair[0] = &exp_res;
-						vec_pair[1] = &qmask;
-
-						// We actually can use op_tok->quotes because if we reach this point
-						// it means ALL quote intervals are located after the first '=' (unquoted)
-
-						// Loop through token symbols
-						i = 0;
-						while (i < tok_len)
-						{
-							// Again, we already excluded cases like VAR"IABLE=VALUE"
-							// here the variable name will not be considered as correct
-							// and we'll be treating this token as an argument
-							
-							if (tok_str[i] == '"') // If current symbol is a double syntax quote
-							{
-								exec_process_double_quote(tok_str, &i, vec_pair, state);
-							}
-							else if (tok_str[i] == '\'') // If current symbol is a single syntax quote
-							{
-								exec_process_single_quote(tok_str, &i, vec_pair, state);
-							}
-							else if (exec_tilde_found(tok_str, i, eqsign_ind, state)) // If ~ was found
-							{
-								exec_expand_tilde(msh, vec_pair, state);
-							}
-							else if (tok_str[i] == '$' && state != IND_QSINGLE) // If $ was found
-							{
-								exec_expand_variable(msh, vec_pair, var_name, state);
-							}
-							else // Current symbol is just a regular symbol (except quote)
-							{
-								vector_push_back_char(&exp_res, tok_str[i]);
-								vector_push_back_char(&qmask, (char)state);
-							}
-							++i;
-						} // while (i < tok_len)
-
-					} // if (is_variable_name_correct(var_name))
-
-					// Create a local environment variable and add it into
-					// the array of variables of this operand `vars`
-					// ...
-				
-
-					free(var_name);
-					free(var_value);
-
-					if (f_varname_correct)
-					{
-						++opt_i; // Next token
+					fret = exec_process_assignment(msh, op, op_tok, &opt_i);
+					if (fret == EXEC_CONTINUE)
 						continue ;
-					}
-					// If variable's name is not correct
-					// We're gonna treat this token as an argument
-
-				} // else if (token_is_assignment(op, op_tok))
+					else if (fret != COMMON_SUCCESS)
+						return (fret);
+				}
 
 				// Argument/Redirection's operand
 				// Current operand's token is a regular argument or a redirection opernad
@@ -198,83 +83,132 @@ int	exec_ops(t_shell *msh, int *ret_code)
 	return (fret);
 }
 
-/* Divide operand's string 'name' on tokens by spaces
- * (which are located outside any quote intervals of
- * course). Each operand contains at least one token */
-int	exec_divide_op_str_on_tokens(t_operand *op)
+/* Here we consider only the first '=' found.
+ * For example:
+ *     # VAR'='=1
+ * in this case we'll get VAR' and '=1 but
+ * the variable name simply will not be
+ * considered as correct later! So it's fine.
+ * Another example:
+ *     # VAR==1
+ * here we'll just get VAR and =1 */
+int	exec_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i)
 {
-	size_t		op_i;
-	size_t		ti;
-	size_t		opstr_len;
-	char		*op_str;
-	char		*tcnt; // Operand's token content
+	int		fret;
+	char	*var[2];
+	bool	f_varname_correct;
 
-	op_str = op->name;
-	opstr_len = ft_strlen(op_str);
+	f_varname_correct = false;
 
-	tcnt = (char *)malloc(MAX_OP_TOKEN_LEN * sizeof(char));
-	if (!tcnt)
+	// Split operand's token string by '='
+	fret = div2_str_by_delim(op_tok->cnt, '=', &var[EXEC_VAR_NAME], &var[EXEC_VAR_VALUE]);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
+
+	// Check LHS (variable's name) for correctness
+	if (is_variable_name_correct(var[EXEC_VAR_NAME]))
 	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
+		// We're gonna treat this token as an assignment
+		f_varname_correct = true;
+		fret = exec_expand_varname(msh, op, op_tok, var);
+		if (fret == EXEC_CONTINUE)
+		{
+			++(*opt_i);
+			return (EXEC_CONTINUE);
+		}
+		if (fret != COMMON_SUCCESS) // We consider EXEC_CONTINUE here
+			return (fret);
 	}
-	ti = 0;
-	op_i = 0;
-	while (op_i < opstr_len)
+	if (f_varname_correct)
 	{
-		if (op_i > MAX_OP_TOKEN_LEN - 1) // Overflow check
-		{
-			print_shell_error(NULL, MAX_OP_TOK_LEN_ERR_MSG);
-			return (COMMON_FAILURE);
-		}
-		if (op_str[op_i] == ' ' && !is_inside_op_quotes(op, op_i))
-		{
-			if (op->token_cnt > MAX_OP_TOKENS_NUM - 1) // Overflow check
-			{
-				print_shell_error(NULL, MAX_OP_TOK_NUM_ERR_MSG);
-				return (COMMON_FAILURE);
-			}
-			tcnt[ti] = '\0';
-			ti = 0;
-			op->tokens[op->token_cnt].cnt = tcnt;
-			++op->token_cnt;
-			tcnt = (char *)malloc(MAX_OP_TOKEN_LEN * sizeof(char));
-			if (!tcnt)
-			{
-				perror("malloc");
-				return (COMMON_SYS_ERR);
-			}
-			skip_spaces(op_str, &op_i);
-			continue ;
-		}
-		tcnt[ti] = op_str[op_i];
-		++op_i;
-		++ti;
+		++(*opt_i); // Next token
+		return (EXEC_CONTINUE);
 	}
-	tcnt[ti] = '\0';
-	op->tokens[op->token_cnt].cnt = tcnt;
-	++op->token_cnt;
+	// If variable's name is not correct
+	// We're gonna treat this token as an argument	
 	return (COMMON_SUCCESS);
 }
 
-/* Updates quote intervals for each operand's token */
-int exec_update_op_tokens_quote_intervals(t_operand *op)
+/* vec_pair[0] - exp_res - Quote mask;
+ * vec_pair[1] - qmask - Array that stores expansion results.
+ *
+ * We do not have to expand anything in variable's name.
+ * So let's start with the next symbol after '='.
+ * Always search for the first '=' occurence.
+ *
+ * if (i == ft_strlen(tok_str))
+ *     We don't have to expand anything.
+ *     We just create a variable with empty value and we
+ *     don't care about an error cause it can't be critical */
+int	exec_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var[])
 {
-	int			fret;
-	size_t		ti;
-	t_op_token	*op_tok;
-
-	ti = 0;
-	fret = COMMON_SUCCESS;
-	while (ti < op->token_cnt)
+	size_t		i;				// Symbol index in operand's token
+	size_t		eqsign_ind;
+	char		*tok_str;		// Pointer to operand's token string
+	t_vector	*vec_pair[2];	// To pass our lovely friend Norminette
+		
+	tok_str = op_tok->cnt;
+	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
+	i = eqsign_ind + 1;
+	// If after '=' goes nothing ( things like "VAR=" )
+	if (i == ft_strlen(tok_str))
 	{
-		op_tok = &op->tokens[ti];
-		fret = quotes_parser(op_tok->cnt, op_tok->quotes, &op_tok->qpair_cnt);
-		if (fret != COMMON_SUCCESS)
-			return (fret);
-		++ti;
+		env_set(op->my_env, ft_strdup(var[EXEC_VAR_NAME]),
+			ft_strdup(var[EXEC_VAR_NAME]), LOCAL);
+		free(var[EXEC_VAR_NAME]);
+		free(var[EXEC_VAR_VALUE]);
+		return (EXEC_CONTINUE); // Go to the next operand's token
 	}
-	return (fret);
+	// Initialize `qmask` and `exp_res` vectors
+	if (!exec_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1))
+	{
+		free(var[EXEC_VAR_NAME]);
+		free(var[EXEC_VAR_VALUE]);
+		return (COMMON_SYS_ERR);
+	}
+	// We actually can use op_tok->quotes because if we reach this point
+	// it means ALL quote intervals are located after the first '=' (unquoted)
+	exec_expand_varname_loop(msh, tok_str, var[EXEC_VAR_NAME], vec_pair);
+	// Create a local environment variable and add it into
+	// the array of variables of this operand `vars`
+	env_set(op->my_env, ft_strdup(var[EXEC_VAR_NAME]),
+		ft_strdup(vec_pair[EXEC_EXP_RES]->data), LOCAL);
+	free(var[EXEC_VAR_NAME]);
+	free(var[EXEC_VAR_VALUE]);
+	return (COMMON_SUCCESS);
+}
+
+/* Loop through token symbols.
+ * Again, we already excluded cases like VAR"IABLE=VALUE"
+ * here the variable name will not be considered as correct
+ * and we'll be treating this token as an argument */
+void	exec_expand_varname_loop(t_shell *msh, char *tok_str, char *var_name, t_vector *vec_pair[])
+{
+	size_t		i;
+	size_t		eqsign_ind;
+	t_ind_type	state; // State of the current operand's token symbol
+
+	i = 0;
+	state = IND_QNONE;
+	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
+	while (i < ft_strlen(tok_str))
+	{	
+		if (tok_str[i] == '"') // If current symbol is a double syntax quote
+			exec_process_double_quote(tok_str, &i, vec_pair, state);
+		else if (tok_str[i] == '\'') // If current symbol is a single syntax quote
+			exec_process_single_quote(tok_str, &i, vec_pair, state);
+		else if (exec_tilde_found(tok_str, i, eqsign_ind, state)) // If ~ was found
+			exec_expand_tilde(msh, vec_pair, state);
+		else if (tok_str[i] == '$' && state != IND_QSINGLE) // If $ was found
+			exec_expand_variable(msh, vec_pair, var_name, state);
+		else // Current symbol is just a regular symbol (except quote)
+		{
+			vector_push_back_char(vec_pair[EXEC_EXP_RES], tok_str[i]);
+			vector_push_back_char(vec_pair[EXEC_QMASK], (char)state);
+		}
+		++i;
+	}
+	vector_push_back_char(vec_pair[EXEC_EXP_RES], '\0');
 }
 
 void	exec_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state)

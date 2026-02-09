@@ -5,17 +5,18 @@
 #include "libft.h"
 #include "error.h"
 
-int	exec_vectors_init(t_vector *qmask, t_vector *exp_res, size_t cap)
+/* First we initialize `exp_res` and then `qmask` */
+int	exec_vectors_init(t_vector *vec_pair[], size_t cap)
 {
-	if (!vector_init(qmask, CHAR, cap))
+	if (!vector_init(vec_pair[EXEC_EXP_RES], CHAR, cap))
 	{
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	if (!vector_init(exp_res, CHAR, cap))
+	if (!vector_init(vec_pair[EXEC_QMASK], CHAR, cap))
 	{
 		perror("malloc");
-		vector_free(qmask);
+		vector_free(vec_pair[EXEC_EXP_RES]);
 		return (COMMON_SYS_ERR);
 	}
 	return (COMMON_SUCCESS);

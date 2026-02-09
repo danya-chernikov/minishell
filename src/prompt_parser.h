@@ -27,6 +27,14 @@ typedef struct s_parser_data
 	size_t		op_cnt;						// Operand counter
 	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
 	
+	size_t		token_cnt;					// Token counter
+	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
+	
+	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
+	size_t		qpair_cnt;					// Counter of quote pairs
+
+
+	/* Auxiliary things */
 	size_t		opar_num;					// Number of all opening-parentheses
 	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
 	
@@ -38,12 +46,6 @@ typedef struct s_parser_data
 	
 	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
 	size_t		par_cnt;					// Parentheses pair counter
-	
-	size_t		token_cnt;					// Token counter
-	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
-	
-	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
-	size_t		qpair_cnt;					// Counter of quote pairs
 
 }	t_parser_data;
 
@@ -52,7 +54,7 @@ int		parser_init(t_parser_data *d, char *rline_buf);
 void	parser_free(t_parser_data *d);
 
 /* prompt_parser2.c */
-int		parser_engine(t_parser_data *d);
+int		parser_engine(t_parser_data *d); // Main function
 int		handle_open_par(t_parser_data *d, int opar_ind);
 int		handle_close_par(t_parser_data *d);
 
