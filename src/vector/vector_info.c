@@ -19,7 +19,6 @@ size_t	vector_strlen(const t_vector *v)
 
 	if (!v || !v->data)
 		return (0);
-
 	len = 0;
 	data = (t_uchar *)v->data;
 	while (len < v->size && data[len] != '\0')

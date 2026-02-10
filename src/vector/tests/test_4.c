@@ -48,6 +48,17 @@ int	main()
 
 	printf("Vector: "); vector_print(&v2, ""); printf("\n");
 
+	vector_push_back_char(&v2, '\0');
+
+	for (int i = 0; i < vector_strlen(&v2); ++i)
+	{
+		if (*((char *)vector_at(&v2, i)) == 'V')
+		{
+			printf("Index of the first 'V' is: %d\n", i);
+			break;
+		}
+	}
+
 	vector_free(&v2);
 
 	return 0;

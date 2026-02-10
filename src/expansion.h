@@ -19,9 +19,9 @@ typedef struct s_vector		t_vector;
 int		exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i);
 int		exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var_name);
 void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
-void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
 
 /* exp_argredir.c */
+int		exp_process_argredir(t_shell *msh, t_op_token *op_tok);
 void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
 
 /* exec_preparation.c */
@@ -33,11 +33,13 @@ void	exp_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_
 void	exp_process_single_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state);
 void	exp_expand_tilde(t_shell *msh, t_vector *vec_pair[], t_ind_type state);
 void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_ind_type state);
+void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
 
 /* exec_service.c */
 int		exp_vectors_init(t_vector *vec_pair[], size_t cap);
 void	exp_vectors_free(t_vector *vec_pair[]);
-bool	exp_tilde_found(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state);
+bool	exp_tilde_found_assign(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state);
+bool	exp_tilde_found_argredir(char *tstr, size_t i, t_ind_type state);
 bool	exp_token_is_assignment(t_operand *op, t_op_token *op_tok);
 
 /* exec_service2.c */

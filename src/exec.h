@@ -14,5 +14,4 @@ int	exec_ops(t_shell *msh, int *ret_code);
 /* exec2.c */
 int	close_pipes(t_shell *msh);
 
-
 #endif

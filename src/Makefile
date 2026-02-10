@@ -20,10 +20,12 @@ SRCS=main.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
-	 engine.c redirect_parser.c redirect.c heredoc.c wildcards.c builtin.c \
-	 exec.c exec2.c \
+	 engine.c redirect_parser.c redirect.c heredoc.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c \
+	 wildcards.c wildcards2.c \
+	 exec.c exec2.c \
+	 builtin.c \
 	 signals.c signals2.c \
 	 aux_common.c aux_common2.c aux_io.c error.c debug.c test.c
 
@@ -39,9 +41,11 @@ OBJS=main.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
-	 engine.o redirect_parser.o redirect.o heredoc.o wildcards.o builtin.o \
-	 exec.o exec2.o \
+	 engine.o redirect_parser.o redirect.o heredoc.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
+	 wildcards.o wildcards2.o \
+	 exec.o exec2.o \
+	 builtin.o \
 	 exp_service.o exp_service2.o \
 	 signals.o signals2.o \
 	 aux_common.o aux_common2.o aux_io.o error.o debug.o test.o
@@ -276,7 +280,7 @@ exp_assignment.o : exp_assignment.c expansion.h shell.h prompt_parser.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_assignment.c
 
-exp_argredir.o : exp_argredir.c expansion.h shell.h \
+exp_argredir.o : exp_argredir.c expansion.h shell.h operand.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_argredir.c
@@ -308,6 +312,11 @@ wildcards.o : wildcards.c operand.h wildcards.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards.c
+
+wildcards2.o : wildcards2.c operand.h wildcards.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards2.c
 
 
 # ================================ Execution =================================

@@ -122,13 +122,13 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
 	while (i < ft_strlen(tok_str))
 	{	
-		if (tok_str[i] == '"') // If current symbol is a double syntax quote
+		if (tok_str[i] == '"')
 			exp_process_double_quote(tok_str, &i, vec_pair, state);
-		else if (tok_str[i] == '\'') // If current symbol is a single syntax quote
+		else if (tok_str[i] == '\'')
 			exp_process_single_quote(tok_str, &i, vec_pair, state);
-		else if (exp_tilde_found(tok_str, i, eqsign_ind, state)) // If ~ was found
+		else if (exp_tilde_found_assign(tok_str, i, eqsign_ind, state))
 			exp_expand_tilde(msh, vec_pair, state);
-		else if (tok_str[i] == '$' && state != IND_QSINGLE) // If $ was found
+		else if (tok_str[i] == '$' && state != IND_QSINGLE)
 		{
 			// We need to extract the variable name first
 			// Just go to the right of the $ and copy all the characters
@@ -144,22 +144,4 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 		++i;
 	}
 	vector_push_back_char(vec_pair[EXP_RES], '\0');
-}
-
-/* I think overflow here is impossible, because when we create an environment
- * variable we check for its maximum length (See set_rest_env_vars() function)*/
-void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i)
-{
-	size_t	j;
-
-	j = 0;
-	++(*i);
-	while (*i < ft_strlen(tok_str) && is_varname_symbol_permitted(tok_str[*i]))
-	{
-		dlr_varname[j] = tok_str[*i];
-		++(*i);
-		++j;
-	}
-	--(*i);
-	dlr_varname[j] = '\0';
 }

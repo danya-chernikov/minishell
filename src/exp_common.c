@@ -93,3 +93,21 @@ void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_i
 		++j;
 	}
 }
+
+/* I think overflow here is impossible, because when we create an environment
+ * variable we check for its maximum length (See set_rest_env_vars() function)*/
+void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i)
+{
+	size_t	j;
+
+	j = 0;
+	++(*i);
+	while (*i < ft_strlen(tok_str) && is_varname_symbol_permitted(tok_str[*i]))
+	{
+		dlr_varname[j] = tok_str[*i];
+		++(*i);
+		++j;
+	}
+	--(*i);
+	dlr_varname[j] = '\0';
+}

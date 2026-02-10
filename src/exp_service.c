@@ -30,11 +30,21 @@ void	exp_vectors_free(t_vector *vec_pair[])
 
 /* If state == IND_QNONE for index `i` then it's obvious
  * that tok_str[i + 1] will be unquoted or be a quote */
-bool	exp_tilde_found(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state)
+bool	exp_tilde_found_assign(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state)
 {
 	if (tstr[i] == '~' &&
 		i - 1 == eqsign_ind &&
 		state == IND_QNONE &&
+		(tstr[i + 1] == '/' || tstr[i + 1] == '\0'))
+	{
+		return (true);
+	}
+	return (false);
+}
+
+bool	exp_tilde_found_argredir(char *tstr, size_t i, t_ind_type state)
+{
+	if (state == IND_QNONE && i == 0 && tstr[i] == '~' &&
 		(tstr[i + 1] == '/' || tstr[i + 1] == '\0'))
 	{
 		return (true);

@@ -16,10 +16,12 @@ typedef enum e_quote_type
 
 }	t_quote_type;
 
+/* li - left-side index;
+ * ri - right-side index */
 typedef struct s_quote_interval
 {
-	size_t			li;		// Left-side index
-	size_t			ri;		// Right-side index
+	size_t			li;
+	size_t			ri;
 	t_quote_type	type;
 
 }	t_quote_int;
