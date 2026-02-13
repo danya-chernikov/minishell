@@ -21,10 +21,16 @@ typedef enum e_redir_type
 
 }	t_redir_type;
 
+/* In case if the redirection is heredoc
+ * we're gonna store it's data in `hd`.
+ *     tok_ind - the token index of this redirection in
+ *				 tokens array. We need it just in case..
+ *				 For now we do not even initialize it */
 typedef struct s_redir
 {
+	int				tok_ind;
 	t_redir_type	type;
-	int				target_fd; // 0 for < and <<, and 1 for >> and >>
+	int				target_fd; // 0 for < and <<, and 1 for > and >>
 	char			*path;
 	t_heredoc		hd;
 

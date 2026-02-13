@@ -23,7 +23,8 @@ SRCS=main.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c \
-	 wildcards.c wildcards2.c \
+	 wildcards_filesclt.c wildcards_filesclt2.c \
+	 wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
 	 exec.c exec2.c \
 	 builtin.c \
 	 signals.c signals2.c \
@@ -43,7 +44,8 @@ OBJS=main.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o redirect_parser.o redirect.o heredoc.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
-	 wildcards.o wildcards2.o \
+	 wildcards_filesclt.o wildcards_filesclt2.o \
+	 wildcards_sieve.o wildcards_sieve2.o wildcards_common.o \
 	 exec.o exec2.o \
 	 builtin.o \
 	 exp_service.o exp_service2.o \
@@ -73,7 +75,7 @@ fclean : clean
 
 re : fclean all
 
-main.o : main.c shell.h \
+main.o : main.c shell.h engine.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c main.c
@@ -308,15 +310,30 @@ exec_service2.o : exec_service2.c operand.h \
 
 
 # ================================ Wildcards =================================
-wildcards.o : wildcards.c operand.h wildcards.h \
+wildcards_filesclt.o : wildcards_filesclt.c wildcards.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c wildcards.c
+	-c wildcards_filesclt.c
 
-wildcards2.o : wildcards2.c operand.h wildcards.h \
+wildcards_filesclt2.o : wildcards_filesclt2.c wildcards.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c wildcards2.c
+	-c wildcards_filesclt2.c
+
+wildcards_sieve.o : wildcards_sieve.c wildcards.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards_sieve.c
+
+wildcards_sieve2.o : wildcards_sieve2.c wildcards.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards_sieve2.c
+
+wildcards_common.o : wildcards_common.c wildcards.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards_common.c
 
 
 # ================================ Execution =================================

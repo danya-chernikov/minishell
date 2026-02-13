@@ -7,11 +7,15 @@
 #include "vector.h"
 #include "error.h"
 
-int		exp_process_argredir(t_shell *msh, t_op_token *op_tok)
+int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i)
 {
+	int			fret;
 	char		*tok_str;
+	char		**wc_res;
 	t_vector	*vec_pair[2];
-	
+
+	fret = COMMON_SUCCESS;
+
 	tok_str = op_tok->cnt;
 
 	if (!exp_vectors_init(vec_pair, ft_strlen(tok_str) + 1))
@@ -19,39 +23,86 @@ int		exp_process_argredir(t_shell *msh, t_op_token *op_tok)
 
 	exp_expand_argredir_loop(msh, tok_str, vec_pair);
 
-	// Expand wildcards
-	{	
-		size_t		i;
-		bool		f_wc_expand;
-		t_vector	*exp_res;
-		t_vector	*qmask;
-		t_vector	wc_mask;
+	// Now `exp_res` is a wildcard mask. Let's eliminate
+	// all asterisks that go consequtively in the `exp_res`
+	// updating corresponding indecies in `qmask`	
+	wc_collapse_conseq_asterisks(vec_pair[EXP_RES], vec_pair[QMASK]);
 
-		i = 0;
-		f_wc_expand = true;
-		vector_init(&wc_mask, CHAR, 64);
-		exp_res = vec_pair[EXP_RES];
-		qmask = vec_pair[QMASK];
-		while (i < vector_strlen(exp_res))
+	// Then we'll just pass `exp_res` as
+	// wildcard mask into expand_wildcards()
+	if (wc_alloc_res(&wc_res) != COMMON_SUCCESS)
+	{
+		exp_vectors_free(vec_pair);
+		return (COMMON_SYS_ERR);
+	}
+
+	fret = expand_wildcards(wc_res,
+		(char *)vec_pair[EXP_RES]->data, vec_pair[QMASK]);
+	if (fret != COMMON_SUCCESS)
+	{
+		exp_vectors_free(vec_pair);
+		return (fret);
+	}
+
+	// If previous token was a redirection
+	// (it can be any redirection except heredoc)
+	if (exp_token_is_redirect(&op->tokens[*opt_i - 1]))
+	{
+		// It means we were handling a redirection operand/path
+		// If globbing gave us more than one coincidence
+		if (wc_res[1] != NULL)
 		{
-			// Means the entire token is a globbing mask)
-			if (*((char *)vector_at(exp_res, i)) == '*' &&
-				*((t_ind_type *)vector_at(qmask, i)) == IND_QNONE)
+			print_shell_error(NULL, AMBIG_REDIRECT_ERR_MSG);
+			return (COMMON_FAILURE);
+		}
+		// Update the corresponding redirection path (this case
+		// we have the unique wildcards expansion result)
+		if (op->redirs[op_tok->redir_ind].path)
+		{
+			free(op->redirs[op_tok->redir_ind].path);
+			op->redirs[op_tok->redir_ind].path = ft_strdup(wc_res[0]);
+			if (!op->redirs[op_tok->redir_ind].path)
 			{
-				if (i > 0 && *((char *)vector_at(exp_res, i - 1)) == '*')
-				{
-					++i;
-					continue ;
-				}
-				vector_push_back_char(wc_mask, '*');
+				perror("malloc");
+				wc_free_res(&wc_res);
+				exp_vectors_free(vec_pair);
+				return (COMMON_SYS_ERR);
 			}
-			else
+		}
+	}
+	else
+	{
+		// We were handling an argument
+		size_t	i;
+			
+		// Mark that all variables created while parsing
+		// current operand were per-command variables.
+		// It implies we'll not be creating any more
+		// variables while parsing the current operand
+		op->f_per_cmd = true;
+
+		// Add all globbing results into arguments
+		// (if there was no globbing performed
+		// the expans_wildcards() will just put
+		// into wc_res[0] its mask vec_pair[QMASK])
+		i = 0;
+		while (wc_res[i] != NULL)
+		{
+			op->argv[op->argc] = ft_strdup(wc_res[i]);
+			if (!op->argv[op->argc])
+			{
+				perror("malloc");
+				fret = COMMON_SYS_ERR;
+				break ;
+			}
+			++op->argc;
 			++i;
 		}
 	}
 
+	wc_free_res(&wc_res);
 	exp_vectors_free(vec_pair);
-	return (COMMON_SUCCESS);
+	return (fret);
 }
 
 void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])

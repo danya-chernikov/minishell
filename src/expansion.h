@@ -21,7 +21,7 @@ int		exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *v
 void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
 
 /* exp_argredir.c */
-int		exp_process_argredir(t_shell *msh, t_op_token *op_tok);
+int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i);
 void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
 
 /* exec_preparation.c */

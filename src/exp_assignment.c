@@ -93,11 +93,14 @@ int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *va
 	exp_expand_varname_loop(msh, tok_str, vec_pair);
 	// Create a local environment variable and add it into
 	// the array of variables of this operand `vars`
-	if (env_set(op->my_env, var_name,
-		ft_strdup(vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
+	if (!op->f_per_cmd) // We still have not found any arguments
 	{
-		exp_vectors_free(vec_pair);
-		return (COMMON_FAILURE);
+		if (env_set(op->my_env, var_name,
+			ft_strdup(vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
+		{
+			exp_vectors_free(vec_pair);
+			return (COMMON_FAILURE);
+		}
 	}
 	exp_vectors_free(vec_pair);
 	return (COMMON_SUCCESS);

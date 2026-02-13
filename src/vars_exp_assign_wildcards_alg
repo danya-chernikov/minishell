@@ -176,8 +176,10 @@ Now the updated algorithm.
 			3.3.7.2. Update the corresponding redirection's path
 		3.3.8. ELSE (means we were handling an argument)
 			3.3.8.1. Add this processed token into array of arguments `argv`;
-			3.3.8.2. Mark all variables created while parsing current operand as per-command
-					   variables (basically by setting `f_per_cmd`); It implyes we'll not
-					   be creating any more variables while parsing the current operand;
+			3.3.8.2. Mark that all variables created while parsing the current operand
+					 were per-command variables (basically by setting `f_per_cmd`). This
+					 implies we will not be creating any more variables while parsing
+					 the current operand. All further operand-tokens will be considered
+					 as arguments, not as assignments;
 
 4. END of token LOOP;

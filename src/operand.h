@@ -13,6 +13,8 @@
 # define MAX_OP_LEN			1024	// Maximum operand length
 # define MAX_OP_TOKENS_NUM	1024	// Maximum operand tokens number
 # define MAX_OP_TOKEN_LEN	256		// Maximum token length
+# define MAX_ARGC_NUM		1024
+# define MAX_ARGV_LEN		4096
 
 typedef struct s_env	t_env;
 
@@ -27,10 +29,15 @@ typedef enum e_ind_type
 }	t_ind_type;
 
 /* Operand's token.
- *     cnt - token's content;
- */
+ *     cnt			- token's content;
+ *
+ *     redir_ind	- the redirection index of this token
+ *					  in redirections array. We need it so
+ *					  we could update the corresponding
+ *					  redirection */
 typedef struct	s_op_token
 {
+	int			redir_ind;
 	char		*cnt;
 	t_quote_int	quotes[MAX_QUOTES_NUM];
 	size_t		qpair_cnt;
@@ -52,14 +59,14 @@ typedef struct s_operand
 	t_quote_int quotes[MAX_QUOTES_NUM];	// All quotes pairs found in `name`
 	size_t		qpair_cnt;				// Counter of quote pairs
 
-	char		**argv;
+	char		**argv;					// On heap
 	int			argc;
 
 	t_op_token	*tokens;				// Tokens of this operand-program
 	size_t		token_cnt;
 
 	t_env		*my_env;				// Variables we created parsing this operand-program
-	bool		f_per_cmd;				// Per-command flag for our variables	
+	bool		f_per_cmd;				// Per-command flag for our variables
 
 	pid_t		pid;
 

@@ -56,6 +56,8 @@
 # define MAX_ENV_VAL_ERR_MSG	"The variable value is too long"
 # define MAX_OP_TOK_LEN_ERR_MSG	"The operand's token is too long"
 # define MAX_OP_TOK_NUM_ERR_MSG	"Too many operand's tokens"
+# define MAX_WC_FNUM_ERR_MSG	"Too many files in current directory"
+# define MAX_WC_FN_LEN_ERR_MSG	"Filename is too long"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"

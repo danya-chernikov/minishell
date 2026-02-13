@@ -32,7 +32,7 @@ int	exp_divide_op_str_on_tokens(t_operand *op)
 	op_i = 0;
 	while (op_i < opstr_len)
 	{
-		if (op_i > MAX_OP_TOKEN_LEN - 1) // Overflow check
+		if (op_i >= MAX_OP_TOKEN_LEN - 1) // Overflow check
 		{
 			print_shell_error(NULL, MAX_OP_TOK_LEN_ERR_MSG);
 			return (COMMON_FAILURE);

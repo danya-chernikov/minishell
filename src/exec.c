@@ -32,7 +32,8 @@ int	exec_ops(t_shell *msh, int *ret_code)
 		{
 			{
 				int			fret;
-				size_t		opt_i; // Operand's token index
+				size_t		opt_i;	// Operand's token index
+				int			redir_cnt;
 				t_operand	*op;
 				t_op_token	*op_tok;
 
@@ -47,6 +48,7 @@ int	exec_ops(t_shell *msh, int *ret_code)
 					return (fret);
 
 				opt_i = 0;
+				redir_cnt = 0;
 				while (opt_i < op->token_cnt)
 				{
 					op_tok = &op->tokens[opt_i];
@@ -54,11 +56,17 @@ int	exec_ops(t_shell *msh, int *ret_code)
 					// >, >>, <, <<
 					if (exp_token_is_redirect(op_tok))
 					{
+						// Let's count redirections so we could uptate their paths later!
+						op->tokens[opt_i + 1].redir_ind = redir_cnt;
+						op->tokens[opt_i].redir_ind = -1;
+						++redir_cnt;
 						++opt_i; // Just skip this operand token
 						continue ;
 					}
 					else if (exp_token_is_assignment(op, op_tok)) // Assignment
 					{
+						// Means this token does not have a corresponding redirection
+						op->tokens[opt_i].redir_ind = -1; // No redirection
 						fret = exp_process_assignment(msh, op, op_tok, &opt_i);
 						if (fret == CONTINUE)
 							continue ;
@@ -68,9 +76,10 @@ int	exec_ops(t_shell *msh, int *ret_code)
 
 					// If we're here the current operand's token
 					// is a regular argument or a redirection opernad
+					op->tokens[opt_i].redir_ind = -1;
 
-					// If the previous token was << (means current
-					// token is a heredoc delimiter)
+					// If the previous token was << (means
+					// current token is a heredoc delimiter)
 					if (exp_token_is_heredoc(&op->tokens[opt_i - 1]))
 					{
 						// Skip it (cause we've already processed
@@ -79,11 +88,12 @@ int	exec_ops(t_shell *msh, int *ret_code)
 						continue ;
 					}
 
-					fret = exp_process_argredir(msh, op_tok);
+					fret = exp_process_argredir(msh, op, op_tok, &opt_i);
 					if (fret != COMMON_SUCCESS)
 						return (fret);
 
 					++opt_i;
+
 				} // while (opt_i < op->token_cnt)
 			
 			}
