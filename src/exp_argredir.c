@@ -73,7 +73,7 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 	else
 	{
 		// We were handling an argument
-		size_t	i;
+		size_t	arg_i;
 			
 		// Mark that all variables created while parsing
 		// current operand were per-command variables.
@@ -85,10 +85,25 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 		// (if there was no globbing performed
 		// the expans_wildcards() will just put
 		// into wc_res[0] its mask vec_pair[QMASK])
-		i = 0;
-		while (wc_res[i] != NULL)
+	
+		fret = exp_alloc_argv(op);
+		if (fret != COMMON_SUCCESS)
+			return (fret);
+
+		arg_i = 0;
+		while (wc_res[arg_i] != NULL)
 		{
-			op->argv[op->argc] = ft_strdup(wc_res[i]);
+			if (arg_i >= MAX_ARGC_NUM - 1)
+			{
+				print_shell_error(NULL, MAX_ARGC_NUM_ERR_MSG);
+				return (COMMON_FAILURE);
+			}
+			if (ft_strlen(wc_res[arg_i]) >= MAX_ARGV_LEN - 1)
+			{
+				print_shell_error(NULL, MAX_ARGV_LEN_ERR_MSG);
+				return (COMMON_FAILURE);
+			}
+			op->argv[op->argc] = ft_strdup(wc_res[arg_i]);
 			if (!op->argv[op->argc])
 			{
 				perror("malloc");
@@ -96,7 +111,7 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 				break ;
 			}
 			++op->argc;
-			++i;
+			++arg_i;
 		}
 	}
 

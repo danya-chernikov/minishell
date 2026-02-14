@@ -21,5 +21,7 @@ void	dbg_prompt_parser_print_parentheses(t_parser_data *d);
 
 void	dbg_print_redirs(t_parser_data *d);
 void	dbg_print_operand_tokens(t_parser_data *d);
+void	dbg_print_operands_env(t_parser_data *d);
+void	dbg_print_operands_args(t_parser_data *d);
 
 #endif

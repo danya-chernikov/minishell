@@ -3,6 +3,7 @@
 #include "prompt_parser.h"
 #include "operand.h"
 #include "token.h"
+#include "aux_common.h"
 
 #include "libft.h"
 #include "vector.h"

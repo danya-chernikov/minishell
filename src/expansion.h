@@ -2,18 +2,18 @@
 # define EXPANSION_H
 
 /* In order to pass Norminette */
-# define CONTINUE	5
 # define EXP_RES	0
 # define QMASK		1
 
 # include <stddef.h>
 # include <stdbool.h>
 
-typedef struct s_shell		t_shell;
-typedef struct s_operand	t_operand;
-typedef struct s_op_token	t_op_token;
-typedef enum e_ind_type		t_ind_type;
-typedef struct s_vector		t_vector;
+typedef struct s_shell			t_shell;
+typedef struct s_operand		t_operand;
+typedef struct s_op_token		t_op_token;
+typedef enum e_ind_type			t_ind_type;
+typedef struct s_vector			t_vector;
+typedef struct s_parser_data	t_parser_data;
 
 /* exp_assignment.c */
 int		exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i);
@@ -35,18 +35,22 @@ void	exp_expand_tilde(t_shell *msh, t_vector *vec_pair[], t_ind_type state);
 void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_ind_type state);
 void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
 
-/* exec_service.c */
+/* exp_service.c */
 int		exp_vectors_init(t_vector *vec_pair[], size_t cap);
 void	exp_vectors_free(t_vector *vec_pair[]);
 bool	exp_tilde_found_assign(char *tstr, size_t i, size_t eqsign_ind, t_ind_type state);
 bool	exp_tilde_found_argredir(char *tstr, size_t i, t_ind_type state);
 bool	exp_token_is_assignment(t_operand *op, t_op_token *op_tok);
 
-/* exec_service2.c */
+/* exp_service2.c */
 bool	exp_token_is_redirect(t_op_token *op_tok);
 bool	exp_token_is_redir_in(t_op_token *op_tok);
 bool	exp_token_is_redir_out(t_op_token *op_tok);
 bool	exp_token_is_redir_app(t_op_token *op_tok);
 bool	exp_token_is_heredoc(t_op_token *op_tok);
+
+/* exp_service3.c */
+int		exp_alloc_argv(t_operand *op);
+void	exp_free_argv(t_parser_data *d);
 
 #endif

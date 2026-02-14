@@ -3,6 +3,9 @@
 
 # include <stdbool.h>
 
+# define BREAK		5
+# define CONTINUE	6
+
 typedef unsigned char		t_uchar;
 typedef unsigned short		t_ushort;
 typedef unsigned int		t_uint;

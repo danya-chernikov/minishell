@@ -1,5 +1,6 @@
 #include "wildcards.h"
 #include "operand.h"
+#include "aux_common.h"
 
 #include "libft.h"
 #include "vector.h"
@@ -76,12 +77,12 @@ void	wc_check_file_loop(t_wc_data *wcd, bool *f_cancel)
 		if (wcd->mask[wcd->mi] == '*' &&
 			*((t_ind_type *)vector_at(wcd->qmask, wcd->mi)) == IND_QNONE)
 		{
-			if (wc_match_asterisk(wcd) == WC_BREAK)
+			if (wc_match_asterisk(wcd) == BREAK)
 				break ;
 		}
 		else
 		{
-			if (wc_match_regular_symbol(wcd, f_cancel) == WC_BREAK)
+			if (wc_match_regular_symbol(wcd, f_cancel) == BREAK)
 				break ;
 		}
 		++wcd->ci;
@@ -93,14 +94,14 @@ int	wc_match_asterisk(t_wc_data *wcd)
 	if (wcd->mi + 1 == wcd->mask_len)
 	{
 		++wcd->mi;
-		return (WC_BREAK);
+		return (BREAK);
 	}
 	while (wcd->ci < wcd->file_len)
 	{
 		if (wcd->file[wcd->ci] == wcd->mask[wcd->mi + 1])
 		{
 			++wcd->mi;
-			return (WC_BREAK);
+			return (BREAK);
 		}
 		++wcd->ci;
 	}
@@ -113,7 +114,7 @@ int	wc_match_regular_symbol(t_wc_data *wcd, bool *f_cancel)
 	if (wcd->file[wcd->ci] != wcd->mask[wcd->mi])
 	{
 		*f_cancel = true;
-		return (WC_BREAK);
+		return (BREAK);
 	}
 	else
 		++wcd->mi;

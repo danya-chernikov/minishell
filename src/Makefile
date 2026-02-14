@@ -22,8 +22,8 @@ SRCS=main.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
-	 exp_service.c exp_service2.c \
-	 wildcards_filesclt.c wildcards_filesclt2.c \
+	 exp_service.c exp_service2.c exp_service3.c \
+	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
 	 wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
 	 exec.c exec2.c \
 	 builtin.c \
@@ -44,11 +44,11 @@ OBJS=main.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o redirect_parser.o redirect.o heredoc.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
-	 wildcards_filesclt.o wildcards_filesclt2.o \
+	 exp_service.o exp_service2.o exp_service3.o \
+	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
 	 wildcards_sieve.o wildcards_sieve2.o wildcards_common.o \
 	 exec.o exec2.o \
 	 builtin.o \
-	 exp_service.o exp_service2.o \
 	 signals.o signals2.o \
 	 aux_common.o aux_common2.o aux_io.o error.o debug.o test.o
 
@@ -277,7 +277,7 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 # ======================= Variable expantion/assignment ======================
 
 exp_assignment.o : exp_assignment.c expansion.h shell.h prompt_parser.h \
-	operand.h token.h \
+	operand.h token.h aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_assignment.c
@@ -298,18 +298,29 @@ exp_common.o : exp_common.c expansion.h shell.h operand.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_common.c
 
-exec_service.o : exec_service.c exec.h operand.h \
+exp_service.o : exp_service.c expansion.h operand.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c exec_service.c
+	-c exp_service.c
 
-exec_service2.o : exec_service2.c operand.h \
+exp_service2.o : exp_service2.c expansion.h operand.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c exec_service2.c
+	-c exp_service2.c
+
+exp_service3.o : exp_service3.c expansion.h operand.h prompt_parser.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exp_service3.c
 
 
 # ================================ Wildcards =================================
+
+wildcards.o : wildcards.c wildcards.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards.c
+
 wildcards_filesclt.o : wildcards_filesclt.c wildcards.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
@@ -320,7 +331,7 @@ wildcards_filesclt2.o : wildcards_filesclt2.c wildcards.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards_filesclt2.c
 
-wildcards_sieve.o : wildcards_sieve.c wildcards.h operand.h \
+wildcards_sieve.o : wildcards_sieve.c wildcards.h operand.h aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards_sieve.c
@@ -338,6 +349,7 @@ wildcards_common.o : wildcards_common.c wildcards.h operand.h \
 
 # ================================ Execution =================================
 exec.o : exec.c exec.h shell.h prompt_parser.h operand.h token.h expansion.h \
+	aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec.c
@@ -388,7 +400,7 @@ error.o : error.c error.h shell.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c error.c
 
-debug.o : debug.c debug.h \
+debug.o : debug.c debug.h env.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c debug.c

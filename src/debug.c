@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "env.h"
 
 void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
 {
@@ -275,4 +276,42 @@ void	dbg_print_operand_tokens(t_parser_data *d)
 		++op_i;
 	}
 	printf("\n");
+}
+
+void	dbg_print_operands_env(t_parser_data *d)
+{
+	size_t		op_i;
+	t_operand	*op;
+
+	printf("\nOperand's environment:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu. %s\n", op_i, op->name);
+		env_print_all(op->my_env);
+		++op_i;
+	}
+}
+
+void	dbg_print_operands_args(t_parser_data *d)
+{
+	size_t		op_i;
+	int			arg_i;
+	t_operand	*op;
+
+	printf("\nOperand's arguments:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu. %s\n", op_i, op->name);
+		arg_i = 0;
+		while (arg_i < op->argc)
+		{
+			printf("\t%d. %s\n", arg_i, op->argv[arg_i]);
+			++arg_i;
+		}
+		++op_i;
+	}
 }

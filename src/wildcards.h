@@ -4,7 +4,6 @@
 # define WC_MAX_MASK_LEN		4096
 # define WC_MAX_FILES_NUM		8192
 # define WC_MAX_FILENAME_LEN	4096
-# define WC_BREAK				6
 
 # include <stddef.h>
 # include <stdbool.h>
@@ -32,8 +31,10 @@ typedef struct s_wc_data
 
 }	t_wc_data;
 
-/* wildcards_filesclt.c */
+/* wildcards.c */
 int		expand_wildcards(char **res_files, char *mask, t_vector *qmask);
+
+/* wildcards_filesclt.c */
 int		wc_get_curdir_files(char *files[], size_t *file_cnt);
 int		wc_init_dir(DIR **dir, struct dirent **entry, char *cwd);
 int		wc_get_curdir_files_loop(DIR *dir, struct dirent *entry, char *files[], size_t *file_cnt);
@@ -53,9 +54,9 @@ int		wc_match_regular_symbol(t_wc_data *wcd, bool *f_cancel);
 int		wc_check_zero_matches(t_wc_data *wcd, char **res_files, size_t *resf_cnt);
 
 /* wildcards_common.c */
+void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask);
 bool	wc_is_asterisk(char expres_char, char qmask_char);
 void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len);
-void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask);
 int		wc_alloc_res(char ***wc_res);
 void	wc_free_res(char ***wc_res);
 

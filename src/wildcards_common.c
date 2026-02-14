@@ -8,28 +8,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-bool	wc_is_asterisk(char expres_char, char qmask_char)
-{
-	if (expres_char == '*' && qmask_char == (char)IND_QNONE)
-		return (true);
-	return (false);
-}
-
-void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len)
-{
-	char	null;
-
-	null = '\0';
-	if (vector_size(exp_res) == new_len)
-		vector_push_back_char(exp_res, '\0');
-	else
-		vector_si(exp_res, new_len, &null);
-	while (vector_size(exp_res) > new_len + 1)
-		vector_pop_back(exp_res);
-	while (vector_size(qmask) > new_len)
-		vector_pop_back(qmask);
-}
-
 /* Collapse consequtive unquoted asterisks in `exp_res` and update `qmask`.
  * We traverse the original vector-string `exp_res` from left to right
  * using index `i` (read_ind) and at the same time, we write the result
@@ -72,6 +50,28 @@ void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask)
 		++read_ind;
 	}
 	wc_trim_vectors(exp_res, qmask, write_ind);
+}
+
+bool	wc_is_asterisk(char expres_char, char qmask_char)
+{
+	if (expres_char == '*' && qmask_char == (char)IND_QNONE)
+		return (true);
+	return (false);
+}
+
+void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len)
+{
+	char	null;
+
+	null = '\0';
+	if (vector_size(exp_res) == new_len)
+		vector_push_back_char(exp_res, '\0');
+	else
+		vector_si(exp_res, new_len, &null);
+	while (vector_size(exp_res) > new_len + 1)
+		vector_pop_back(exp_res);
+	while (vector_size(qmask) > new_len)
+		vector_pop_back(qmask);
 }
 
 int	wc_alloc_res(char ***wc_res)

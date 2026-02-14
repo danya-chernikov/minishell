@@ -83,6 +83,8 @@ void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_i
 	exp_res = vec_pair[EXP_RES];
 	qmask = vec_pair[QMASK];
 	var = env_get_val(&msh->env, var_name);
+	if (!var)
+		var = ft_strdup("");
 	j = 0;
 	// Expand $ by copying the value of `var` into the new array
 	while (j < ft_strlen(var))

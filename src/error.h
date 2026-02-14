@@ -58,6 +58,8 @@
 # define MAX_OP_TOK_NUM_ERR_MSG	"Too many operand's tokens"
 # define MAX_WC_FNUM_ERR_MSG	"Too many files in current directory"
 # define MAX_WC_FN_LEN_ERR_MSG	"Filename is too long"
+# define MAX_ARGC_NUM_ERR_MSG	"Too many arguments were passed"
+# define MAX_ARGV_LEN_ERR_MSG	"Argument's value is too long"
 
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
@@ -78,6 +80,7 @@ typedef enum e_exit_code
 	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
 	CMD_NOT_LOCATED_ERR = 127,
 	SIGNALED_CODE = 128
+
 }	t_exit_code;
 
 void	print_sys_error(char *msg);

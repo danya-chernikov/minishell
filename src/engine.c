@@ -78,6 +78,9 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 
 #if DEBUG == 1
 		dbg_print_operand_tokens(pdata);
+		dbg_print_redirs(pdata);
+		dbg_print_operands_env(pdata);
+		dbg_print_operands_args(pdata);
 #endif
 
 		// Close all pipes of this prompt
