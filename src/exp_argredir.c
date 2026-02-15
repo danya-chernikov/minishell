@@ -46,7 +46,7 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 
 	// If previous token was a redirection
 	// (it can be any redirection except heredoc)
-	if (exp_token_is_redirect(&op->tokens[*opt_i - 1]))
+	if (*opt_i > 0 && exp_token_is_redirect(&op->tokens[*opt_i - 1]))
 	{
 		// It means we were handling a redirection operand/path
 		// If globbing gave us more than one coincidence
@@ -86,10 +86,6 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 		// the expans_wildcards() will just put
 		// into wc_res[0] its mask vec_pair[QMASK])
 	
-		fret = exp_alloc_argv(op);
-		if (fret != COMMON_SUCCESS)
-			return (fret);
-
 		arg_i = 0;
 		while (wc_res[arg_i] != NULL)
 		{
@@ -133,9 +129,9 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 	while (i < slen)
 	{	
 		if (tok_str[i] == '"')
-			exp_process_double_quote(tok_str, &i, vec_pair, state);
+			exp_process_double_quote(tok_str, &i, vec_pair, &state);
 		else if (tok_str[i] == '\'')
-			exp_process_single_quote(tok_str, &i, vec_pair, state);
+			exp_process_single_quote(tok_str, &i, vec_pair, &state);
 		else if (exp_tilde_found_argredir(tok_str, i, state))
 			exp_expand_tilde(msh, vec_pair, state);
 		else if (tok_str[i] == '$' && state != IND_QSINGLE)

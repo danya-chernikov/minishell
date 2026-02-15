@@ -36,6 +36,10 @@ int	exec_ops(t_shell *msh, int *ret_code)
 		token = &pd->tokens[ti];
 		if (token->type == OPERAND)
 		{
+			fret = exp_alloc_argv(token->op);
+			if (fret != COMMON_SUCCESS)
+				return (fret);
+
 			fret = do_all_expansions_assignments(msh, token);
 			if (fret != COMMON_SUCCESS)
 				return (fret);
@@ -63,7 +67,6 @@ int	do_all_expansions_assignments(t_shell *msh, t_token *token)
 	t_operand	*op;
 
 	op = token->op;
-	fret = COMMON_SUCCESS;
 
 	fret = exp_divide_op_str_on_tokens(op);
 	if (fret != COMMON_SUCCESS)
@@ -79,12 +82,13 @@ int	do_all_expansions_assignments(t_shell *msh, t_token *token)
 	while (opt_i < op->token_cnt)
 	{
 		fret = do_expansions_assignments_2nd_lvl_token(msh, op, &opt_i, &redir_cnt);
-		if (fret != CONTINUE)
+		if (fret == CONTINUE)
 			continue ;
 		else if (fret != COMMON_SUCCESS)
 			return (fret);
 		++opt_i;
 	}
+	fret = COMMON_SUCCESS;
 	return (fret);
 }
 
@@ -123,7 +127,7 @@ int	do_expansions_assignments_2nd_lvl_token(t_shell *msh, t_operand *op, size_t 
 
 	// If the previous token was << (means
 	// current token is a heredoc delimiter)
-	if (exp_token_is_heredoc(&op->tokens[*opt_i - 1]))
+	if (*opt_i > 0 && exp_token_is_heredoc(&op->tokens[*opt_i - 1]))
 	{
 		// Skip it (cause we've already processed
 		// it on the preliminary parsing stage)

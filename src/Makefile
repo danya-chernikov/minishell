@@ -254,7 +254,7 @@ operand.o : operand.c operand.h env.h \
 
 
 # ====================== Engine and redirections parser ======================
-engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h \
+engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h expansion.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c

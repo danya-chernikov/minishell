@@ -121,15 +121,15 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 	char		dlr_varname[MAX_ENV_VAL_LEN];
 	t_ind_type	state;
 
-	i = 0;
 	state = IND_QNONE;
 	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
+	i = eqsign_ind + 1;
 	while (i < ft_strlen(tok_str))
 	{	
 		if (tok_str[i] == '"')
-			exp_process_double_quote(tok_str, &i, vec_pair, state);
+			exp_process_double_quote(tok_str, &i, vec_pair, &state);
 		else if (tok_str[i] == '\'')
-			exp_process_single_quote(tok_str, &i, vec_pair, state);
+			exp_process_single_quote(tok_str, &i, vec_pair, &state);
 		else if (exp_tilde_found_assign(tok_str, i, eqsign_ind, state))
 			exp_expand_tilde(msh, vec_pair, state);
 		else if (tok_str[i] == '$' && state != IND_QSINGLE)

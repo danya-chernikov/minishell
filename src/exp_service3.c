@@ -1,13 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exp_service3.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/15 02:40:17 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/15 02:43:18 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "expansion.h"
 #include "operand.h"
 #include "prompt_parser.h"
+
+#include "libft.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 int		exp_alloc_argv(t_operand *op)
 {
-	op->argv = (char **)malloc(MAX_ARGC_NUM * sizeof (char *));
+	op->argv = (char **)ft_calloc(MAX_ARGC_NUM, sizeof (char *));
 	if (!op->argv)
 	{
 		perror("malloc");
@@ -16,7 +30,28 @@ int		exp_alloc_argv(t_operand *op)
 	return (COMMON_SUCCESS);
 }
 
-void	exp_free_argv(t_parser_data *d)
+/* This function we're actually gonna use
+ * in exec_ops() after launching execve()
+ * when we don't need argv[] of this
+ * operand anymore */
+void	exp_free_argv(t_operand	*op)
+{
+	int	arg_i;
+
+	arg_i = 0;
+	while (arg_i < op->argc)
+	{
+		free(op->argv[arg_i]);
+		op->argv[arg_i] = NULL;
+		++arg_i;
+	}
+	free(op->argv);
+	op->argv = NULL;
+}
+
+/* Frees argv[] of all operands. We need it
+ * only for debugging */
+void	exp_free_all_ops_argv(t_parser_data *d)
 {
 	size_t		op_i;
 	int			arg_i;
@@ -30,8 +65,11 @@ void	exp_free_argv(t_parser_data *d)
 		while (arg_i < op->argc)
 		{
 			free(op->argv[arg_i]);
+			op->argv[arg_i] = NULL;
 			++arg_i;
 		}
+		free(op->argv);
+		op->argv = NULL;
 		++op_i;
 	}
 }

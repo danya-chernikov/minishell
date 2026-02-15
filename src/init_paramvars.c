@@ -65,20 +65,20 @@ static void	prelim_vars_init(t_env *env)
 static void	set_var_names(t_env *env)
 {
 	env->vars[PV_HOME].name		= ft_strdup("~"); // may be changed!
-	env->vars[PV_RETCODE].name	= ft_strdup("$?");// may be changed!
-	env->vars[PV_PID].name		= ft_strdup("$$");
-	env->vars[PV_ARGNUM].name	= ft_strdup("$#");
-	env->vars[PV_ALLARGS].name	= ft_strdup("$*");
-	env->vars[PV_ARGV0].name	= ft_strdup("$0");
-	env->vars[PV_ARGV1].name	= ft_strdup("$1");
-	env->vars[PV_ARGV2].name	= ft_strdup("$2");
-	env->vars[PV_ARGV3].name	= ft_strdup("$3");
-	env->vars[PV_ARGV4].name	= ft_strdup("$4");
-	env->vars[PV_ARGV5].name	= ft_strdup("$5");
-	env->vars[PV_ARGV6].name	= ft_strdup("$6");
-	env->vars[PV_ARGV7].name	= ft_strdup("$7");
-	env->vars[PV_ARGV8].name	= ft_strdup("$8");
-	env->vars[PV_ARGV9].name	= ft_strdup("$9");
+	env->vars[PV_RETCODE].name	= ft_strdup("?");// may be changed!
+	env->vars[PV_PID].name		= ft_strdup("$");
+	env->vars[PV_ARGNUM].name	= ft_strdup("#");
+	env->vars[PV_ALLARGS].name	= ft_strdup("*");
+	env->vars[PV_ARGV0].name	= ft_strdup("0");
+	env->vars[PV_ARGV1].name	= ft_strdup("1");
+	env->vars[PV_ARGV2].name	= ft_strdup("2");
+	env->vars[PV_ARGV3].name	= ft_strdup("3");
+	env->vars[PV_ARGV4].name	= ft_strdup("4");
+	env->vars[PV_ARGV5].name	= ft_strdup("5");
+	env->vars[PV_ARGV6].name	= ft_strdup("6");
+	env->vars[PV_ARGV7].name	= ft_strdup("7");
+	env->vars[PV_ARGV8].name	= ft_strdup("8");
+	env->vars[PV_ARGV9].name	= ft_strdup("9");
 }
 
 static int	check_mem_errors(t_env *env)

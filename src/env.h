@@ -158,7 +158,7 @@ typedef struct s_env
 }	t_env;
 
 /* env.c */
-int			env_init(t_env *env);
+int			env_init(t_env *env, char **inh_env);
 void		env_free(t_env *env);
 
 /* env_setters.c */

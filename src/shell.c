@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 
-static int	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
 
 /* Initializes the `t_shell` structure, which represents our
  * minishell and stores all its settings.
@@ -35,11 +35,11 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
 	int	res;
 
-	if (prelim_struct_init(msh, argc, argv, env) != COMMON_SUCCESS)
+	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
 
 	// Allocate environmental variables
-	if (env_init(&msh->env) == COMMON_SYS_ERR)
+	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 
 	// Init history	
@@ -99,7 +99,7 @@ void	msh_free(t_shell *msh)
 	configs_free(&msh->configs);
 }
 
-static int	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv)
 {
 	// By default, let's think our
 	// shell will be interactive
@@ -112,7 +112,6 @@ static int	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	// Assign arguments of main()
 	msh->argc = argc;
 	msh->argv = argv;
-	msh->env.inh_env = env;
 	// Init shell options
 	msh->opts.f_login = false;
 	msh->opts.f_verbose = false;

@@ -4,6 +4,7 @@
 #include "exec.h"
 #include "quote.h"
 #include "debug.h"
+#include "expansion.h"
 
 #include <linux/limits.h> // For PATH_MAX
 
@@ -83,6 +84,8 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		dbg_print_operands_args(pdata);
 #endif
 
+		exp_free_all_ops_argv(pdata);
+
 		// Close all pipes of this prompt
 		//fres = close_pipes(&pdata);
 
@@ -110,16 +113,19 @@ int	comments_parser(t_parser_data *d)
 	{
 		if (d->prompt[pi] == '#' && !is_inside_quotes(d, pi))
 		{
-			d->prompt[pi] = '\0';
-			break ;
+			// Exception for $# variable-parameter
+			if (pi == 0 || (pi > 0 && d->prompt[pi - 1] != '$'))
+			{
+				d->prompt[pi] = '\0';
+				break ;
+			}
 		}
 		++pi;
 	}
 	return (COMMON_SUCCESS);
 }
 
-/* Upates quote indexes for
- * each operand */
+/* Upates quote indexes for each operand */
 int	operands_quotes_parser(t_parser_data *d)
 {
 	t_operand	*op;

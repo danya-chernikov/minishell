@@ -8,15 +8,26 @@
 /* First we initialize `exp_res` and then `qmask` */
 int	exp_vectors_init(t_vector *vec_pair[], size_t cap)
 {
+	vec_pair[EXP_RES] = NULL;
+	vec_pair[QMASK] = NULL;
+	vec_pair[EXP_RES] = malloc(1 * sizeof *vec_pair[EXP_RES]);
+	vec_pair[QMASK] = malloc(1 * sizeof *vec_pair[QMASK]);
+	if (!vec_pair[EXP_RES] || !vec_pair[QMASK])
+	{
+		perror("malloc");
+		exp_vectors_free(vec_pair);
+		return (COMMON_SYS_ERR);
+	}
 	if (!vector_init(vec_pair[EXP_RES], CHAR, cap))
 	{
 		perror("malloc");
+		exp_vectors_free(vec_pair);
 		return (COMMON_SYS_ERR);
 	}
 	if (!vector_init(vec_pair[QMASK], CHAR, cap))
 	{
 		perror("malloc");
-		vector_free(vec_pair[EXP_RES]);
+		exp_vectors_free(vec_pair);
 		return (COMMON_SYS_ERR);
 	}
 	return (COMMON_SUCCESS);
@@ -24,8 +35,16 @@ int	exp_vectors_init(t_vector *vec_pair[], size_t cap)
 
 void	exp_vectors_free(t_vector *vec_pair[])
 {
-	free(vec_pair[0]);
-	free(vec_pair[1]);
+	if (vec_pair[EXP_RES])
+	{
+		vector_free(vec_pair[EXP_RES]);
+		free(vec_pair[EXP_RES]);
+	}
+	if (vec_pair[QMASK])
+	{
+		vector_free(vec_pair[QMASK]);
+		free(vec_pair[QMASK]);
+	}
 }
 
 /* If state == IND_QNONE for index `i` then it's obvious

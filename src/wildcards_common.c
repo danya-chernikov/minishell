@@ -76,9 +76,9 @@ void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len)
 
 int	wc_alloc_res(char ***wc_res)
 {
-	size_t	i;	
+	long long	i;
 
-	*wc_res = (char **)malloc(WC_MAX_FILES_NUM * sizeof (char *));
+	*wc_res = (char **)ft_calloc(WC_MAX_FILES_NUM, sizeof (char *));
 	if (!(*wc_res))
 	{
 		perror("malloc");
@@ -87,9 +87,12 @@ int	wc_alloc_res(char ***wc_res)
 	i = 0;
 	while (i < WC_MAX_FILES_NUM)
 	{
-		*wc_res[i] = (char *)ft_calloc(WC_MAX_FILENAME_LEN, sizeof (char));
-		if (!(*wc_res[i]))
+		(*wc_res)[i] = (char *)ft_calloc(WC_MAX_FILENAME_LEN, sizeof (char));
+		if (!(*wc_res)[i])
 		{
+			while (i > 0)
+				free((*wc_res)[--i]);
+			free(*wc_res);
 			perror("malloc");
 			return (COMMON_SYS_ERR);
 		}
@@ -105,7 +108,7 @@ void	wc_free_res(char ***wc_res)
 	i = 0;
 	while (i < WC_MAX_FILES_NUM)
 	{
-		free(*wc_res[i]);
+		free((*wc_res)[i]);
 		++i;
 	}
 	free(*wc_res);

@@ -62,7 +62,7 @@ int	op_env_init(t_operand *op)
 	op->my_env = malloc(1 * sizeof *op->my_env);
 	if (!op->my_env)
 		return (COMMON_SYS_ERR);
-	env_init(op->my_env);
+	env_init(op->my_env, NULL);
 	return (COMMON_SUCCESS);
 }
 

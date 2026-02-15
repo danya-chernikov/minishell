@@ -29,8 +29,8 @@ int		exp_divide_op_str_on_tokens(t_operand *op);
 int		exp_update_op_tokens_quote_intervals(t_operand *op);
 
 /* exp_common.c */
-void	exp_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state);
-void	exp_process_single_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type state);
+void	exp_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type *state);
+void	exp_process_single_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type *state);
 void	exp_expand_tilde(t_shell *msh, t_vector *vec_pair[], t_ind_type state);
 void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_ind_type state);
 void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
@@ -51,6 +51,7 @@ bool	exp_token_is_heredoc(t_op_token *op_tok);
 
 /* exp_service3.c */
 int		exp_alloc_argv(t_operand *op);
-void	exp_free_argv(t_parser_data *d);
+void	exp_free_argv(t_operand	*op);
+void	exp_free_all_ops_argv(t_parser_data *d);
 
 #endif

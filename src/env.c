@@ -14,11 +14,16 @@
  * its name. So if the user later creates a
  * new variable with the same name, the value
  * will be assigned to the same index in the
- * variables array. */
-int	env_init(t_env *env)
+ * variables array.
+ *     inh_env - parent's inherited environment.
+ *				 May be passed NULL value if we
+ *				 do not have it */
+int	env_init(t_env *env, char **inh_env)
 {
 	size_t	i;
 
+	env->vars_num = 0;
+	env->inh_env = inh_env;
 	env->vars = malloc(MAX_TOTAL_VARS_NUM * sizeof *env->vars);
 	if (!env->vars)
 	{
