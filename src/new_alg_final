@@ -1,0 +1,128 @@
+EXEC_OPS()
+	Traverse all tokens
+		1. IF i-th token is operand-program
+			1.1. IF the next (i-th + 1) token is &&, || or ')'
+				1.1.1. Expand and assign variables and expand wildcards in the current token
+				1.1.2. Update redirections (after path and variable expansion new redirection-operands may appear)
+				1.1.3. Determine program's name and its arguments
+				1.1.4. IF program does not have any arguments (means it consists entirely of redirections or variable assignments or mixed redirections and assignments)
+					1.1.4.1. Traverse all redirections creating/truncating files (redirections' paths/operands); Or error we return the corresponding code
+					1.1.4.2. Copy all local variables created inside this operand (`my_env` field of `t_operand` structure) into the current session's environment
+				1.1.5. IF program does have arguments
+					1.1.5.1. IF program name argv[0] is a 'regular built-in' (cd, pwd, export, unset, env, exit)
+						1.1.5.2. Execute this built-in in the current process (without fork())
+						1.1.5.2. Traverse all redirections creating/truncating files (redirections' paths/operands); Or error we return the corresponding code
+						(actually we ignore all redirections here for the sake of simplicity, but we create/truncate files when necessary)
+						1.1.5.3. Update $?
+					1.1.5.2. ELSE (program name is not a built-in or the 'special built-in' echo that actually has full-fledged redirections support)
+						1.1.5.2.1. IF program name is 'echo'
+							1.1.5.2.1.1. Just leave program name as it is
+						1.1.5.2.2. ELSE
+							1.1.5.2.2.1. Search for a program with this name in PATH
+							1.1.5.2.2.2. IF program was found
+								1.1.5.2.2.2.1. Update argv[0] with path to program (from PATH)
+							1.1.5.2.2.3. ELSE
+								1.1.5.2.2.3.1. Leave program name as it is
+					1.1.5.3. Do fork()
+						1.1.5.3.1. IN CHILD: Assign all redirections and heredocs
+						1.1.5.3.2. IN CHILD: IF program name is 'echo'
+							1.1.5.3.2.1. Execute echo built-in
+						1.1.5.3.3. IN CHILD: ELSE
+							1.1.5.3.3.1. IN CHILD: Form environment for this program (just copy all variables that have ENV type into new array and add `my_env` to this array)
+							1.1.5.3.3.2. IN CHILD: Do execve() passing to it the new environment array and the arguments
+					1.1.5.4. Wait unil program is finished
+					1.1.5.5. Get this program's returned value and update $?
+					1.1.5.6. IF the program's returned value is SUCCESS
+						1.1.5.6.1. IF the next (i-th + 1) token is && (and returned value is SUCCESS)
+							1.1.5.6.1.1. IF the next (i-th + 2) token after && is operand-program
+								1.1.5.6.1.1.1. Move to this token
+								1.1.5.6.1.1.2. Go to step 1.1.1.
+							1.1.5.6.1.2. IF the next (i-th + 2) token after && is '('
+								1.1.5.6.1.2.1. Launch a subshell
+								1.1.5.6.1.2.2. Close all FDs inherited from parent
+								1.1.5.6.1.2.3. Call EXEC_OPS() in the subshell
+								1.1.5.6.1.2.4. Get returned value of the last command executed in the subshell
+						1.1.5.6.2. IF the next token (i-th + 1) is || (and returned value is SUCCESS)
+							1.1.5.6.2.1. IF the next (i-th + 2) token after || is operand-program
+								1.1.5.6.2.1.1. Skip this (i-th + 1) || and this next (i-th + 2) operand
+							1.1.5.6.2.2. IF the next (i-th + 2) token after || is '('
+								1.1.5.6.2.2.1. Skip all inside this parenthesis block
+								1.1.5.6.2.2.2. Continue		
+						1.1.5.6.3. IF the next token (i-th + 1) is ')'
+							1.1.5.6.3.1. Exit the current subshell
+					1.1.5.7. IF the program's returned value is FAILURE
+						1.1.5.7.1. IF the next (i-th + 1) token is && (and returned value is FAILURE)
+							1.1.5.7.1.1. IF the next (i-th + 2) token after && is operand-program
+								1.1.5.7.1.1.1. Skip this (i-th + 1) && and this next (i-th + 2) operand
+								1.1.5.7.1.1.2. Continue
+							1.1.5.7.1.2. IF the next (i-th + 2) token after && is '('
+								1.1.5.7.1.2.1. Skip all inside this parenthesis block
+								1.1.5.7.1.2.2. Continue
+						1.1.5.7.2. IF the next (i-th + 1) token is || (and returned value is FAILURE)
+							1.1.5.7.2.1. IF the next (i-th + 2) token after || is operand-program
+								1.1.5.7.2.1.1. Move to this token
+								1.1.5.7.2.1.2. Go to step 1.1.1.
+							1.1.5.7.2.2. IF the next (i-th + 2) token after || is '('
+								1.1.5.7.2.2.1. Launch a subshell
+								1.1.5.7.2.2.2. Close all FDs inherited from parent
+								1.1.5.7.2.2.3. Call EXEC_OPS() in the subshell
+								1.1.5.7.2.2.4. Get returned value of the last command executed in the subshell
+						1.1.5.7.3. IF the next token (i-th + 1) is ')'
+							1.1.5.7.3.1. Exit the current subshell
+
+			1.2. IF the next (i-th + 1) token is | (we have to reach the end of this pipeline meanwhile connecting its components together via pipes)
+				1.2.1. Go one token forward
+				1.2.2. LOOP until we reach the end of tokens' array
+					1.2.2.1. IF the current token is |
+						1.2.2.1.1. Create a new pipe using pipe()
+						1.2.2.1.2. Add created pipe in the array of all pipes
+						1.2.2.1.3. IF this is the first pipe in the current pipeline
+							1.2.2.1.3.1. Assign to 'STDIN' (read-end) of the last operand-program found the NONE_PIPE value (-1)
+						1.2.2.1.4. ELSE (not the first pipe)
+							1.2.2.1.4.1. Assign to 'STDIN' (read-end) of the last operand-program found the index of the second to last pipe in pipes array
+						1.2.2.1.5. Assign to 'STDOUT' (write-end) of the last operand-program the index of the last pipe created
+					1.2.2.2. ELSE IF the current token is an operand-program
+						1.2.2.2.1. Mark this operand-program as the last operand-program found
+					1.2.2.3. ELSE IF the current token is a logical operator (this means we reached the end of the current pipeline)
+						1.2.2.3.1. Assign to 'STDOUT' (write-end) of the last operand-program found the NONE_PIPE value (-1)
+						1.2.2.3.2. Remember the index of the last token in the pipeline
+						1.2.2.3.3. Break
+					1.2.2.4. ELSE IF the current token is '(' (in this case it's guaranteed the previous token was a pipe)
+						1.2.2.4.1. Assign to 'STDIN' (read-end) of this opening-parenthesis the index of the last pipe found
+						1.2.2.4.2. Skip this entire parenthesis block and move ourselves onto the first token that goes after ')'
+						1.2.2.4.3. IF there is no token after ')' (it mean the ')' was the last token) OR after ')' goes a logical operator
+							1.2.2.4.3.1. Assign to 'STDOUT' (write-end) of this opening-parentheses the NONE_PIPE value (-1)
+						1.2.2.4.4. ELSE (not the last token; in fact after ')' may go only logical operator or a pipe)
+							1.2.2.4.4.1. Do nothing? (HERE I'M NOT SURE WHAT TO DO)
+					1.2.2.5. Go to the next token
+				1.2.3. END of LOOP until we reach the end of tokens' array
+			
+			# We're on the i-th token (where our pipeline begins). Now we're gonna execute all operand-programs in this pipeline
+			1.3. LOOP until we reach the last token in the current pipeline
+				1.3.1. IF the current token is |
+					1.3.1.1. Skip it
+				1.3.2. IF the current token is '('
+					1.3.2.1. Launch a subshell
+					1.3.2.2. Close all FDs inherited from parent
+					1.3.2.3. Call EXEC_OPS() in the subshell
+					1.3.2.4. Get returned value of the last command executed in the subshell
+				1.3.3. IF the current token is ')'
+					1.3.3.1. Exit the current subshell
+				1.3.4. IF the current token is an operand-program
+					1.3.4.1. Do the same actions as we do in steps 1.1.1 - 1.1.5.5., i.e. expand everything, form arguments, search in PATH, fork() and then execve() and etc.
+				1.3.5. Next token
+			1.4. END of LOOP until we reach the last token in the current pipeline
+			1.5. Wait for all launched operand-programs in the processed pipeline
+			1.6. Get the returned code of the last operand-program executed in the processed pipeline
+
+		2. IF i-th token is a '('
+			2.1. Launch a subshell
+			2.2. Close all FDs inherited from parent
+			2.3. Call EXEC_OPS() in the subshell
+			2.4. Get returned value of the last command executed in the subshell
+
+		3. Next token	
+
+	End of tokens traversal
+
+END of EXEC_OPS()

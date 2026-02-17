@@ -1,0 +1,194 @@
+typedef struct s_range
+{
+    size_t	L;	// First token stage's index
+    size_t	R;	// Last token stage's index
+}	t_range;
+
+t_range stage[MAX_STAGES];
+
+EXEC_OPS() ( first launch: last_status = EXEC_OPS(pd, 0, pd->token_cnt - 1) )
+	Definitions:
+		TERM	- a pipeline (one or more stages separated by |) on CURRENT parentheses depth
+		STAGE	- either OPERAND or a parenthesis block "( ... )" (subshell stage)
+		exit status of TERM = exit status of the LAST stage in its pipeline
+
+	Traverse tokens from left to right (index ti)
+		0. Initialize:
+			0.1. ti = 0
+			0.2. last_status = 0
+			0.3. depth = 0 # for completeness (in practice we jump using pdata->pars[])
+
+		LOOP while i < token_cnt
+			1. Determine the next TERM starting at token ti (TERM boundaries are &&, || or ')' at current depth)
+				1.1. term_start = ti
+				1.2. Scan forward to find term_stop_op (index of the next AND/OR token at current depth)
+					 OR the next CLOSE_PAR at current depth (means we must return from subshell)
+					 OR end of tokens.
+					1.2.1. tj = ti
+					1.2.2. depth = 0
+					1.2.3. LOOP tj < token_cnt
+						1.2.3.1. IF tokens[tj] is OPEN_PAR
+							1.2.3.1.1. Jump tj to its matching CLOSE_PAR using pdata->pars[]
+						1.2.3.2. ELSE IF tokens[tj] is && or || (and we're at current depth)
+							1.2.3.2.1. term_stop_op = tj
+							1.2.3.2.2. break
+						1.2.3.3. ELSE IF tokens[j] is CLOSE_PAR (and we're at current depth of current EXEC_OPS call)
+							1.2.3.3.1. term_stop_op = tj # special stop: end of subshell block
+							1.2.3.3.2. break
+						1.2.3.4. ELSE
+							1.2.3.4.1. ++tj
+					END of LOOP tj < token_cnt
+					1.2.4. IF we reached end of tokens without finding AND/OR/CLOSE_PAR
+						1.2.4.1. term_stop_op = token_cnt # one past last (no operator after term)
+
+				1.3. term_end = term_stop_op - 1 # inclusive index of the last token of TERM
+
+			2. Execute this TERM [term_start ... term_end] as a pipeline (even if it has 1 stage)
+				2.1. Split TERM into STAGES by pipe tokens '|' at current depth
+					2.1.1. stage_cnt = 0
+					2.1.2. tj = term_start
+					2.1.3. LOOP tj <= term_end
+						2.1.3.1. IF tokens[tj] is OPERAND
+							2.1.3.1.1. stage[stage_cnt] = this OPERAND token (stage[stage_cnt].l = ti; stage[stage_cnt].r = ti;)
+							2.1.3.1.2. ++stage_cnt
+							2.1.3.1.3. ++j
+						2.1.3.2. ELSE IF tokens[tj] is OPEN_PAR # subshell stage
+							2.1.3.2.1. close = matching ')' index from pdata->pars[]
+							2.1.3.2.2. stage[stage_cnt] = range [tj ... close] (stage[stage_cnt].l = ti; stage[stage_cnt].r = close;) # a SUBSHELL stage
+							2.1.3.2.3. ++stage_cnt
+							2.1.3.2.4. tj = close + 1
+						2.1.3.3. ELSE IF tokens[tj] is PIPE
+							2.1.3.3.1. ++j # The '|' itself, so just skip it
+						2.1.3.4. ELSE
+							2.1.3.4.1. ++j # (should not happen inside TERM on valid syntax)
+					END of LOOP ti <= term_end
+
+				2.2. Build and connect pipes for this pipeline
+					2.2.1. IF stage_cnt == 1
+						2.2.1.1. There is NO pipe() needed
+					2.2.2. ELSE (stage_cnt > 1)
+						2.2.2.1. Create stage_cnt - 1 pipes with pipe()
+						2.2.2.2. Store them in local array pipes[stage_cnt - 1][2] (pipes[k] connects stages k and k + 1: output k -> input k + 1)
+
+				2.3. Do expansions/assignments and decide whether we can execute in parent (without fork())
+					 # only for single-stage parent-builtin (cd/export/unset/exit that are located NOT in a pipeline and OUTSIDE of any subshell)
+					2.3.1. IF stage_cnt == 1 AND stage[0] is OPERAND AND we are NOT inside a subshell-stage execution
+						2.3.1.0. Prepare operand (compose argv):
+							2.3.1.0.1. exp_alloc_argv(op)
+							2.3.1.0.2. do_all_expansions_assignments(msh, token)
+						2.3.1.1. IF op->argc == 0 (only assignments)
+							2.3.1.1.1. Save STDIN/STDOUT (dup)
+							2.3.1.1.2. Apply redirections of this operand-program in current process (parent)
+								2.3.1.1.2.1. Open files / heredoc pipes in order and dup2() to fd 0 or 1
+								2.3.1.1.2.2. On error -> restore stdio, set last_status, skip execution
+							2.3.1.1.3. Copy operand's `my_env` into session environment
+							2.3.1.1.4. last_status = 0
+							2.3.1.1.5. Restore STDIN/STDOUT, close saved FDs
+							2.3.1.1.6. Update $?
+							2.3.1.1.7. exp_free_argv(op)
+						2.3.1.2. ELSE (op->argc > 0)
+							2.3.1.2.1. IF argv[0] is a parent builtin one of cd/export/unset/exit
+								2.3.1.2.1.1. Save STDIN/STDOUT (dup)
+								2.3.1.2.1.2. Apply redirections of this operand-program in current process (parent)
+									2.3.1.2.2.1. Open files / heredoc pipes in order and dup2() to fd 0 or 1
+									2.3.1.2.2.2. On error -> restore stdio, set last_status, skip execution
+								2.3.1.2.1.2. Execute builtin in parent (without fork())
+								2.3.1.2.1.3. last_status = builtin return code
+								2.3.1.1.1.4. Update $?
+								2.3.1.1.1.5. exp_free_argv(op)
+							2.3.1.2.2. ELSE (not a parent builtin)
+								2.3.1.2.2.1. Execute pipeline via fork() for EACH stage (including builtins and subshell-stages): go to 2.4
+
+				2.4. Execute pipeline via fork() (this branch is used when stage_cnt > 1 OR not-parent-builtin)
+					2.4.1. LOOP k = 0 ... stage_cnt - 1
+						2.4.1.1. Determine stage input/output fds:
+							2.4.1.1.1. IF k == 0        stage_in  = STDIN_FILENO
+							2.4.1.1.2. ELSE             stage_in  = read-end of pipe[k - 1]
+							2.4.1.1.3. IF k == last     stage_out = STDOUT_FILENO
+							2.4.1.1.4. ELSE             stage_out = write-end of pipe[k]
+						2.4.1.2. pid[k] = fork()
+						2.4.1.3. IN CHILD:
+							2.4.1.3.1. Set child signal behavior (SIGINT/SIGQUIT default)
+							2.4.1.3.2. dup2(stage_in, STDIN_FILENO)
+							2.4.1.3.3. dup2(stage_out, STDOUT_FILENO)
+							2.4.1.3.4. Close ALL pipe ends inherited (both read and write ends of all created pipes)
+							2.4.1.3.5. IF current STAGE is OPERAND (tokens[stage[k].l].type == OPERAND)
+								2.4.1.3.5.1. exp_alloc_argv(op) 
+								2.4.1.3.5.2. do_all_expansions_assignments(msh, token)
+								2.4.1.3.5.3. Apply operand redirections and heredocs (after pipeline dup2(), so redirs may override)
+								2.4.1.3.5.4. IF operand argc == 0 (variable assignments-only)
+									2.4.1.3.5.4.1. Apply operand's `my_env` only to this child process
+									2.4.1.3.5.4.2. exit(0)
+								2.4.1.3.5.5. ELSE IF argv[0] is ANY builtin (echo, cd, pwd, export, unset, env, exit)
+									2.4.1.3.5.5.1. Execute builtin in child
+									2.4.1.3.5.5.2. exp_free_argv(op)
+									2.4.1.3.5.5.3. exit(builtin_status)
+								2.4.1.3.5.6. ELSE (external program)
+									2.4.1.3.5.6.1. Form envp for execve (session env + per-command vars from my_env if needed)
+									2.4.1.3.5.6.2. Resolve argv[0] via PATH when required
+									2.4.1.3.5.6.3. execve()
+									2.4.1.3.5.6.5. On execve error -> exit(mapped_error_status)
+										exp_free_argv(op) # not obligatory but preferable
+										if errno == EOENT -> 127
+										else if errno == {EACCESS,EISDIR,ENOEXEC} -> 126
+							2.4.1.3.6. ELSE IF current STAGE is SUBSHELL (a '( ... )' range)
+									   (tokens[stage[k].l].type == OPEN_PAR)
+								2.4.1.3.6.1. Close only those FDs which we've been using for dup2() and which are not standard
+											 # (if stage_in != 0 -> close it; if stage_out != 1 -> close it;)
+								2.4.1.3.6.2. open = stage[k].l
+								2.4.1.3.6.3. close = stage[k].r
+								2.4.1.2.6.4. returned_status = EXEC_OPS(pd, open + 1, close - 1)
+								2.4.1.3.6.5. exit(returned_status)
+						2.4.1.4. IN PARENT:
+							2.4.1.4.1. Continue loop creating next stages
+					END of LOOP k = 0 ... stage_cnt - 1
+
+					2.4.2. After forking all stages:
+						2.4.2.1. Close ALL pipe ends in parent (both read and write ends)
+						2.4.2.2. Wait for all pids in this pipeline
+						2.4.2.3. last_status = exit status of the LAST stage process (k == stage_cnt - 1)
+						2.4.2.4. Update $? with last_status
+
+			3. After TERM execution, process the operator that follows it (&& / || / ')'/ end)
+				3.1. IF term_stop_op == token_cnt
+					3.1.1. Break traversal (no operator after last TERM)
+				3.2. IF tokens[term_stop_op] is CLOSE_PAR
+					3.2.1. Return last_status to caller (end of current subshell block)
+				3.3. IF tokens[term_stop_op] is AND or OR
+					3.3.1. op = tokens[term_stop_op] # && or ||
+					3.3.2. next_term_start = term_stop_op + 1
+
+					3.3.3. SHORT-CIRCUIT loop (may skip one or many TERMS without executing them)
+						3.3.3.1. IF op == AND and last_status != 0
+							3.3.3.1.1. Skip the next TERM completely (including its whole pipeline and nested parentheses)
+							3.3.3.1.2. Find the operator after the skipped TERM (next AND/OR or CLOSE_PAR or end)
+							3.3.3.1.3. IF end -> i = token_cnt ; Break traversal
+							3.3.3.1.4. IF CLOSE_PAR -> Return last_status
+							3.3.3.1.5. ELSE -> op = that operator; next_term_start = operator_index + 1
+							3.3.3.1.6. Repeat SHORT-CIRCUIT loop with the same last_status
+						3.3.3.2. IF op == OR and last_status == 0
+							3.3.3.2.1. Skip the next TERM completely (including its whole pipeline and nested parentheses)
+							3.3.3.2.2. Find the operator after the skipped TERM (next AND/OR or CLOSE_PAR or end)
+							3.3.3.2.3. IF end -> i = token_cnt ; Break traversal
+							3.3.3.2.4. IF CLOSE_PAR -> Return last_status
+							3.3.3.2.5. ELSE -> op = that operator; next_term_start = operator_index + 1
+							3.3.3.2.6. Repeat SHORT-CIRCUIT loop with the same last_status
+						3.3.3.3. ELSE (we SHOULD execute the next TERM)
+							3.3.3.3.1. i = next_term_start
+							3.3.3.3.2. Continue main traversal loop (go to step 1)
+
+			4. (Helper: How to SKIP a TERM starting at some index S)
+				4.1. S points to either OPERAND or OPEN_PAR
+				4.2. Scan forward similarly to step 1.2:
+					4.2.1. while S < token_cnt:
+						4.2.1.1. if token[S] is OPEN_PAR -> jump to matching ')'
+						4.2.1.2. else if token[S] is AND/OR at current depth -> stop, return this operator index
+						4.2.1.3. else if token[S] is CLOSE_PAR at current depth -> stop, return this index
+						4.2.1.4. else -> ++S
+				4.3. if end reached -> return token_cnt
+
+		END LOOP
+
+	Return last_status
+
+END of EXEC_OPS()
