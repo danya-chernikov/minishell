@@ -6,6 +6,7 @@
 
 /* MAX_SUBSHS_NUM - Maximum number of subshells */
 # define MAX_SUBSHS_NUM	64
+# define MAX_DEPTH		64
 
 typedef struct s_shell		t_shell;
 typedef struct s_token		t_token;

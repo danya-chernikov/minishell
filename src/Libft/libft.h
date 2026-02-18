@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/23 16:21:42 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/18 01:05:09 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <stddef.h>
 # include <sys/types.h>
 # include <dirent.h>
+# include <stdbool.h>
 
 /* ==================== get_next_line() DEFINITIONS  ==================== */
 # ifndef GNL_BUFFER_SIZE
@@ -179,5 +180,6 @@ void	ft_list_remove_if(t_list **beg_list, void *data_ref, int (*cmp)());
 
 /* Math */
 size_t	ft_abs(long long num);
+bool	ft_isnum(const char *s);
 
 #endif

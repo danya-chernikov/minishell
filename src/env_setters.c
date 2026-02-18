@@ -1,6 +1,7 @@
 #include "env.h"
 #include "error.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 /* Service functions for env_set() */
@@ -13,19 +14,28 @@ static void	create_new_var(t_env *env, char *name, char *val, t_var_type type);
  * heap-allocated. If the variable named `name` has the read-only
  * flag set, the function returns an error. If env_set() fails to
  * create a new variable or assign a new value to exiting variable,
- * it frees both `name` and `value` */
+ * it frees both `name` and `value`. We return COMMON_SYS_ERR
+ * when !name or !value because doing so helps us save code in case
+ * if ft_strdup() fails (in the majority of cases caller passes
+ * `name` and `value` as return value from ft_strdup) */
 int	env_set(t_env *env, char *name, char *value, t_var_type type)
 {
 	t_env_var	*var;
-
+	
+	if (!name || !value)
+	{
+		free(name);
+		name = NULL;
+		free(value);
+		value = NULL;
+		return (COMMON_SYS_ERR);
+	}
 	var = env_get_ptr(env, name);
-	// Variables already exists
 	if (var)
 	{
 		if (!set_existing_var(var, name, value))
 			return (COMMON_FAILURE);
 	}
-	// A variable with this name has not been created yet
 	else
 	{
 		if (!check_bounds(env, name, value))
@@ -53,11 +63,14 @@ int	env_unset(t_env *env, char *name)
 		{
 			if (var->value)
 				free(var->value);
-			var->value = NULL;	
+			var->value = NULL;
+			if (var->name)
+				free(var->name);
+			var->name = NULL;
 		}
 		else
 			return (COMMON_FAILURE);
-	} // Otherwise the variable did not exist
+	}
 	else
 		return (COMMON_FAILURE);
 	return (COMMON_SUCCESS);

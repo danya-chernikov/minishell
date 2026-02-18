@@ -38,8 +38,10 @@
 # define NO_SUCH_FD_ERR_MSG		"No such file or directory"
 # define DOM_TOO_LONG_ERR_MSG	"(Sub)domain is too long"
 # define PROMPT_TOO_LONG		"Prompt is too long"
+# define EXIT_NUM_ARG_REQ		"numeric argument required"
+# define EXIT_TOO_MANY_ARGS		"too many arguments"
 
-/* Redirection error */
+/* Redirection errors */
 # define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
 # define TOO_MANY_REDIRECTS		"too many redirections"
 # define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
@@ -50,7 +52,7 @@
 /* Warnings */
 # define HEREDOC_EOF_WARN_MSG	"here-document was delimited by end-of-file"
 
-/* Overflow control */
+/* Overflow control errors */
 # define MAX_ENV_NUM_ERR_MSG	"Too many environment variables were created"
 # define MAX_ENV_NAME_ERR_MSG	"The variable name is too long"
 # define MAX_ENV_VAL_ERR_MSG	"The variable value is too long"
@@ -61,10 +63,14 @@
 # define MAX_ARGC_NUM_ERR_MSG	"Too many arguments were passed"
 # define MAX_ARGV_LEN_ERR_MSG	"Argument's value is too long"
 
+/* Our system calls implementations errors */
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
 # define GETUID_ERR_MSG			"Could not get my UID/EUID"
 # define GETPWUID_ERR_MSG		"Could not get info about the user who is running me"
+
+/* Errors that should not occur in practice, but are still handled */
+# define OP_ARGV_IS_NULL		"Operand's argv is NULL"
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was

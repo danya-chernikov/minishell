@@ -26,9 +26,11 @@ SRCS=main.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
 	 wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
 	 exec.c exec2.c \
-	 builtin.c \
+	 builtin.c builtin_echo.c builtin_cd.c builtin_exit.c \
+	 builtin_export.c builtin_others.c \
 	 signals.c signals2.c \
-	 aux_common.c aux_common2.c aux_io.c error.c debug.c test.c
+	 aux_common.c aux_common2.c aux_common3.c \
+	 aux_io.c error.c debug.c test.c
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o \
@@ -48,9 +50,11 @@ OBJS=main.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
 	 wildcards_sieve.o wildcards_sieve2.o wildcards_common.o \
 	 exec.o exec2.o \
-	 builtin.o \
+	 builtin.o builtin_echo.o builtin_cd.o builtin_exit.o \
+	 builtin_export.o builtin_others.o \
 	 signals.o signals2.o \
-	 aux_common.o aux_common2.o aux_io.o error.o debug.o test.o
+	 aux_common.o aux_common2.o aux_common3.o \
+	 aux_io.o error.o debug.o test.o
 
 all : libft libvector $(NAME)
 
@@ -361,10 +365,35 @@ exec2.o : exec2.c exec.h shell.h operand.h prompt_parser.h \
 
 
 # ================================ Built-ins =================================
-builtin.o : builtin.c builtin.h \
+builtin.o : builtin.c builtin.h aux_common.h operand.h shell.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin.c
+
+builtin_echo.o : builtin_echo.c builtin.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin_echo.c
+
+builtin_cd.o : builtin_cd.c builtin.h shell.h operand.h env.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin_cd.c
+
+builtin_exit.o : builtin_exit.c builtin.h shell.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin_exit.c
+
+builtin_export.o : builtin_export.c builtin.h shell.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin_export.c
+
+builtin_others.o : builtin_others.c builtin.h shell.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c builtin_others.c
 
 
 # ================================= Signals ==================================
@@ -389,6 +418,11 @@ aux_common2.o : aux_common2.c aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_common2.c
+
+aux_common3.o : aux_common3.c aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_common3.c
 
 aux_io.o : aux_io.c aux_io.h \
 	libft.h vector.h error.h debug.h
