@@ -71,6 +71,7 @@
 
 /* Errors that should not occur in practice, but are still handled */
 # define OP_ARGV_IS_NULL		"Operand's argv is NULL"
+# define USER_NOT_FOUND			"Could not determine username"
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was

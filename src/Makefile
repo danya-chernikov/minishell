@@ -103,7 +103,7 @@ shell_launcher.o : shell_launcher.c shell.h engine.h signals.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_launcher.c
 
-aux_shell.o : aux_shell.c shell.h \
+aux_shell.o : aux_shell.c shell.h aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell.c

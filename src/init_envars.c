@@ -59,7 +59,7 @@ static void	prelim_vars_init(t_env *env)
 	}
 }
 
-// Check for malloc() errors
+/* Check for malloc() errors */
 static int	check_mem_errors(t_env *env)
 {
 	t_senvar	vi;

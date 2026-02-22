@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-// HOSTTYPE		
+/* HOSTTYPE */
 int	set_local_hosttype(t_env *env)
 {
 	env->vars[SL_HOSTTYPE].name = ft_strdup("HOSTTYPE");
@@ -15,11 +15,14 @@ int	set_local_hosttype(t_env *env)
 	return (COMMON_SUCCESS);
 }
 
-// Let's consider get_next_line() error as system error
+/* Let's consider get_next_line()
+ * error as system error.
+ * fd		- '/etc/hostname' file descriptor;
+ * gnlerr	-  get_next_line() error */
 char	*get_hostname(void)
 {
-	int		fd;			// Host file descriptor
-	int		gnlerr;		// get_next_line() error
+	int		fd;
+	int		gnlerr;
 	char	*hostname;
 
 	fd = open(HOSTNAME_PATH, O_RDONLY);
@@ -33,7 +36,7 @@ char	*get_hostname(void)
 	if (!hostname && gnlerr)
 	{	
 		print_shell_error("get_next_line()", GNL_ERR_MSG);
-		gnl_finish(fd); // Obligatory!
+		gnl_finish(fd);
 		return (NULL);
 	}
 	if (close(fd) == -1)
@@ -45,7 +48,7 @@ char	*get_hostname(void)
 	return (hostname);
 }
 
-// HOSTNAME	
+/* HOSTNAME	*/
 int	set_local_hostname(t_env *env)
 {
 	char	*hostname;
@@ -58,7 +61,7 @@ int	set_local_hostname(t_env *env)
 	return (COMMON_SUCCESS);
 }
 
-// OSTYPE
+/* OSTYPE */
 int	set_local_ostype(t_env *env)
 {
 	env->vars[SL_OSTYPE].name = ft_strdup("OSTYPE");
@@ -66,7 +69,7 @@ int	set_local_ostype(t_env *env)
 	return (COMMON_SUCCESS);
 }
 
-// HOSTMACH
+/* HOSTMACH */
 int	set_local_hostmach(t_env *env)
 {
 	char	*machtype;
