@@ -1,10 +1,10 @@
 #include "exec.h"
 #include "shell.h"
-#include "prompt_parser.h"
-#include "operand.h"
 #include "token.h"
+#include "operand.h"
 #include "expansion.h"
 #include "aux_common.h"
+#include "prompt_parser.h"
 
 #include "libft.h"
 #include "vector.h"
@@ -12,43 +12,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-/* Goes from left to right over the
- * tokens array and executes all token
- * operands, taking boolean logic operators
- * into account and launching subshells
- * when necessary.
- *     ti - token index */
-int	exec_ops(t_shell *msh, int *ret_code)
-{
-	int				fret;
-	size_t			ti;
-	t_parser_data	*pd;
-	t_token			*token;
-	
-	(void)ret_code;
-	ti = 0;
-	pd = msh->pd;
-	fret = COMMON_SUCCESS;
-	// Go through all token-operands
-	while (ti < pd->token_cnt)
-	{
-		token = &pd->tokens[ti];
-		if (token->type == OPERAND)
-		{
-			fret = exp_alloc_argv(token->op);
-			if (fret != COMMON_SUCCESS)
-				return (fret);
-
-			fret = do_all_expansions_assignments(msh, token);
-			if (fret != COMMON_SUCCESS)
-				return (fret);
-
-		}	
-		++ti;
-	}
-	return (fret);
-}
 
 /* Performs expansions and assignments for all second-level
  * tokens of this operand token. First, it divides the

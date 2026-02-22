@@ -178,6 +178,12 @@ void		env_print_locals(t_env *env);
 /* env_service.c */
 bool		env_exist(t_env *env, char *name);
 int			env_export(t_env *env, char *name);
+size_t		env_count_exported_vars(t_env *env);
+size_t		env_count_all_vars(t_env *env);
+
+/* env_exec.c */
+int			env_apply_as_local(t_env *dst, t_env *src);
+int			env_apply_as_env(t_env *dst, t_env *src);
 
 /* Each variable's number here corresponds to its index in the `vars`
  * array of the `s_shell` structure. In our minishell, we have the

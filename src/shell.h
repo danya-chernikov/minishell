@@ -74,14 +74,15 @@ int		msh_init(t_shell *msh, int argc, char **argv, char **env);
 void	msh_free(t_shell *msh);
 
 /* shell_launcher.c */
-int		msh_launch(t_shell *msh);
-int		launch_script(t_shell *msh);
-int		launch_cmd(t_shell *msh);
-int		launch_stdin_cmd(t_shell *msh);
-int		launch_int_session(t_shell *msh);
+int		msh_launch(t_shell *msh, int *ret_code);
+int		launch_script(t_shell *msh, int *ret_code);
+int		launch_cmd(t_shell *msh, int *ret_code);
+int		launch_stdin_cmd(t_shell *msh, int *ret_code);
+int		launch_int_session(t_shell *msh, int *ret_code);
 
 /* aux_shell.c */
 int		gen_prompt_inv(t_shell *msh);
+void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */
 int		msh_load_configs(t_shell *msh);

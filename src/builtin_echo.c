@@ -13,7 +13,7 @@ int	builtin_echo(t_operand *op)
 
 	newline = true;
 	arg_i = 1;
-	while (arg_i < op->argc && is_n_flag(op->argv[1]))
+	while (arg_i < op->argc && is_n_flag(op->argv[arg_i]))
 	{
 		newline = false;
 		++arg_i;

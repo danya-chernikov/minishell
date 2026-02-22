@@ -47,19 +47,14 @@ static int	builtin_export_alg(t_shell *msh, char *var_name, char *var_value)
 		if (fret != COMMON_SUCCESS)
 			return (fret);
 	}
-	else
+	if (env_exist(&msh->env, var_name))
 	{
-		if (env_exist(&msh->env, var_name))
-			env_export(&msh->env, var_name);
-		else
-		{
-			fret = env_set(&msh->env, var_name, ft_strdup(""), ENV);
-			if (fret != COMMON_SUCCESS)
-				return (fret);
-		}
+		env_export(&msh->env, var_name);
 		free(var_name);
+		return (COMMON_SUCCESS);
 	}
-	return (COMMON_SUCCESS);
+	fret = env_set(&msh->env, var_name, ft_strdup(""), ENV);
+	return (fret);
 }
 
 /* Parses things like 'export VAR=VALUE' */

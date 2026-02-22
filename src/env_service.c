@@ -38,3 +38,43 @@ int	env_export(t_env *env, char *name)
 		return (COMMON_FAILURE);
 	return (COMMON_SUCCESS);
 }
+
+size_t	env_count_exported_vars(t_env *env)
+{
+	size_t	vi;
+	size_t	exp_cnt;
+
+	if (!env)
+		return (0);
+	vi = 0;
+	exp_cnt = 0;
+	while (vi < env->vars_num)
+	{
+		if (env->vars[vi].name && env->vars[vi].type == ENV)
+			++exp_cnt;
+		++vi;
+	}
+	return (exp_cnt);
+}
+
+size_t	env_count_all_vars(t_env *env)
+{
+	size_t	vi;
+	size_t	var_cnt;
+
+	if (!env)
+		return (0);
+	vi = 0;
+	var_cnt = 0;
+	while (vi < env->vars_num)
+	{
+		if (env->vars[vi].name &&
+			env->vars[vi].value &&
+			env->vars[vi].type != PARAM)
+		{
+			++var_cnt;
+		}
+		++vi;
+	}
+	return (var_cnt);
+}

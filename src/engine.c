@@ -25,7 +25,7 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 	try = 0;
 	fres = COMMON_SUCCESS;
 	pdata = msh->pd;
-	ft_bzero(pdata, sizeof(pdata)); // We don't need it anymore..
+	ft_bzero(pdata, sizeof(t_parser_data)); // We don't need it anymore..
 	while (try < 1)
 	{
 		if (!prompt || ft_strlen(prompt) == 0)
@@ -71,23 +71,15 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 
 #if DEBUG == 1
 		dbg_print_redirs(pdata);
-#endif
-
-		fres = exec_ops(msh, ret_code);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
-#if DEBUG == 1
 		dbg_print_operand_tokens(pdata);
 		dbg_print_redirs(pdata);
 		dbg_print_operands_env(pdata);
 		dbg_print_operands_args(pdata);
 #endif
 
-		exp_free_all_ops_argv(pdata);
-
-		// Close all pipes of this prompt
-		//fres = close_pipes(&pdata);
+		fres = exec_ops(msh, ret_code);
+		if (fres != COMMON_SUCCESS)
+			break ;
 
 		++try;
 	} // End try block

@@ -34,7 +34,7 @@ int	wc_sift_files_by_mask(t_wc_data *wcd, char **res_files, char *files[], size_
 	fret = wc_check_zero_matches(wcd, res_files, &resf_cnt);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
-	res_files[resf_cnt] = NULL;
+	res_files[resf_cnt][0] = '\0';
 	return (fret);
 }
 
@@ -52,12 +52,13 @@ int	wc_check_file(t_wc_data	*wcd, char **res_files, size_t *resf_cnt)
 		f_cancel = true;
 	if (!f_cancel)
 	{
-		res_files[*resf_cnt] = ft_strdup(wcd->file);
-		if (!res_files[*resf_cnt])
+		//res_files[*resf_cnt] = ft_strdup(wcd->file);
+		ft_strlcpy(res_files[*resf_cnt], wcd->file, WC_MAX_FILENAME_LEN);
+		/*if (!res_files[*resf_cnt])
 		{
 			perror("malloc");
 			return (COMMON_SYS_ERR);
-		}
+		}*/
 		++(*resf_cnt);
 	}
 	return (COMMON_SUCCESS);

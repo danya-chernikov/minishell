@@ -4,7 +4,7 @@ LIBFT_PATH=Libft/
 LIBVECTOR_NAME=vector
 LIBVECTOR_PATH=vector/
 NAME=minishell
-DEBUG_LVL=1
+DEBUG_LVL=0
 
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
@@ -15,6 +15,7 @@ SRCS=main.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
 	 env.c env_setters.c env_getters.c env_printers.c env_service.c \
+	 env_exec.c \
 	 history.c shell_history.c \
 	 config.c shell_configs.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
@@ -25,7 +26,10 @@ SRCS=main.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
 	 wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
-	 exec.c exec2.c \
+	 exec_expassign.c exec_ops.c exec_ops2.c \
+	 exec_pipeline.c exec_pipeline2.c exec_pipeline3.c \
+	 exec_execve.c exec_execve2.c exec_execve3.c \
+	 exec_execve4.c exec_execve5.c exec_execve6.c \
 	 builtin.c builtin_echo.c builtin_cd.c builtin_exit.c \
 	 builtin_export.c builtin_others.c \
 	 signals.c signals2.c \
@@ -39,6 +43,7 @@ OBJS=main.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
 	 env.o env_setters.o env_getters.o env_printers.o env_service.o \
+	 env_exec.o \
 	 history.o shell_history.o \
 	 config.o shell_configs.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
@@ -49,7 +54,10 @@ OBJS=main.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
 	 wildcards_sieve.o wildcards_sieve2.o wildcards_common.o \
-	 exec.o exec2.o \
+	 exec_expassign.o exec_ops.o exec_ops2.o \
+	 exec_pipeline.o exec_pipeline2.o exec_pipeline3.o \
+	 exec_execve.o exec_execve2.o exec_execve3.o \
+	 exec_execve4.o exec_execve5.o exec_execve6.o \
 	 builtin.o builtin_echo.o builtin_cd.o builtin_exit.o \
 	 builtin_export.o builtin_others.o \
 	 signals.o signals2.o \
@@ -85,12 +93,12 @@ main.o : main.c shell.h engine.h \
 	-c main.c
 
 # ============================== Shell launcher  =============================
-shell.o : shell.c shell.h cmdargs_parser.h prompt_parser.h \
+shell.o : shell.c shell.h cmdargs_parser.h prompt_parser.h expansion.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell.c
 
-shell_launcher.o : shell_launcher.c shell.h engine.h \
+shell_launcher.o : shell_launcher.c shell.h engine.h signals.h \
 	libft.h error.h vector.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_launcher.c
@@ -184,6 +192,11 @@ env_service.o : env_service.c env.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c env_service.c
+
+env_exec.o : env_exec.c env.h shell.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c env_exec.c
 
 
 # ================================ History ===================================
@@ -352,16 +365,71 @@ wildcards_common.o : wildcards_common.c wildcards.h operand.h \
 
 
 # ================================ Execution =================================
-exec.o : exec.c exec.h shell.h prompt_parser.h operand.h token.h expansion.h \
-	aux_common.h \
-	libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c exec.c
 
-exec2.o : exec2.c exec.h shell.h operand.h prompt_parser.h \
+exec_expassign.o : exec_expassign.c exec.h shell.h token.h operand.h \
+	expansion.h aux_common.h prompt_parser.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c exec2.c
+	-c exec_expassign.c
+
+exec_ops.o : exec_ops.c exec.h shell.h redirect.h prompt_parser.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_ops.c
+
+exec_ops2.o : exec_ops2.c exec.h prompt_parser.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_ops2.c
+
+exec_pipeline.o : exec_pipeline.c exec.h shell.h builtin.h signals.h \
+	expansion.h aux_common.h prompt_parser.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_pipeline.c
+
+exec_pipeline2.o : exec_pipeline2.c exec.h shell.h operand.h builtin.h \
+	prompt_parser.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_pipeline2.c
+
+exec_pipeline3.o : exec_pipeline3.c exec.h operand.h aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_pipeline3.c
+
+exec_execve.o : exec_execve.c exec.h env.h token.h operand.h builtin.h \
+	expansion.h aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve.c
+
+exec_execve2.o : exec_execve2.c exec.h token.h shell.h operand.h builtin.h \
+	expansion.h aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve2.c
+
+exec_execve3.o : exec_execve3.c exec.h shell.h builtin.h aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve3.c
+
+exec_execve4.o : exec_execve4.c exec.h aux_io.h operand.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve4.c
+
+exec_execve5.o : exec_execve5.c exec.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve5.c
+
+exec_execve6.o : exec_execve6.c exec.h builtin.h aux_common.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve6.c
 
 
 # ================================ Built-ins =================================

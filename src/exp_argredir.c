@@ -50,7 +50,7 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 	{
 		// It means we were handling a redirection operand/path
 		// If globbing gave us more than one coincidence
-		if (wc_res[1] != NULL)
+		if (wc_res[1][0] != '\0')
 		{
 			print_shell_error(NULL, AMBIG_REDIRECT_ERR_MSG);
 			return (COMMON_FAILURE);
@@ -87,7 +87,7 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 		// into wc_res[0] its mask vec_pair[QMASK])
 	
 		arg_i = 0;
-		while (wc_res[arg_i] != NULL)
+		while (arg_i < WC_MAX_FILES_NUM && wc_res[arg_i][0] != '\0')
 		{
 			if (arg_i >= MAX_ARGC_NUM - 1)
 			{

@@ -53,5 +53,6 @@ bool	exp_token_is_heredoc(t_op_token *op_tok);
 int		exp_alloc_argv(t_operand *op);
 void	exp_free_argv(t_operand	*op);
 void	exp_free_all_ops_argv(t_parser_data *d);
+void	exp_free_op_tokens(t_operand *op);
 
 #endif

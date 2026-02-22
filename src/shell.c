@@ -1,7 +1,10 @@
 #include "shell.h"
 #include "cmdargs_parser.h"
 #include "prompt_parser.h"
+#include "expansion.h"
+
 #include "debug.h"
+#include "error.h"
 #include "libft.h"
 
 #include <stdlib.h>
@@ -33,7 +36,7 @@ static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
  * bash will handle pipes and redirections! */
 int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
-	int	res;
+	int	fres;
 
 	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
@@ -54,11 +57,9 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	// of our shell. At this stage, we can
 	// determine the shell's mode and set
 	// some parameter variables
-	res = cmdargs_parser(msh);
-	if (res == COMMON_FAILURE)
-		return (COMMON_FAILURE);
-	else if (res != COMMON_SUCCESS) // The code we should transfer to the caller
-		return (res);
+	fres = cmdargs_parser(msh);
+	if (fres != COMMON_SUCCESS) // The code we should transfer to the caller
+		return (fres);
 
 	if (!isatty(STDIN_FILENO)) // If shell is not connected to any terminal
 	{
@@ -69,9 +70,9 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	/* Set local and environment variables */
 	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	res = msh_set_env_vars(&msh->env);
-	if (res != COMMON_SUCCESS)
-		return (res);
+	fres = msh_set_env_vars(&msh->env);
+	if (fres != COMMON_SUCCESS)
+		return (fres);
 
 #if DEBUG == 1
 	printf("Local variables:\n");
@@ -91,7 +92,10 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 void	msh_free(t_shell *msh)
 {
 	if (msh->pd)
+	{
+		//exp_free_all_ops_argv(msh->pd);
 		free(msh->pd);
+	}
 	if (msh->prompt_inv)
 		free(msh->prompt_inv);
 	env_free(&msh->env);

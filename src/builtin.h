@@ -42,6 +42,8 @@
 # define RET_CMD_FAILURE	1
 
 # define BUILTIN_NOT_FOUND	1
+# define BUILTIN_IN_PARENT	1
+# define BUILTIN_IN_CHILD	0
 
 typedef struct s_shell		t_shell;
 typedef struct s_operand	t_operand;

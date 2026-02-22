@@ -24,7 +24,7 @@ int	run_builtin(t_shell *msh, t_operand *op, bool f_in_parent)
 	if (!prog)
 	{
 		print_shell_error(NULL, OP_ARGV_IS_NULL);
-		return (COMMON_FAILURE);
+		return (RET_CMD_FAILURE);
 	}
 	fret = run_builtin_first_part(msh, op, prog);
 	if (fret == CONTINUE)

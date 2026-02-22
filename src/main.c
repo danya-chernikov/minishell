@@ -9,22 +9,18 @@ int	main(int argc, char **argv, char **env)
 {
 	t_shell	msh;
 	int		fret;
-	int		shret;
+	int		ret_code;
 
-	shret = EXIT_SUCCESS;
-
+	ret_code = EXIT_SUCCESS;
 	fret = msh_init(&msh, argc, argv, env);
-	if (fret == COMMON_SYS_ERR) // -1
-		shret = SYS_ERR; // 1
-	else
-		shret = fret;
-
-	fret = msh_launch(&msh);
-	if (fret == COMMON_SYS_ERR) // -1
-		shret = SYS_ERR; // 1
-	else
-		shret = fret;
-
+	if (fret != COMMON_SUCCESS)
+	{
+		ret_code = EXIT_FAILURE;
+		return (ret_code);
+	}
+	fret = msh_launch(&msh, &ret_code);
+	if (fret != COMMON_SUCCESS)
+		ret_code = EXIT_FAILURE;
 	msh_free(&msh);
-	return (shret);
+	return (ret_code);
 }

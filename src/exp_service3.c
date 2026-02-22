@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 02:40:17 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/15 02:43:18 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/22 03:43:43 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,19 +38,24 @@ void	exp_free_argv(t_operand	*op)
 {
 	int	arg_i;
 
-	arg_i = 0;
-	while (arg_i < op->argc)
+	if (!op)
+		return ;
+	if (op->argv)
 	{
-		free(op->argv[arg_i]);
-		op->argv[arg_i] = NULL;
-		++arg_i;
+		arg_i = 0;
+		while (arg_i < op->argc)
+		{
+			free(op->argv[arg_i]);
+			op->argv[arg_i] = NULL;
+			++arg_i;
+		}
+		free(op->argv);
+		op->argv = NULL;
 	}
-	free(op->argv);
-	op->argv = NULL;
+	op->argc = 0;
 }
 
-/* Frees argv[] of all operands. We need it
- * only for debugging */
+/* Frees argv[] of all operands */
 void	exp_free_all_ops_argv(t_parser_data *d)
 {
 	size_t		op_i;
@@ -61,15 +66,37 @@ void	exp_free_all_ops_argv(t_parser_data *d)
 	while (op_i < d->op_cnt)
 	{
 		op = &d->ops[op_i];
-		arg_i = 0;
-		while (arg_i < op->argc)
+		if (op->argv)
 		{
-			free(op->argv[arg_i]);
-			op->argv[arg_i] = NULL;
-			++arg_i;
+			arg_i = 0;
+			while (arg_i < op->argc)
+			{
+				free(op->argv[arg_i]);
+				op->argv[arg_i] = NULL;
+				++arg_i;
+			}
+			free(op->argv);
+			op->argv = NULL;
 		}
-		free(op->argv);
-		op->argv = NULL;
+		op->argc = 0;
 		++op_i;
 	}
+}
+
+void	exp_free_op_tokens(t_operand *op)
+{
+	size_t	i;
+
+	if (!op)
+		return ;
+	i = 0;
+	while (i < op->token_cnt)
+	{
+		free(op->tokens[i].cnt);
+		op->tokens[i].cnt = NULL;
+		op->tokens[i].qpair_cnt = 0;
+		op->tokens[i].redir_ind = -1;
+		++i;
+	}
+	op->token_cnt = 0;
 }

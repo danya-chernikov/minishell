@@ -44,6 +44,8 @@ void	env_free(t_env *env)
 {
 	size_t	i;
 
+	if (!env)
+		return ;
 	i = 0;
 	while (i < MAX_TOTAL_VARS_NUM)
 	{
@@ -60,5 +62,10 @@ void	env_free(t_env *env)
 		++i;
 	}
 	if (env->vars)
+	{
 		free(env->vars);
+		env->vars = NULL;
+	}
+	env->vars_num = 0;
+	env->inh_env = NULL;
 }
