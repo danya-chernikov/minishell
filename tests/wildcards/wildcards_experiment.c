@@ -8,8 +8,6 @@
 #include <dirent.h>
 #include <sys/types.h>
 
-/* Rewrite it using vector! */
- 
 # define MAX_FILE_NUM	128
 # define FLEN			30
  

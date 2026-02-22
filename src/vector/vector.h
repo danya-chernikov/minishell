@@ -1,19 +1,22 @@
 #ifndef VECTOR_H
 # define VECTOR_H
 
-/* Basic slow and UNSAFE vector implementation
+/* Basic slow and UNSAFE vector implementation.
  * When we call vector_init() and pass it a capacity, it creates
  * a vector with that capacity. When adding new elements, if the
  * vector is about to overflow, it increases its current capacity
  * by DEFAULT_VEC_ENLARGER or by the value specified in the optional
- * third argument, enlarger, when overloading vector_init() */
+ * third argument, enlarger, when overloading vector_init().
+ *
+ * DO NOT USE IT WITH RAW VOID!!! It's now finished yet
+ * (and it's unlikely ot be of any use to us) */
 
 # include <stdio.h>
 # include <stdlib.h>
 # include <stddef.h>
 # include <stdbool.h>
 
-# define DEFAULT_VEC_ENLARGER	128
+# define DEFAULT_VEC_ENLARGER	16
 
 typedef unsigned char       t_uchar;
 typedef unsigned short      t_ushort;
@@ -112,6 +115,7 @@ void	vector_msi(t_vector *v, size_t ri, size_t ci);
 
 /* vector_stack.c */
 int		vector_push_back(t_vector *v, void *val);
+int		vector_push_back_char(t_vector *v, char c);
 void	*vector_pop_back(t_vector *v);
 
 /* vector_settings.c

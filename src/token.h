@@ -3,8 +3,7 @@
 
 # include <stddef.h>
 
-# include "operand.h"
-# include "aux_prompt_parser.h"
+# include "aux_common.h"
 
 # define TOKEN_PIPE			"|"
 # define TOKEN_OPEN_PAR		"("
@@ -12,11 +11,13 @@
 # define TOKEN_AND			"&&"
 # define TOKEN_OR			"||"
 
-# define MAX_TOKEN_LEN		512 // Maximum length of each token
-# define MAX_TOKENS_NUM		256 // Maximum number of tokens
+# define MAX_TOKEN_LEN		2048 // Maximum length of each token
+# define MAX_TOKENS_NUM		8192 // Maximum number of tokens
 
 typedef struct s_parser_data	t_parser_data;
+typedef struct s_operand		t_operand;
 
+/* Add T_ prefixes */
 typedef enum e_token_type
 {
     OPERAND,
@@ -26,6 +27,7 @@ typedef enum e_token_type
 	AND,
 	OR,
 	NONE // No tokens were found yet
+	
 }   t_token_type;
 
 /* If this token's type is OPERAND we store
@@ -33,16 +35,16 @@ typedef enum e_token_type
  *
  *     start_pi - Index of the first character
  *				  in the prompt string with
- *				  which this operand starts
- * */
+ *				  which this operand starts */
 typedef struct s_token
 {
 	t_token_type	type;
 	t_operand		*op;
 	size_t			start_pi;
+
 }	t_token;
 
-void	init_tokens(t_parser_data *d);
+void	tokens_init(t_parser_data *d);
 t_ll	get_token_by_prompt_ind(t_parser_data *d, size_t prompt_ind);
 
 #endif

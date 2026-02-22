@@ -1,7 +1,7 @@
 #include "token.h"
 #include "prompt_parser.h"
 
-void	init_tokens(t_parser_data *d)
+void	tokens_init(t_parser_data *d)
 {
 	size_t	i;
 
@@ -21,8 +21,7 @@ void	init_tokens(t_parser_data *d)
  * with such an index in `d->tokens`, returns -1
  *
  *     ti			- token index
- *     prompt_ind	- index of token in prompt
- * */
+ *     prompt_ind	- index of token in prompt */
 t_ll	get_token_by_prompt_ind(t_parser_data *d, size_t prompt_ind)
 {
 	t_ll	ti;

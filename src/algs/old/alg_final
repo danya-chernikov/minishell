@@ -1,0 +1,119 @@
+PREPARE_HEREDOCS()
+	We already have it implemented in code :D
+
+EXEC_OPS()
+    Traverse all tokens
+	    1. Take i-th token
+		2. IF this i-th token is operand-program
+		3. Let's see the next token after i-th
+		    3.1. IF the next token (i-th + 1) is && or ||
+			    3.1.1. Expand and assign variables
+				3.1.2. Update quotes
+			    3.1.3. Expand wildcards
+				3.1.4. Update quotes
+				3.1.5. Update redirections (after path and variables expansion new redirection-operands may appear)
+				3.1.6. Determine program's name and its arguments
+				3.1.7. IF program's name contains /
+				    3.1.7.1. Launch execve withtout changing program's name
+				3.1.8. ELSE (does not contain /)
+				    3.1.8.1. IF program is built-in
+					    3.1.8.1.1. Run built-in
+						3.1.8.1.2. Go to 3.1.11
+					3.1.8.2. ELSE (not built-in)
+					    3.1.8.2.2. Search in PATH
+				3.1.8.  Do fork() for this operand-program
+				3.1.9.  Assign redirections and heredocs (open all files and bound their FDs with program STDIN/STDOUT using dup())
+				3.1.10. Do execve() for this program passing to it parsed arguments and environment
+				3.1.11. Wait until program will be finished
+				3.1.12. Get this program's returned value
+				3.1.13. IF the program's returned value is SUCCESS
+
+				    3.1.13.1. IF the next token is && (and returned value is SUCCESS)
+						3.1.13.1.1. IF the next token after && (i-th + 2) is operand
+						    3.1.13.1.1.1. Move to this token
+						    3.1.13.1.1.2. Go to step 3.1.1
+					    3.1.13.1.2. IF the next token after && (i-th + 2) is '('
+						    3.1.13.1.2.1. Launch a subshell
+							3.1.13.1.2.2. Call EXEC_OPS() in the subshell
+
+					3.1.13.2. IF the next token is || (and returned value is SUCCESS)
+						3.1.13.2.1. IF the next token after || (i-th + 2) is operand
+						    3.1.13.2.1.1. Skip this || and this next (i-th + 2) operand
+						    3.1.13.2.1.2. Continue
+					    3.1.13.2.2. IF the next token after || (i-th + 2) is '('
+						    3.1.13.2.2.1. Skip all inside this parentheses block
+							3.1.13.2.2.2. Continue
+
+				3.1.14. IF the program's returned value is FAILURE
+		
+				    3.1.14.1. IF the next token is && (and returned value is FAILURE)
+						3.1.14.1.1. IF the next token after && (i-th + 2) is operand
+						    3.1.14.2.1.1. Skip this && and this next (i-th + 2) operand
+						    3.1.14.2.1.2. Continue
+					    3.1.14.1.2. IF the next token after && (i-th + 2) is '('
+						    3.1.14.2.2.1. Skip all inside this parentheses block
+							3.1.14.2.2.2. Continue
+
+					3.1.14.2. IF the next token is || (and returned value is FAILURE) 
+						3.1.14.2.1. IF the next token after || (i-th + 2) is operand
+						    3.1.14.1.1.1. Move to this token
+						    3.1.14.1.1.2. Go to step 3.1.1
+					    3.1.14.2.2. IF the next token after || (i-th + 2) is '('
+						    3.1.14.1.2.1. Launch a subshell
+							3.1.14.1.2.2. Call EXEC_OPS() in the subshell
+
+		    3.2. IF the next token (i-th + 1) is | (we have to reach the end of this pipeline meanwhile connecting its componenets together via pipes)
+			    3.2.1. Go one token forward
+			    3.2.2. LOOP until we reach the end of tokens' array
+
+					3.2.2.1. IF the current token is |
+						3.2.2.1.1. Create a new pipe using pipe()
+						3.2.2.1.2. Add created pipe in the array of all pipes
+						3.2.2.1.3. IF this is the first pipe in the current pipeline
+							3.2.2.1.3.1. Assign to 'STDIN' (read-end) of the last operand-program found the NONE_PIPE value (-1)
+						3.2.2.1.4. ELSE (not the first pipe)
+							3.2.2.1.4.1. Assign 'STDIN' (read-end) of the last operand-program found the index of the second to last pipe in pipes array
+						3.2.2.1.5. Assign 'STDOUT' (write-end) of the last operand-program the index of the last created pipe
+
+					3.2.2.2. IF the current token is an operand-program
+						3.2.2.2.1. Mark this operand-program as the last operand-program found
+
+					3.2.2.3. IF the current token is a logical operator (this means we reached the end of the current pipeline)
+						3.2.2.3.1. Assign 'STDOUT' (write-end) of the last operand-program found the NONE_PIPE value (-1)
+						3.2.2.3.2. Remember the index of the last token in the pipeline
+						3.2.2.3.3. Break
+
+					3.2.2.4. IF the current token is '(' (in this case it's guaranteed the previous token was a pipe)
+						3.2.2.4.1. Assign 'STDIN' (read-end) of this opening-parenthesis the index of the last pipe found
+						3.2.2.4.2. Skip this entire parentheses block and move ourselves onto the first token that goes after ')'
+						3.2.2.4.3. IF there is no any token after ')' (it means the ')' was the last token)
+						    3.2.2.4.3.1. Assign 'STDOUT' (write-end) of this opening-parenthesis the NONE_PIPE value (-1)
+						3.2.2.4.4. ELSE (not the last token; in fact after ')' may go only logical operator or a pipe)
+						    3.2.2.4.4.1. Go to the next token
+
+						3.2.2.4.3. Assign 'STDOUT' (write-end) of this opening-parenthesis the 
+
+					3.2.2.5. Go to the next token
+
+				3.2.3. END of LOOP until we reach the end of tokens' array
+
+				# We're at the i-th token (with which our pipelines begins). Now we're gonna execute all operand-programs in this pipeline
+				3.2.4. Extract the index of the last token in the pipeline
+				3.2.5. LOOP until we reach the extracted token index
+					3.2.5.1. IF the current token is |
+					    3.2.5.1.1. Skip it
+					3.2.5.2. IF the current token is '('
+					    3.2.5.2.1. Launch the subshell and call EXEC_OPS() into it
+					3.2.5.3. IF the current token is operand-program
+						3.2.5.3.1. Expand wildcards
+						3.2.5.3.2. Expand and assign variables
+						3.2.5.3.3. Determine program name and its arguments
+						3.2.5.3.4. Parse redirections and heredocs
+						3.2.5.3.5. Do fork() for this operand-program
+						3.2.5.3.6. Assign redirections and heredocs (open all files and bound their FDs with program STDIN/STDOUT using dup())
+						3.2.5.3.7. Do execve() for this program passing to it parsed arguments and environment
+					3.2.5.4. Next operand
+				3.2.6. END of LOOP until we reach the extracted token index (we launched all operand-programs in the processed pipeline)
+				3.2.6. Wait for all launched operand-programs in the processed pipeline
+				3.2.7. Get the returned code of the last operand-program executed in the processed pipeline
+				

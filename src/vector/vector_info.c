@@ -2,7 +2,7 @@
 
 bool	vector_empty(const t_vector *v)
 {
-	return (v->size);
+	return (v->size == 0);
 }
 
 size_t	vector_size(const t_vector *v)
@@ -10,14 +10,18 @@ size_t	vector_size(const t_vector *v)
 	return (v->size);
 }
 
+/* If '\0' wasn't found it will return
+ * the vector size */
 size_t	vector_strlen(const t_vector *v)
 {
 	size_t	len;
 	t_uchar	*data;
 
+	if (!v || !v->data)
+		return (0);
 	len = 0;
 	data = (t_uchar *)v->data;
-	while (data[len] != '\0')
+	while (len < v->size && data[len] != '\0')
 		++len;
 	return (len);
 }

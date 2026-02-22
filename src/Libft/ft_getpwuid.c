@@ -11,6 +11,7 @@
 #include <errno.h>
 
 static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid);
+static void	passwd_attempt_clearner(char ***ptokens, char *line, int fd);
 static int	home_attempt(t_passwd *pwd, uid_t uid);
 static int	home_loop_body(t_passwd *pwd, struct dirent *entry,
 	struct stat *st, uid_t uid);
@@ -61,6 +62,7 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 	char	**ptokens;
 	int		err;
 	
+	err = 0;
 	line = get_next_line(fd, &err);
 	while (line)
 	{
@@ -71,23 +73,32 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 		{
 			if (!fill_pwd_struct(pwd, ptokens, uid))
 			{
-				gnl_finish(fd);
+				passwd_attempt_clearner(&ptokens, line, fd);
 				return (-1);
 			}
+			passwd_attempt_clearner(&ptokens, line, fd);
 			return (1);
 		}
-		split_free(&ptokens);
 		free(line);
+		split_free(&ptokens);
 		line = get_next_line(fd, &err);
 	}
 	if (!line && err)
 	{
 		write(STDERR_FILENO, GNL_ERR_MSG, ft_strlen(GNL_ERR_MSG));
 		gnl_finish(fd); // I guess we need it also her
+		split_free(&ptokens);
 		return (-1);
 	}
 	gnl_finish(fd); // And here
 	return (0);
+}
+
+static void	passwd_attempt_clearner(char ***ptokens, char *line, int fd)
+{
+	free(line);
+	gnl_finish(fd);
+	split_free(ptokens);
 }
 
 /* Returns -1 on a malloc() error, 0 if no match is

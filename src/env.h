@@ -17,8 +17,8 @@
  * this later */
 # define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # define DEF_PS1			"\\s-\\v\\$"
-# define DEF_PS2			">"
-# define DEF_PS4			"+"
+# define DEF_PS2			"> "
+# define DEF_PS4			"+ "
 # define DEF_LANGUAGE		"en"
 # define DEF_LANG			"en_US.UTF-8"
 # define UNKNOWN_VALUE		"?"
@@ -153,21 +153,37 @@ typedef struct s_env
 {	
 	size_t		vars_num;
 	char		**inh_env;
-	t_env_var	*vars;// on heap
+	t_env_var	*vars;		// on heap
 
 }	t_env;
 
-int			env_init(t_env *env);
-char		*env_get_val(t_env *env, char *name);
-t_env_var	*env_get_ptr(t_env *env, char *name);
-bool		env_exist(t_env *env, char *name);
+/* env.c */
+int			env_init(t_env *env, char **inh_env);
+void		env_free(t_env *env);
+
+/* env_setters.c */
 int			env_set(t_env *env, char *name, char *value, t_var_type type);
 int			env_unset(t_env *env, char *name);
-int			env_export(t_env *env, char *name);
+
+/* env_getters.c */
+char		*env_get_val(t_env *env, char *name);
+t_env_var	*env_get_ptr(t_env *env, char *name);
+
+/* env_printers.c */
 void		env_print_value(t_env *env, char *name);
 void		env_print_env(t_env *env);
 void		env_print_all(t_env *env);
 void		env_print_locals(t_env *env);
+
+/* env_service.c */
+bool		env_exist(t_env *env, char *name);
+int			env_export(t_env *env, char *name);
+size_t		env_count_exported_vars(t_env *env);
+size_t		env_count_all_vars(t_env *env);
+
+/* env_exec.c */
+int			env_apply_as_local(t_env *dst, t_env *src);
+int			env_apply_as_env(t_env *dst, t_env *src);
 
 /* Each variable's number here corresponds to its index in the `vars`
  * array of the `s_shell` structure. In our minishell, we have the

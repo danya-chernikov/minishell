@@ -1,11 +1,13 @@
 #include "debug.h"
+#include "env.h"
 
 void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
 {
 	int	i;
 
+	printf("\nConfiguration files:\n");
 	i = 0;
-	if (ctype == LOGIN_CONF)	
+	if (ctype == LOGIN_CONF)
 	{
 		while (i < LOGIN_CONFIGS_NUM)
 		{
@@ -21,6 +23,7 @@ void	dbg_print_configs(t_configs *cnf, t_conf_type ctype)
 			++i;
 		}
 	}
+	printf("\n");
 }
 
 void	dbg_print_filehistory(t_history *history)
@@ -34,23 +37,30 @@ void	dbg_print_filehistory(t_history *history)
 		printf("%s\n", history->lines[i].cmd);
 		++i;
 	}
+	printf("\n");
 }
 
-void	print_all(t_parser_data *d)
+void	dbg_prompt_parser_print_all(t_parser_data *d)
 {
-	print_parsed_data(d);
-	print_tokens(d);
-	print_parentheses(d);
-	print_quotes(d);
+	dbg_prompt_parser_print_parsed_data(d);
+	dbg_prompt_parser_print_tokens(d);
+	dbg_prompt_parser_print_parentheses(d);
+	dbg_prompt_parser_print_quotes(d);
 }
 
-void	print_quotes(t_parser_data *d)
+void	dbg_prompt_parser_print_quotes(t_parser_data *d)
 {
 	size_t	i;
 	char	quote;
 
 	i = 0;
 	printf("\nQuote intervals:\n");
+	if (d->qpair_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
+
 	while (i < d->qpair_cnt)
 	{
 		if (d->quotes[i].type == DOUBLE_QUOTE)
@@ -64,15 +74,21 @@ void	print_quotes(t_parser_data *d)
 			d->quotes[i].ri);
 		++i;
 	}
+	printf("\n");
 }
 
-void	print_parsed_data(t_parser_data *d)
+void	dbg_prompt_parser_print_parsed_data(t_parser_data *d)
 {
 	size_t	i;
 
 	// Let's output the pipes we found
 	i = 0; 
 	printf("\nPipes:\n");
+	if (d->pipe_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->pipe_cnt)
 	{
 		printf("%lu: [%d] [%d]\n", i + 1,
@@ -84,6 +100,11 @@ void	print_parsed_data(t_parser_data *d)
 	// Let's output the operands we found
 	i = 0; 
 	printf("\nOperands:\n");
+	if (d->op_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->op_cnt)
 	{
 		printf("%lu: [%s] [%d] [%d]\n", i + 1,
@@ -93,7 +114,7 @@ void	print_parsed_data(t_parser_data *d)
 	printf("\n");
 }
 
-void	print_tokens(t_parser_data *d)
+void	dbg_prompt_parser_print_tokens(t_parser_data *d)
 {
 	char	format[MAX_FORMAT_STR_LEN];
 	size_t	i;
@@ -101,6 +122,11 @@ void	print_tokens(t_parser_data *d)
 	strncpy(format, "%d\t%s\t%lu\n", MAX_FORMAT_STR_LEN);
 	i = 0;
 	printf("\nTokens:\n");
+	if (d->token_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
 	while (i < d->token_cnt)
 	{
 		if (d->tokens[i].type == OPERAND)
@@ -120,16 +146,14 @@ void	print_tokens(t_parser_data *d)
 	printf("\n");
 }
 
-void	print_parentheses(t_parser_data *d)
+void	dbg_prompt_parser_print_parentheses(t_parser_data *d)
 {	
 	size_t	i;
 
 	i = 0;
 	printf("\nParentheses:\n");
 	if (d->par_cnt == 0)
-	{
 		printf("----------\n\n");
-	}
 	else
 	{
 		printf("#\t(\t)\n");
@@ -139,5 +163,155 @@ void	print_parentheses(t_parser_data *d)
 			++i;
 		}
 		printf("\n");
+	}
+}
+
+void	dbg_print_redirs(t_parser_data *d)
+{
+	t_redir	*r;
+	size_t	op_i;
+	size_t	ri;
+
+	printf("\nRedirections:\n");
+	op_i = 0;
+	if (d->op_cnt == 0)
+	{
+		printf("----------\n\n");
+		return ;
+	}
+	while (op_i < d->op_cnt)
+	{
+		printf("%zu. %s\n", op_i, d->ops[op_i].name);
+
+		if (d->ops[op_i].red_cnt == 0)
+		{
+			printf("----------\n");
+		}
+		else
+		{
+			ri = 0;
+			while (ri < d->ops[op_i].red_cnt)
+			{
+				r = &d->ops[op_i].redirs[ri];
+
+				printf("\t%zu\n", ri);
+
+				if (r->type == REDIR_IN)
+					printf("\tREDIR_IN\n");
+				else if (r->type == REDIR_OUT)
+					printf("\tREDIR_OUT\n");
+				else if (r->type == REDIR_APP)
+					printf("\tREDIR_APP\n");
+				else if (r->type == REDIR_HEREDOC)
+					printf("\tREDIR_HEREDOC\n");
+
+				printf("\tTarget FD: %d\n", r->target_fd);
+
+				if (r->type == REDIR_HEREDOC)
+				{
+					if (r->hd.content)
+						printf("\tContent: %s\n", r->hd.content);
+					if (r->hd.delim)
+						printf("\tDelimiter: %s\n", r->hd.delim);
+					if (r->hd.f_expand_body)
+						printf("\tExpand body?: YES\n");
+					else	
+						printf("\tExpand body?: NO\n");
+				}
+				else
+				{
+					printf("\tOperand-path: %s\n", r->path);
+				}
+
+				++ri;
+			}
+		}
+		++op_i;
+	}
+	printf("\n");
+}
+
+void	dbg_print_operand_tokens(t_parser_data *d)
+{
+	size_t		ti;
+	size_t		op_i;
+	size_t		qi;
+	char		quote;
+	t_operand	*op;
+	t_op_token	*token;
+
+	printf("\nOperand's tokens:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu: %s\n", op_i, op->name);
+		if (op->token_cnt == 0)
+		{
+			printf("----------\n\n");
+			return ;
+		}
+		ti = 0;
+		while (ti < op->token_cnt)
+		{
+			token = &op->tokens[ti];
+			printf("\t%zu. %s\n", ti, token->cnt);
+			qi = 0;
+			while (qi < token->qpair_cnt)
+			{
+				if (token->quotes[qi].type == DOUBLE_QUOTE)
+					quote = '"';
+				else
+					quote = '\'';
+				printf("\t\t%zu\t%c\t%zu\t%zu\n",
+					qi,
+					quote,
+					token->quotes[qi].li,
+					token->quotes[qi].ri);
+				++qi;
+			}
+			++ti;
+		}
+		printf("\n");
+		++op_i;
+	}
+	printf("\n");
+}
+
+void	dbg_print_operands_env(t_parser_data *d)
+{
+	size_t		op_i;
+	t_operand	*op;
+
+	printf("\nOperand's environment:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu. %s\n", op_i, op->name);
+		env_print_all(op->my_env);
+		++op_i;
+	}
+}
+
+void	dbg_print_operands_args(t_parser_data *d)
+{
+	size_t		op_i;
+	int			arg_i;
+	t_operand	*op;
+
+	printf("\nOperand's arguments:\n");
+	op_i = 0;
+	while (op_i < d->op_cnt)
+	{
+		op = &d->ops[op_i];
+		printf("%zu. %s\n", op_i, op->name);
+		arg_i = 0;
+		while (arg_i < op->argc)
+		{
+			printf("\t%d. %s\n", arg_i, op->argv[arg_i]);
+			++arg_i;
+		}
+		++op_i;
 	}
 }

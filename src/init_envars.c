@@ -53,6 +53,8 @@ static void	prelim_vars_init(t_env *env)
 		env->vars[vi].type = ENV;
 		env->vars[vi].f_readonly = false;
 		env->vars[vi].f_inherit = true;
+		env->vars[vi].name = NULL;
+		env->vars[vi].value = NULL;
 		++vi;
 	}
 }

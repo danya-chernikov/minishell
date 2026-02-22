@@ -1,22 +1,28 @@
 #include "quote.h"
-# include "prompt_parser.h"
+#include "prompt_parser.h"
 
-bool quotes_parser(t_parser_data *d)
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Quotes parser for prompt.
+ * ADD OVERFLOW CHECK! */
+bool quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
 {
-	bool	f_noerr;
+	int		fret;
 	bool	f_dquote;	// Double quote found flag
 	bool	f_squote;	// Single quote found flag
-	size_t	prompt_len;
-	size_t	pi;			// Prompt index
+	size_t	slen;
+	size_t	i;
 
-	pi = 0;
-	f_noerr = true;
+	i = 0;
 	f_dquote = false;
 	f_squote = false;
-	prompt_len = ft_strlen(d->prompt);
-	while (pi < prompt_len)
+	*qpair_cnt = 0;
+	fret = COMMON_SUCCESS;
+	slen = ft_strlen(str);
+	while (i < slen)
 	{
-		if (d->prompt[pi] == '"') // If we encounter with a double quote
+		if (str[i] == '"') // If we encounter with a double quote
 		{
 			// If it's the first double quote found
 			if (f_dquote == false)
@@ -27,21 +33,21 @@ bool quotes_parser(t_parser_data *d)
 				}
 				else
 				{
-					d->quotes[d->qpair_cnt].li = pi;
-					d->quotes[d->qpair_cnt].type = DOUBLE_QUOTE;
+					quotes[*qpair_cnt].li = i;
+					quotes[*qpair_cnt].type = DOUBLE_QUOTE;
 					f_dquote = true;
 				}
 			}
 			else // We have already found earlier a qouble quote
 			{
 				// Let's close this interval and add it into the quote intervals array
-				d->quotes[d->qpair_cnt].ri = pi;
-				++d->qpair_cnt;
+				quotes[*qpair_cnt].ri = i;
+				++(*qpair_cnt);
 				f_dquote = false;
 				// Go further by prompt
 			}
 		}
-		else if (d->prompt[pi] == '\'') // If we encounter with a single quote
+		else if (str[i] == '\'') // If we encounter with a single quote
 		{
 			// If it's the first single quote found
 			if (f_squote == false)
@@ -52,26 +58,154 @@ bool quotes_parser(t_parser_data *d)
 				}
 				else
 				{
-					d->quotes[d->qpair_cnt].li = pi;
-					d->quotes[d->qpair_cnt].type = SINGLE_QUOTE;
+					quotes[*qpair_cnt].li = i;
+					quotes[*qpair_cnt].type = SINGLE_QUOTE;
 					f_squote = true;
 				}
 			}
 			else // We have already found earlier a qouble quote
 			{
 				// Let's close this interval and add it into the quote intervals array
-				d->quotes[d->qpair_cnt].ri = pi;
-				++d->qpair_cnt;
+				quotes[*qpair_cnt].ri = i;
+				++(*qpair_cnt);
 				f_squote = false;
 				// Go further by prompt
 			}
 		}
-		++pi;
+		++i;
 	} // while (pi < prompt_len)
 	
 	// If after parsing there are any unmatched
 	// quotes (quotes without pairs) left 
 	if (f_squote || f_dquote)
-		parser_error(&f_noerr);
-	return (f_noerr);
+	{
+		print_shell_error(NULL, UNMATCH_QUOTES_ERR_MSG);
+		fret = COMMON_FAILURE;
+	}
+	return (fret);
+}
+
+bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (ind > quotes[qi].li && ind < quotes[qi].ri)
+			return (true);
+		++qi;
+	}
+	return (false);
+}
+
+/* Check if index `op_i` belongs to any operand's `name`
+ * quote interval (single or double quotes) */
+bool	is_inside_op_quotes(t_operand *op, size_t op_i)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < op->qpair_cnt)
+	{
+		if (op_i > op->quotes[qi].li && op_i < op->quotes[qi].ri)
+			return (true);
+		++qi;
+	}
+	return (false);
+}
+
+bool	is_inside_op_quotes_single(t_operand *op, size_t op_i)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < op->qpair_cnt)
+	{
+		if (op->quotes[qi].type == SINGLE_QUOTE)
+		{
+			if (op_i > op->quotes[qi].li && op_i < op->quotes[qi].ri)
+				return (true);
+		}
+		++qi;
+	}
+	return (false);
+}
+
+bool	is_inside_op_quotes_double(t_operand *op, size_t op_i)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < op->qpair_cnt)
+	{
+		if (op->quotes[qi].type == DOUBLE_QUOTE)
+		{
+			if (op_i > op->quotes[qi].li && op_i < op->quotes[qi].ri)
+				return (true);
+		}
+		++qi;
+	}
+	return (false);
+}
+
+bool	is_syntax_quote(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
+{
+	size_t	qi;
+	
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (ind == quotes[qi].li || ind == quotes[qi].ri)
+			return (true);
+		++qi;
+	}
+	return (false);
+}
+
+/* If mark[i] == 1 we'll not include this symbol */
+int	remove_syntax_quotes(char *str,  t_quote_int *quotes, size_t qpair_cnt)
+{
+	size_t	slen;
+	size_t	i;
+	size_t	w;
+	size_t	qi;
+	char	*mark;
+
+	if (!str || !quotes || qpair_cnt == 0)
+		return (COMMON_SUCCESS);
+
+	slen = ft_strlen(str);
+	if (slen == 0)
+		return (COMMON_SUCCESS);
+	
+	mark = (char *)ft_calloc(slen, sizeof(char));
+	if (!mark)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+
+	qi = 0;
+	while (qi < qpair_cnt)
+	{
+		if (quotes[qi].li < slen)
+			mark[quotes[qi].li] = 1;
+		if (quotes[qi].ri < slen)
+			mark[quotes[qi].ri] = 1;
+		++qi;
+	}
+
+	w = 0;
+	i = 0;
+	while (i < slen)
+	{
+		if (!mark[i])
+			str[w++] = str[i];
+		++i;
+	}
+	str[w] = '\0';
+	
+	free(mark);
+	return (COMMON_SUCCESS);
 }

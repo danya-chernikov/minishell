@@ -18,11 +18,11 @@ int	vector_init(t_vector *v, t_data_type dtype, size_t cap)
 	set_bcap1(v);
 	set_bcap2(v);
 	v->esize = v->bcapacity / v->capacity;
-	v->front = NULL;
-	v->back = NULL;
 	v->data = malloc(v->bcapacity);
 	if (!v->data)
 		return (0);
+	v->front = NULL;
+	v->back = NULL;
 	return (1);
 }
 
@@ -39,12 +39,12 @@ int	vector_finit(t_vector *v, t_data_type dtype, size_t cap, int filler)
 	set_bcap1(v);
 	set_bcap2(v);
 	v->esize = v->bcapacity / v->capacity;
-	v->front = v->data;
-	v->back = v->data + (v->size - 1) * v->esize;
 	v->data = malloc(v->bcapacity);
 	if (!v->data)
 		return (0);
 	vector_memset(v->data, filler, v->bcapacity);
+	v->front = v->data;
+	v->back = v->data + (v->size - 1) * v->esize;
 	return (1);
 }
 
@@ -61,11 +61,11 @@ int	vector_minit(t_vector *v, t_data_type dtype, size_t row_n, size_t col_n)
 	set_bcap1(v);
 	set_bcap2(v);
 	v->esize = v->bcapacity / v->capacity;
-	v->front = NULL;
-	v->back = NULL;
 	v->data = malloc(v->bcapacity);
 	if (!v->data)
 		return (0);
+	v->front = NULL;
+	v->back = NULL;
 	return (1);
 }
 

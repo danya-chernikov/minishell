@@ -4,24 +4,34 @@
 # include <stdbool.h>
 # include <stddef.h>
 
-# define MAX_QUOTES_NUM	128
+# define MAX_QUOTES_NUM	256
 
 typedef struct s_parser_data	t_parser_data;
+typedef struct s_operand		t_operand;
 
 typedef enum e_quote_type
 {
 	DOUBLE_QUOTE,
 	SINGLE_QUOTE
+
 }	t_quote_type;
 
+/* li - left-side index;
+ * ri - right-side index */
 typedef struct s_quote_interval
 {
-	size_t			li; // Left-side index
-	size_t			ri; // Right-side index
+	size_t			li;
+	size_t			ri;
 	t_quote_type	type;
 
 }	t_quote_int;
 
-bool	quotes_parser(t_parser_data *d);
+bool	quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt);
+bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind);
+bool	is_inside_op_quotes(t_operand *op, size_t op_i);
+bool	is_inside_op_quotes_single(t_operand *op, size_t op_i);
+bool	is_inside_op_quotes_double(t_operand *op, size_t op_i);
+bool	is_syntax_quote(t_quote_int *quotes, size_t qpair_cnt, size_t ind);
+int		remove_syntax_quotes(char *str,  t_quote_int *quotes, size_t qpair_cnt);
 
 #endif

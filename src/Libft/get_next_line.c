@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 19:48:41 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/12 13:31:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/01/23 16:31:02 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,26 +26,26 @@
  * called */
 char	*get_next_line(int fd, int *err)
 {
-	static char			buf[BUFFER_SIZE];
+	static char			buf[GNL_BUFFER_SIZE];
 	static char			*line = NULL;
 	static int			flags[5] = {0, 1, 0, 0, 0};
 	static long long	v[9];
 
-	v[ERR] = *err;
-	v[FD] = (long long)fd;
-	if (v[BUF_POS] >= v[RLEN] && v[BUF_POS] > 0 && v[RLEN] > 0)
-		flags[EXIT] = 1;
+	v[GNL_ERR] = *err;
+	v[GNL_FD] = (long long)fd;
+	if (v[GNL_BUF_POS] >= v[GNL_RLEN] && v[GNL_BUF_POS] > 0 && v[GNL_RLEN] > 0)
+		flags[GNL_EXIT] = 1;
 	while (1)
 	{
-		v[RES] = gnl_loop_alg(buf, &line, v, flags);
-		if (v[RES] == RET)
+		v[GNL_RES] = gnl_loop_alg(buf, &line, v, flags);
+		if (v[GNL_RES] == GNL_RET)
 			return (line);
-		else if (v[RES] == BREAK)
+		else if (v[GNL_RES] == GNL_BREAK)
 			break ;
-		else if (v[RES] == CONT)
+		else if (v[GNL_RES] == GNL_CONT)
 			continue ;
 	}
-	if (v[ERR])
+	if (v[GNL_ERR])
 		*err = 1;
 	gnl_clear_func_state(&line, v, flags);
 	return (NULL);
@@ -57,25 +57,25 @@ int	gnl_loop_alg(char *buf, char **line, long long *v, int *flags)
 	int	res;
 
 	res = gnl_init(buf, line, v, flags);
-	if (res == RET)
-		return (RET);
-	else if (res == BREAK)
-		return (BREAK);
-	if (gnl_get_chunk(buf, line, v, flags) == BREAK)
-		return (BREAK);
+	if (res == GNL_RET)
+		return (GNL_RET);
+	else if (res == GNL_BREAK)
+		return (GNL_BREAK);
+	if (gnl_get_chunk(buf, line, v, flags) == GNL_BREAK)
+		return (GNL_BREAK);
 	gnl_check_reaching_end(v, flags);
-	if (buf[v[BUF_POS]] == '\n')
+	if (buf[v[GNL_BUF_POS]] == '\n')
 	{
 		gnl_process_new_line(buf, line, v, flags);
-		return (RET);
+		return (GNL_RET);
 	}
 	else
 	{
 		if (gnl_process_end_chunk(line, v, flags))
-			return (RET);
-		return (CONT);
+			return (GNL_RET);
+		return (GNL_CONT);
 	}
-	return (NORM);
+	return (GNL_NORM);
 }
 
 /* It finds the first chunk of data in read buffer,
@@ -83,58 +83,58 @@ int	gnl_loop_alg(char *buf, char **line, long long *v, int *flags)
  * into the `line` */
 int	gnl_get_chunk(char *buf, char **line, long long *v, int *flags)
 {
-	v[I] = 0;
-	while (buf[v[BUF_POS]] != '\n' && v[BUF_POS] < v[RLEN])
+	v[GNL_I] = 0;
+	while (buf[v[GNL_BUF_POS]] != '\n' && v[GNL_BUF_POS] < v[GNL_RLEN])
 	{
-		v[BUF_POS]++;
-		v[I]++;
+		v[GNL_BUF_POS]++;
+		v[GNL_I]++;
 	}
-	v[LINE_LEN] = v[I];
-	v[LINE_POS] += v[LINE_LEN];
-	if (gnl_alloc_mem(line, v, flags) == BREAK)
-		return (BREAK);
-	v[I] = 0;
-	while (v[I] < v[LINE_LEN])
+	v[GNL_LINE_LEN] = v[GNL_I];
+	v[GNL_LINE_POS] += v[GNL_LINE_LEN];
+	if (gnl_alloc_mem(line, v, flags) == GNL_BREAK)
+		return (GNL_BREAK);
+	v[GNL_I] = 0;
+	while (v[GNL_I] < v[GNL_LINE_LEN])
 	{
-		(*line)[v[LINE_POS] - v[LINE_LEN] + v[I]]
-			= buf[v[BUF_POS] - v[LINE_LEN] + v[I]];
-		v[I]++;
+		(*line)[v[GNL_LINE_POS] - v[GNL_LINE_LEN] + v[GNL_I]]
+			= buf[v[GNL_BUF_POS] - v[GNL_LINE_LEN] + v[GNL_I]];
+		v[GNL_I]++;
 	}
-	return (NORM);
+	return (GNL_NORM);
 }
 
 void	gnl_process_new_line(char *buf, char **line, long long *v, int *flags)
 {
-	(*line)[v[LINE_POS] - v[LINE_LEN] + v[I]] = '\n';
-	(*line)[v[LINE_POS] - v[LINE_LEN] + v[I] + 1] = '\0';
-	if (v[BUF_POS] < v[RLEN] - 1 && !flags[END])
-		v[BUF_POS]++;
-	v[LINE_POS] = 0;
-	flags[ALLOC] = 0;
-	flags[READ] = 0;
-	flags[END] = 0;
-	if (v[BUF_POS] == v[RLEN] - 1 && buf[v[BUF_POS]] == '\n')
+	(*line)[v[GNL_LINE_POS] - v[GNL_LINE_LEN] + v[GNL_I]] = '\n';
+	(*line)[v[GNL_LINE_POS] - v[GNL_LINE_LEN] + v[GNL_I] + 1] = '\0';
+	if (v[GNL_BUF_POS] < v[GNL_RLEN] - 1 && !flags[GNL_END])
+		v[GNL_BUF_POS]++;
+	v[GNL_LINE_POS] = 0;
+	flags[GNL_ALLOC] = 0;
+	flags[GNL_READ] = 0;
+	flags[GNL_END] = 0;
+	if (v[GNL_BUF_POS] == v[GNL_RLEN] - 1 && buf[v[GNL_BUF_POS]] == '\n')
 	{
-		flags[READ] = 1;
-		if (!flags[AGAIN] && buf[v[BUF_POS] - 1] == '\n')
+		flags[GNL_READ] = 1;
+		if (!flags[GNL_AGAIN] && buf[v[GNL_BUF_POS] - 1] == '\n')
 		{
-			flags[AGAIN] = 1;
-			flags[READ] = 0;
+			flags[GNL_AGAIN] = 1;
+			flags[GNL_READ] = 0;
 		}
 	}
 }
 
 int	gnl_process_end_chunk(char **line, long long *v, int *flags)
 {
-	flags[ALLOC] = 1;
-	flags[READ] = 1;
-	flags[END] = 0;
-	if (v[RLEN] < BUFFER_SIZE)
+	flags[GNL_ALLOC] = 1;
+	flags[GNL_READ] = 1;
+	flags[GNL_END] = 0;
+	if (v[GNL_RLEN] < GNL_BUFFER_SIZE)
 	{
-		(*line)[v[LINE_POS] - v[LINE_LEN] + v[I]] = '\0';
-		flags[ALLOC] = 0;
-		v[LINE_POS] = 0;
-		return (RET);
+		(*line)[v[GNL_LINE_POS] - v[GNL_LINE_LEN] + v[GNL_I]] = '\0';
+		flags[GNL_ALLOC] = 0;
+		v[GNL_LINE_POS] = 0;
+		return (GNL_RET);
 	}
-	return (NORM);
+	return (GNL_NORM);
 }

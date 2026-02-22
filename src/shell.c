@@ -1,10 +1,15 @@
 #include "shell.h"
 #include "cmdargs_parser.h"
+#include "prompt_parser.h"
+#include "expansion.h"
+
 #include "debug.h"
+#include "error.h"
+#include "libft.h"
 
 #include <stdlib.h>
 
-static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
 
 /* Initializes the `t_shell` structure, which represents our
  * minishell and stores all its settings.
@@ -31,12 +36,13 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env);
  * bash will handle pipes and redirections! */
 int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
-	int	res;
+	int	fres;
 
-	prelim_struct_init(msh, argc, argv, env);
+	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
 
 	// Allocate environmental variables
-	if (env_init(&msh->env) == COMMON_SYS_ERR)
+	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 
 	// Init history	
@@ -51,11 +57,9 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	// of our shell. At this stage, we can
 	// determine the shell's mode and set
 	// some parameter variables
-	res = cmdargs_parser(msh);
-	if (res == COMMON_FAILURE)
-		return (COMMON_FAILURE);
-	else if (res != COMMON_SUCCESS) // The code we should transfer to the caller
-		return (res);
+	fres = cmdargs_parser(msh);
+	if (fres != COMMON_SUCCESS) // The code we should transfer to the caller
+		return (fres);
 
 	if (!isatty(STDIN_FILENO)) // If shell is not connected to any terminal
 	{
@@ -66,9 +70,9 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	/* Set local and environment variables */
 	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	res = msh_set_env_vars(&msh->env);
-	if (res != COMMON_SUCCESS)
-		return (res);
+	fres = msh_set_env_vars(&msh->env);
+	if (fres != COMMON_SUCCESS)
+		return (fres);
 
 #if DEBUG == 1
 	printf("Local variables:\n");
@@ -85,7 +89,21 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 	return (COMMON_SUCCESS);
 }
 
-static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
+void	msh_free(t_shell *msh)
+{
+	if (msh->pd)
+	{
+		//exp_free_all_ops_argv(msh->pd);
+		free(msh->pd);
+	}
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
+	env_free(&msh->env);
+	history_free(&msh->history);
+	configs_free(&msh->configs);
+}
+
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv)
 {
 	// By default, let's think our
 	// shell will be interactive
@@ -98,7 +116,6 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	// Assign arguments of main()
 	msh->argc = argc;
 	msh->argv = argv;
-	msh->env.inh_env = env;
 	// Init shell options
 	msh->opts.f_login = false;
 	msh->opts.f_verbose = false;
@@ -106,36 +123,12 @@ static void	prelim_struct_init(t_shell *msh, int argc, char **argv, char **env)
 	msh->opts.f_c = false;
 	// Init configs
 	configs_init(&msh->configs);
-}
-
-void	msh_free_all_vars(t_env *env)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < MAX_TOTAL_VARS_NUM)
+	// Init t_parser_data
+	msh->pd = (t_parser_data *)ft_calloc(1, sizeof(t_parser_data));
+	if (!msh->pd)
 	{
-		if (env->vars[i].name)
-		{
-			free(env->vars[i].name);
-			env->vars[i].name = NULL;
-		}
-		if (env->vars[i].value)
-		{
-			free(env->vars[i].value);
-			env->vars[i].value = NULL;
-		}
-		++i;
+		perror("malloc");
+		return (COMMON_SYS_ERR);
 	}
-	if (env->vars)
-		free(env->vars);
-}
-
-void	msh_free(t_shell *msh)
-{
-	if (msh->prompt_inv)
-		free(msh->prompt_inv);
-	msh_free_all_vars(&msh->env);
-	history_free(&msh->history);
-	configs_free(&msh->configs);
+	return (COMMON_SUCCESS);
 }

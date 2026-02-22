@@ -50,31 +50,6 @@ char	*get_full_path(char *rel_path)
 	return (full_path);
 }
 
-/* If ~ does not exist in `str` returns	a duplicate
- * of `str` on heap. On error returns NULL */
-char	*expand_homedir(char *str, char *home)
-{
-	size_t		new_size;
-	char		*new_str;
-	char		*tilda;
-	ptrdiff_t	pdif;
-	
-	tilda = ft_strchr(str, '~');
-	if (!tilda)
-		return (ft_strdup(str));
-	// Minus one ~ symbol plus one null-byte annihilate each other
-	new_size = ft_strlen(str) + ft_strlen(home); // -1 + 1
-	new_str = (char *)malloc(new_size * sizeof(char));
-	if (!new_str)
-		return (NULL);
-	// plus 1 null-terminator	
-	pdif = ft_abs((ptrdiff_t)str - (ptrdiff_t)tilda);
-	ft_strlcpy(new_str, str, pdif + 1);
-	ft_strlcat(new_str, home, new_size + 1);
-	ft_strlcat(new_str, str + pdif + 1, new_size + 1);
-	return (new_str);
-}
-
 /* Does the same as ft_split(), but only for two tokens, i.e. it splits `str`
  * into two substrings, `part1` and `part2`, using the delimiter `delim` */
 int div2_str_by_delim(char *str, char delim, char **part1, char **part2)
@@ -92,8 +67,6 @@ int div2_str_by_delim(char *str, char delim, char **part1, char **part2)
 		++i;
 	}
     (*part1)[i] = '\0';
-	if (!(*part2))
-		return (COMMON_SUCCESS);
 	++i;
     while (str[i])
 	{

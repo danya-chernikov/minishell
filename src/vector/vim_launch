@@ -1,1 +1,1 @@
-vim vector.h vector_main.c vector_access.c vector_info.c vector_si.c vector_msi.c vector_stack.c vector_settings.c vector_utility.c Makefile
+vector.h vector_main.c vector_access.c vector_info.c vector_si.c vector_msi.c vector_stack.c vector_settings.c vector_utility.c Makefile

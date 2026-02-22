@@ -5,20 +5,28 @@ static void	push_back2(t_vector *v, void *val);
 
 int	vector_push_back(t_vector *v, void *val)
 {
+	void	*tmp;
+
 	if (v->size + 1 > v->capacity)
 	{			
 		v->capacity += v->enlarger;
-		v->data = vector_realloc(v->data, v->bcapacity, v->capacity * v->esize);
-		if (!v->data)
+		tmp = vector_realloc(v->data, v->bcapacity, v->capacity * v->esize);
+		if (!tmp)
 			return (0);
+		v->data = tmp;
 		v->bcapacity = v->capacity * v->esize;
 	}
 	push_back1(v, val);
 	push_back2(v, val);
 	++v->size;
 	v->front = v->data;
-	v->back = v->data + (v->size - 1) * v->esize;
+	v->back = (t_uchar *)v->data + (v->size - 1) * v->esize;
 	return (1);
+}
+
+int	vector_push_back_char(t_vector *v, char c)
+{
+	return (vector_push_back(v, &c));
 }
 
 /* On error returns NULL */
@@ -28,9 +36,18 @@ void	*vector_pop_back(t_vector *v)
 
 	if (v->size == 0)
 		return (NULL);
-	ret = v->data + ((v->size - 1) * v->esize);
+	ret = (t_uchar *)v->data + ((v->size - 1) * v->esize);
 	--v->size;
-	v->back = v->data + (v->size - 1) * v->esize;
+	if (v->size == 0)
+	{
+		v->front = NULL;
+		v->back = NULL;
+	}
+	else
+	{
+		v->front = v->data;
+		v->back = (t_uchar *)v->data + (v->size - 1) * v->esize;
+	}
 	return (ret);
 }
 

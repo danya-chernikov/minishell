@@ -2,8 +2,7 @@
 
 #include <stdlib.h>
 
-/* Generates prompt invitation
- * user@host:pwd$ */
+/* Generates prompt invitation user@host:pwd$ */
 int	gen_prompt_inv(t_shell *msh)
 {
 	size_t	inv_len;
@@ -20,7 +19,7 @@ int	gen_prompt_inv(t_shell *msh)
 	point = ft_strchr(hostname, '.');
 	if (point) // There is a point in the domain name
 	{
-		sd_len = ft_abs((ptrdiff_t)hostname - (ptrdiff_t)point);
+		sd_len = (ptrdiff_t)point - (ptrdiff_t)hostname;
 		if (sd_len > MAX_SUBDOMAIN_LEN - 1)
 		{
 			print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
@@ -40,6 +39,8 @@ int	gen_prompt_inv(t_shell *msh)
 		print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
 		return (COMMON_FAILURE);
 	}
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
 	msh->prompt_inv = (char *)malloc(inv_len * sizeof(char));
 	if (!msh->prompt_inv)
 	{
@@ -53,4 +54,16 @@ int	gen_prompt_inv(t_shell *msh)
 	ft_strlcat(msh->prompt_inv, pwd, inv_len);
 	ft_strlcat(msh->prompt_inv, "$ ", inv_len);
 	return (COMMON_SUCCESS);
+}
+
+void	msh_update_retcode(t_shell *msh, int status)
+{
+	char	*new_val;
+
+	new_val = ft_itoa(status);
+	if (!new_val)
+		return ;
+	if (msh->env.vars[PV_RETCODE].value)
+		free(msh->env.vars[PV_RETCODE].value);
+	msh->env.vars[PV_RETCODE].value = new_val;
 }
