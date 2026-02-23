@@ -83,16 +83,16 @@ static int	set_existing_var(t_env_var *var, char *name, char *value)
 		if (ft_strlen(value) >= MAX_ENV_VAL_LEN - 1)
 		{
 			print_shell_error(NULL, MAX_ENV_VAL_ERR_MSG);
-			free(name); // IT WAS ADDED RECETLY. I'M NOT SURE WE NEED THIS
-			free(value); // We just leave variable's value unchanged
+			free(name);
+			free(value);
 			return (COMMON_FAILURE);
 		}
 		if (var->value)
 			free(var->value);
 		var->value = value;
-		free(name); // `name` was already allocated!
+		free(name);
 	}
-	else // Variable exists but is read-only
+	else
 	{
 		print_shell_error(name, READONLY_VAR_ERR_MSG);
 		free(name);
@@ -109,7 +109,6 @@ static int	check_bounds(t_env *env, char *name, char *value)
 	{
 		free(name);
 		free(value);
-		// Variable is too long.. so why to print it xd
 		print_shell_error(NULL, MAX_ENV_NUM_ERR_MSG);
 		return (COMMON_FAILURE);
 	}
@@ -134,7 +133,7 @@ static void	create_new_var(t_env *env, char *name, char *value, t_var_type type)
 {
 	env->vars[env->vars_num].type = type;
 	env->vars[env->vars_num].f_readonly = false;
-	if (type == ENV)
+	if (type != PARAM)
 		env->vars[env->vars_num].f_inherit = true;
 	else
 		env->vars[env->vars_num].f_inherit = false;

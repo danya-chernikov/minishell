@@ -6,10 +6,12 @@ char	*env_get_val(t_env *env, char *name)
 {
 	size_t	i;	
 
+	if (!env || !name)
+		return (NULL);
 	i = 0;
 	while (i < env->vars_num)
 	{
-		if (strings_equal(name, env->vars[i].name))
+		if (env->vars[i].name && strings_equal(name, env->vars[i].name))
 			return (env->vars[i].value);
 		++i;
 	}
@@ -21,15 +23,15 @@ char	*env_get_val(t_env *env, char *name)
  * We do not care at all here about variable's value */
 t_env_var	*env_get_ptr(t_env *env, char *name)
 {
-	t_env_var	*var;
 	size_t		i;
 
+	if (!env || !name)
+		return (NULL);
 	i = 0;
 	while (i < env->vars_num)
 	{
-		var = &env->vars[i];
-		if (strings_equal(name, var->name))
-			return (var);
+		if (env->vars[i].name && strings_equal(name, env->vars[i].name))
+			return (&env->vars[i]);
 		++i;
 	}
 	return (NULL);

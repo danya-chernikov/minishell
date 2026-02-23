@@ -56,6 +56,10 @@ static int	run_builtin_second_part(t_shell *msh, t_operand *op,
 		return (builtin_env(msh));
 	if (strings_equal(prog, EXIT_CMD))
 		return (builtin_exit(msh, op, f_in_parent));
+	if (strings_equal(prog, LOCALS_CMD))
+		return (builtin_locals(msh));
+	if (strings_equal(prog, SET_CMD))
+		return (builtin_set(msh));
 	if (strings_equal(prog, TRUE_CMD))
 		return (RET_CMD_SUCCESS);
 	if (strings_equal(prog, FALSE_CMD))

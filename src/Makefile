@@ -34,7 +34,7 @@ SRCS=main.c \
 	 builtin_export.c builtin_others.c \
 	 signals.c signals2.c \
 	 aux_common.c aux_common2.c aux_common3.c \
-	 aux_io.c error.c debug.c test.c
+	 aux_io.c error.c debug.c
 
 OBJS=main.o \
 	 shell.o shell_launcher.o aux_shell.o \
@@ -62,7 +62,7 @@ OBJS=main.o \
 	 builtin_export.o builtin_others.o \
 	 signals.o signals2.o \
 	 aux_common.o aux_common2.o aux_common3.o \
-	 aux_io.o error.o debug.o test.o
+	 aux_io.o error.o debug.o
 
 all : libft libvector $(NAME)
 
@@ -506,10 +506,5 @@ debug.o : debug.c debug.h env.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c debug.c
-
-test.o : test.c test.h \
-	libft.h vector.h error.h debug.h
-	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
-	-c test.c
 
 .PHONY: all clean fclean re libft libvector

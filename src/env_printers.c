@@ -27,8 +27,12 @@ void	env_print_env(t_env *env)
 	vi = 0;	
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name && env->vars[vi].type == ENV)
+		if (env->vars[vi].name &&
+			env->vars[vi].value &&
+			env->vars[vi].type == ENV)
+		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		}
 		++vi;
 	}
 }
@@ -44,8 +48,12 @@ void	env_print_all(t_env *env)
 	vi = 0;	
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name && env->vars[vi].type != PARAM)
+		if (env->vars[vi].name &&
+			env->vars[vi].value &&
+			env->vars[vi].type != PARAM)
+		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		}
 		++vi;
 	}
 }
@@ -64,8 +72,12 @@ void	env_print_locals(t_env *env)
 	vi = 0;	
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name && env->vars[vi].type == LOCAL)
+		if (env->vars[vi].name &&
+			env->vars[vi].value &&
+			env->vars[vi].type == LOCAL)
+		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
+		}
 		++vi;
 	}
 }

@@ -11,9 +11,11 @@
 
 #include <stdlib.h>
 
-static void	free_envp_partial(char **envp, size_t n);
-static int	copy_operand_env(t_operand *op, char **envp, size_t *ei);
-static int	copy_shell_env(t_shell *msh, char **envp, size_t *ei);
+static void		free_envp_partial(char **envp, size_t n);
+static int		copy_operand_env(t_operand *op, char **envp, size_t *ei);
+static int		copy_shell_env(t_shell *msh, char **envp, size_t *ei);
+static size_t	count_operand_envp(t_env *env);
+static size_t	count_shell_envp(t_shell *msh, t_env *op_env);
 
 /* We do NOT have to call msh_free() here on exit,
  * because the kernel will release memory upon
@@ -66,12 +68,13 @@ char	**build_envp_for_operand(t_shell *msh, t_operand *op)
 {
 	int		fret;
 	size_t	ei;
-	size_t	expvar_num;
+	size_t	total;
 	char	**envp;
 
-	expvar_num = env_count_exported_vars(&msh->env) +
-		env_count_all_vars(op->my_env);
-	envp = malloc((expvar_num + 1) * sizeof *envp);
+	total = 0;
+	total += count_operand_envp(op->my_env);
+	total += count_shell_envp(msh, op->my_env);
+	envp = malloc((total + 1) * sizeof *envp);
 	if (!envp)
 		return (NULL);
 	ei = 0;
@@ -137,6 +140,43 @@ static int	copy_shell_env(t_shell *msh, char **envp, size_t *ei)
 		++mi;
 	}
 	return (COMMON_SUCCESS);
+}
+
+static size_t	count_operand_envp(t_env *env)
+{
+	size_t	i;
+	size_t	cnt;
+
+	if (!env)
+		return (0);
+	i = 0;
+	cnt = 0;
+	while (i < env->vars_num)
+	{
+		if (env->vars[i].name && env->vars[i].value &&
+			env->vars[i].type != PARAM)
+			++cnt;
+		++i;
+	}
+	return (cnt);
+}
+
+static size_t	count_shell_envp(t_shell *msh, t_env *op_env)
+{
+	size_t	i;
+	size_t	cnt;
+
+	i = 0;
+	cnt = 0;
+	while (i < msh->env.vars_num)
+	{
+		if (msh->env.vars[i].name &&
+			msh->env.vars[i].type == ENV &&
+			(!op_env || !env_exist(op_env, msh->env.vars[i].name)))
+			++cnt;
+		++i;
+	}
+	return (cnt);
 }
 
 char	*key_value_to_str(const char *key, const char *value)

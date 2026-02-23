@@ -70,5 +70,7 @@ int	builtin_export(t_shell *msh, t_operand *op);
 int	builtin_pwd(void);
 int	builtin_unset(t_shell *msh, t_operand *op);
 int	builtin_env(t_shell *msh);
+int	builtin_locals(t_shell *msh);
+int	builtin_set(t_shell *msh);
 
 #endif

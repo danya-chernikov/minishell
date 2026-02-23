@@ -29,13 +29,12 @@ int	env_export(t_env *env, char *name)
 	t_env_var	*var;
 
 	var = env_get_ptr(env, name);
-	if (var)
-	{
-		if (var->type == LOCAL && var->f_inherit)
-			var->type = ENV;
-	}
-	else
+	if (!var)
 		return (COMMON_FAILURE);
+	if (var->type == PARAM)
+		return (COMMON_FAILURE);
+	var->type = ENV;
+	var->f_inherit = true;
 	return (COMMON_SUCCESS);
 }
 

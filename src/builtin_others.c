@@ -41,3 +41,15 @@ int	builtin_env(t_shell *msh)
 	env_print_env(&msh->env);
 	return (RET_CMD_SUCCESS);
 }
+
+int	builtin_locals(t_shell *msh)
+{
+	env_print_locals(&msh->env);
+	return (RET_CMD_SUCCESS);
+}
+
+int	builtin_set(t_shell *msh)
+{
+	env_print_all(&msh->env);
+	return (RET_CMD_SUCCESS);
+}
