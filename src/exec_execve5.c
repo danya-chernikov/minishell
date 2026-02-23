@@ -1,4 +1,5 @@
 #include "exec.h"
+#include "aux_common.h"
 
 #include "error.h"
 

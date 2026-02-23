@@ -421,7 +421,7 @@ exec_execve4.o : exec_execve4.c exec.h aux_io.h operand.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve4.c
 
-exec_execve5.o : exec_execve5.c exec.h \
+exec_execve5.o : exec_execve5.c exec.h aux_common.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve5.c

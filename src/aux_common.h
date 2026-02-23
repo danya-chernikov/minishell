@@ -34,12 +34,15 @@ char	*expand_homedir(char *str, char *home);
 bool	contains_quote(char *str);
 bool	is_variable_name_correct(char *var_name);
 bool	is_varname_symbol_permitted(char symbol);
+char	*join_path(const char *dir, const char *cmd);
 
 /* aux_common3.c */
 int		perror_and_return(char *where, int ret_code);
 int		free_one_and_return(void *ptr, int ret_code);
 int		free_two_and_return(void *ptr1, void *ptr2, int ret_code);
-bool	is_surrounded_quotes(char *str); // Obsolete
-void	erase_quotes_no_check(char *str); // Obsolete
+bool	is_surrounded_quotes(char *str);
+void	erase_quotes_no_check(char *str);
+/* is_surrounded_quotes()	- obsolete
+ * erase_quotes_no_check()	- obsolete */
 
 #endif

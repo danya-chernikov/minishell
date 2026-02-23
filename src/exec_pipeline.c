@@ -45,7 +45,6 @@ int	pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth)
 	if (pl_spawn_all(msh, &pl, depth) != COMMON_SUCCESS)
 	{
 		parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-		pl_free(&pl);
 		return (pl_free(&pl), RET_CMD_FAILURE);
 	}
 	status = pl_wait(&pl);

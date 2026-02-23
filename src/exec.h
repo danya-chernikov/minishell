@@ -90,7 +90,6 @@ int		map_exec_errno(int errnum);
 char	*resolve_cmd_path(t_shell *msh, char *cmd);
 char	*resolve_in_path(t_shell *msh, const char *cmd);
 char	*try_path_dir(const char *dir, const char *cmd);
-char	*join_path(const char *dir, const char *cmd);
 
 /* exec_execve4.c */
 int		apply_redirs(t_operand *op);

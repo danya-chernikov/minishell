@@ -27,6 +27,7 @@ int	history_init(t_history *history)
 	history->histsize = DEF_HISTSIZE;
 	history->histfilesize = DEF_HISTFILESIZE;
 	history->lines = malloc(MAX_HIST_LINES_NUM * sizeof *history->lines);
+	history->histfile_path = NULL;
 	if (!history->lines)
 	{
 		perror("malloc");
@@ -45,18 +46,27 @@ void	history_free(t_history *history)
 {	
 	size_t	i;
 
+	if (!history)
+		return ;
 	i = 0;
 	while (i < history->lines_num)
 	{
 		if (history->lines[i].cmd)
 		{
 			free(history->lines[i].cmd);
-			history->lines[i].cmd = NULL; // Does not make much sense here.. but ok
+			history->lines[i].cmd = NULL;
 		}
 		++i;
 	}
 	if (history->lines)
+	{
 		free(history->lines);
+		history->lines = NULL;
+	}
 	if (history->histfile_path)
+	{
 		free(history->histfile_path);
+		history->histfile_path = NULL;
+	}
+	history->lines_num = 0;
 }

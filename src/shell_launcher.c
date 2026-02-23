@@ -83,6 +83,7 @@ int	launch_script(t_shell *msh, int *ret_code)
 		return (COMMON_SYS_ERR);
 	}
 	line = get_next_line(fd, &gnlerr);
+	gnlerr = 0;
 	while (line)
 	{
 		remove_newline(line);
@@ -136,6 +137,7 @@ int	launch_stdin_cmd(t_shell *msh, int *ret_code)
 	fres = COMMON_SUCCESS;
 	*ret_code = EXIT_SUCCESS;
 	line = get_next_line(STDIN_FILENO, &gnlerr);
+	gnlerr = 0;
 	while (line)
 	{
 		remove_newline(line);

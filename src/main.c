@@ -19,7 +19,7 @@ int	main(int argc, char **argv, char **env)
 		return (ret_code);
 	}
 	fret = msh_launch(&msh, &ret_code);
-	if (fret != COMMON_SUCCESS)
+	if (fret == COMMON_SYS_ERR)
 		ret_code = EXIT_FAILURE;
 	msh_free(&msh);
 	return (ret_code);

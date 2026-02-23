@@ -83,23 +83,3 @@ char	*try_path_dir(const char *dir, const char *cmd)
 	free(p);
 	return (NULL);
 }
-
-char	*join_path(const char *dir, const char *cmd)
-{
-	size_t	dir_len;
-	size_t	cmd_len;
-	size_t	out_len;
-	char	*out;
-
-	dir_len = ft_strlen(dir);
-	cmd_len = ft_strlen(cmd);
-	out_len = dir_len + cmd_len + 2;
-	out = (char *)malloc(out_len * sizeof (char));
-	if (!out)
-		return (NULL);
-	ft_strlcpy(out, dir, out_len);
-	if (dir_len && out[dir_len - 1] != '/')
-		ft_strlcat(out, "/", out_len);
-	ft_strlcat(out, cmd, out_len);
-	return (out);
-}

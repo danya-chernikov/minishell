@@ -31,22 +31,25 @@ char	*get_full_path(char *rel_path)
 {
 	char	*full_path;
 	char	cwd[PATH_MAX];
-	size_t	fp_len;
 
-	if (!getcwd(cwd, PATH_MAX))
+	if (!rel_path)
+		return (NULL);
+	if (rel_path[0] == '/')
+	{
+		full_path = ft_strdup(rel_path);
+		if (!full_path)
+		{
+			perror("malloc");
+			return (NULL);
+		}
+		return (full_path);
+	}
+	if (!getcwd(cwd, sizeof (cwd)))
 	{
 		perror("getcwd");
 		return (NULL);
 	}
-	fp_len = ft_strlen(cwd) + ft_strlen(rel_path) + 1;
-	full_path = (char *)malloc(fp_len * sizeof(char));
-	if (!full_path)
-	{
-		perror("malloc");
-		return (NULL);
-	}
-	ft_strlcpy(full_path, cwd, fp_len);
-	ft_strlcat(full_path, rel_path, fp_len);
+	full_path = join_path(cwd, rel_path);
 	return (full_path);
 }
 
