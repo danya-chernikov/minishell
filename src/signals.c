@@ -24,6 +24,11 @@ void	signals_init(void)
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGQUIT, &sa, NULL);
+
+	// SIGWINCH
+	sa.sa_handler = sigwinch_handler;
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGWINCH, &sa, NULL);
 }
 
 /* A handler that prints something
@@ -38,8 +43,9 @@ void	sigquit_handler(int signo)
 void	sigint_handler(int signo)
 {
 	(void)signo;
-	write(STDOUT_FILENO, "^C\n", 3);
+	//write(STDOUT_FILENO, "^C\n", 3);
 	g_got_sigint = 1;
+	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
@@ -49,4 +55,5 @@ void	sigint_handler(int signo)
 void	sigwinch_handler(int signo)
 {
 	(void)signo;
+	rl_resize_terminal();
 }

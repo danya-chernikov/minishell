@@ -1,6 +1,7 @@
 #include "exec.h"
 #include "operand.h"
 #include "aux_common.h"
+#include "signals.h"
 
 #include "error.h"
 
@@ -97,9 +98,18 @@ int		pl_wait(t_pipeline *pl)
 
 int		pl_wait_status(int ws)
 {
+	int	signum;
+
 	if (WIFEXITED(ws))
 		return (WEXITSTATUS(ws));
 	if (WIFSIGNALED(ws))
-		return (SIGNALED_CODE + WTERMSIG(ws));
+	{
+		signum = WTERMSIG(ws);
+		if (signum == SIGQUIT)
+			write(STDERR_FILENO, SIGQUIT_MSG, 19);
+		else if (signum == SIGINT)
+			write(STDERR_FILENO, "\n", 1);
+		return (SIGNALED_CODE + signum);
+	}
 	return (COMMON_SUCCESS);
 }

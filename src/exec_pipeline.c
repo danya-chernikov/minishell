@@ -39,9 +39,17 @@ int	pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth)
 		return (pl_free(&pl), RET_CMD_FAILURE);
 	if (pl_make_pipes(&pl) != COMMON_SUCCESS)
 		return (pl_free(&pl), RET_CMD_FAILURE);
-	if (pl_spawn_all(msh, &pl, depth, sig) != COMMON_SUCCESS)
+
+	parent_ignore_sigint_sigquit(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
+
+	if (pl_spawn_all(msh, &pl, depth) != COMMON_SUCCESS)
+	{
+		parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
+		pl_free(&pl);
 		return (pl_free(&pl), RET_CMD_FAILURE);
+	}
 	status = pl_wait(&pl);
+	parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
 	pl_free(&pl);
 	return (status);
 }
@@ -73,7 +81,31 @@ int	pl_parent_single_try(t_shell *msh, t_token *token, int depth)
 	return (status);
 }
 
-int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth, struct sigaction *sig)
+/* NEW */
+int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth)
+{
+	int	fret;
+	int	st_i;
+	
+	st_i = 0;
+	while (st_i < pl->stages_num)
+	{
+		fret = pl_fork_one_stage(msh, pl, st_i, depth);
+		if (fret != COMMON_SUCCESS)
+		{
+			if (pl_close_all_pipes(pl) != COMMON_SUCCESS)
+				return (COMMON_SYS_ERR);
+			return (fret);
+		}
+		++st_i;
+	}
+	if (pl_close_all_pipes(pl) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
+	return (COMMON_SUCCESS);
+}
+
+/* OLD */
+/*int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth, struct sigaction *sig)
 {
 	int	fret;
 	int	st_i;
@@ -96,7 +128,7 @@ int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth, struct sigaction *sig)
 		return (COMMON_SYS_ERR);
 	parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
 	return (COMMON_SUCCESS);
-}
+}*/
 
 /* The condition `close_i == CLOSE_PAR_NOT_FOUND` practically should
  * never happen, but just in case let's check it.. */

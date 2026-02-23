@@ -16,7 +16,8 @@ typedef struct s_vector			t_vector;
 typedef struct s_parser_data	t_parser_data;
 
 /* exp_assignment.c */
-int		exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i);
+int		exp_process_assignment(t_shell *msh, t_operand *op,
+		t_op_token *op_tok, size_t *opt_i);
 int		exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var_name);
 void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[]);
 

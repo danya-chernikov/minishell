@@ -57,7 +57,7 @@ int		check_depth_limit(t_parser_data *pd, size_t l, size_t r, int base);
 /* exec_pipeline.c */
 int		pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth);
 int		pl_parent_single_try(t_shell *msh, t_token *token, int depth);
-int		pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth, struct sigaction *sig);
+int		pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth);
 int		pl_fill_stages(t_parser_data *pd, size_t l, size_t r, t_pipeline *pl);
 
 /* exec_pipeline2.c */

@@ -394,7 +394,7 @@ exec_pipeline2.o : exec_pipeline2.c exec.h shell.h operand.h builtin.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_pipeline2.c
 
-exec_pipeline3.o : exec_pipeline3.c exec.h operand.h aux_common.h \
+exec_pipeline3.o : exec_pipeline3.c exec.h operand.h aux_common.h signals.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_pipeline3.c

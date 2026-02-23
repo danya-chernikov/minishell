@@ -3,6 +3,8 @@
 
 #include <signal.h>
 
+# define SIGQUIT_MSG	"Quit (core dumped)\n"
+
 extern volatile sig_atomic_t	g_got_sigint;
 
 /* signals.c */
