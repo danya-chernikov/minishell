@@ -19,6 +19,7 @@ int	map_exec_errno(int errnum)
 
 char	*resolve_cmd_path(t_shell *msh, char *cmd)
 {
+	char	*fret;
 	char	*str;
 
 	if (!cmd)
@@ -32,8 +33,16 @@ char	*resolve_cmd_path(t_shell *msh, char *cmd)
 	if (cmd[0] == '/')
 		return (str);
 	if (has_slash(cmd))
-		return (get_full_path_from_cwd(cmd));
-	return (resolve_in_path(msh, cmd));
+	{
+		fret = get_full_path_from_cwd(cmd);
+		if (!fret)
+			free(str);
+		return (fret);
+	}
+	fret = resolve_in_path(msh, cmd);
+	if (!fret)
+		free(str);
+	return (fret);
 }
 
 char	*resolve_in_path(t_shell *msh, const char *cmd)

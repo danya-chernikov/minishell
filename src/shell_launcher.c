@@ -215,7 +215,7 @@ int	launch_int_session(t_shell *msh, int *ret_code)
 		// we just free `rline_buf` and prompt user again
 		free(rline_buf);
 		rline_buf = NULL;
-		if (fres != COMMON_SUCCESS)
+		if (fres == COMMON_SYS_ERR)
 			break ;
 	} // while (1)
 
