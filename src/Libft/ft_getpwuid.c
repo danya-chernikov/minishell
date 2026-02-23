@@ -35,7 +35,7 @@ int	ft_getpwuid(t_passwd *pwd, uid_t uid)
 	int	fd;
 	int	res;
 
-	ft_memset(pwd, 0, sizeof(pwd));
+	ft_memset(pwd, 0, sizeof(*pwd));
 	fd = open(PASSWD_PATH, O_RDONLY);
 	if (fd == -1)
 	{
@@ -69,6 +69,12 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 		if (line[ft_strlen(line) - 1] == '\n')
 			line[ft_strlen(line) - 1] = '\0';
 		ptokens	= ft_split(line, ':');
+		if (!ptokens)
+		{
+			free(line);
+			gnl_finish(fd);
+			return (perror("malloc"), -1);
+		}
 		if (split_size(ptokens) > 2 && ft_atoi(ptokens[2]) == (int)uid)
 		{
 			if (!fill_pwd_struct(pwd, ptokens, uid))

@@ -80,7 +80,6 @@ int	pl_parent_single_try(t_shell *msh, t_token *token, int depth)
 	return (status);
 }
 
-/* NEW */
 int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth)
 {
 	int	fret;
@@ -102,32 +101,6 @@ int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth)
 		return (COMMON_SYS_ERR);
 	return (COMMON_SUCCESS);
 }
-
-/* OLD */
-/*int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth, struct sigaction *sig)
-{
-	int	fret;
-	int	st_i;
-	
-	parent_ignore_sigint_sigquit(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-	st_i = 0;
-	while (st_i < pl->stages_num)
-	{
-		fret = pl_fork_one_stage(msh, pl, st_i, depth);
-		if (fret != COMMON_SUCCESS)
-		{
-			if (pl_close_all_pipes(pl) != COMMON_SUCCESS)
-				return (COMMON_SYS_ERR);
-			parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-			return (fret);
-		}
-		++st_i;
-	}
-	if (pl_close_all_pipes(pl) != COMMON_SUCCESS)
-		return (COMMON_SYS_ERR);
-	parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-	return (COMMON_SUCCESS);
-}*/
 
 /* The condition `close_i == CLOSE_PAR_NOT_FOUND` practically should
  * never happen, but just in case let's check it.. */
