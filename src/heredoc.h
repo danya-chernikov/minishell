@@ -28,9 +28,13 @@ typedef struct s_heredoc
 
 }	t_heredoc;
 
+/* heredoc.c */
 int		read_heredocs(t_shell *msh);
 int		read_one_heredoc(t_shell *msh, t_heredoc *hd);
 void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd);
 int		heredoc_parent_collect(int rfd, t_heredoc *hd);
+
+/* heredoc2.c */
+char	*heredoc_expand_line(t_shell *msh, const char *line);
 
 #endif

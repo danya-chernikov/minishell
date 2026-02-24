@@ -134,6 +134,9 @@ void	ops_free(t_operand *ops)
 			}
 			++j;
 		}
+		ops[i].red_cnt = 0;
+		ops[i].token_cnt = 0;
+		ops[i].argc = 0;
 		++i;
 	}
 }

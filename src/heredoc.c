@@ -12,6 +12,10 @@
 #include <termios.h>
 #include <readline/readline.h>
 
+#include "libft.h"
+#include "vector.h"
+#include "error.h"
+
 /* Main function in this module.
  * Asks user for all heredocs.
  *     rc - return code */
@@ -104,53 +108,148 @@ int	read_one_heredoc(t_shell *msh, t_heredoc *hd)
 	return (ret_code);
 }
 
-/* env_get_val(msh->env, "PS1") will never return NULL! Cause if we
- * haven't inherited it we set the default value */
-void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
+void    heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
 {
-	char	*line;
-	size_t	len;
+    char    *line;
 
-	g_got_sigint = 0;
-	child_set_heredoc_signals();
-	while (1)
-	{
-		line = readline(env_get_val(&msh->env, "PS2"));
-		if (g_got_sigint)
-		{
-			free(line);
-			close(wfd);
-			exit(SIGNALED_CODE + SIGINT); // 128 + 2
-		}
-		if (!line)
-		{
-			print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG);
-			break ;
-		}
-		if (strings_equal(line, hd->delim))
-		{
-			free(line);
-			break ;
-		}
-		// Here we can apply expansion of variables
-		// to line in case f_expand_body was set
-		len = ft_strlen(line);
-		if (write_all(wfd, line, len) != COMMON_SUCCESS ||
-			write_all(wfd, "\n", 1) != COMMON_SUCCESS)
-		{
-			free(line);
-			break ;
-		}
-		free(line);
-	}
-	close(wfd);
-	exit(EXIT_SUCCESS);
+    g_got_sigint = 0;
+    child_set_heredoc_signals();
+
+    while (1)
+    {
+        line = readline(env_get_val(&msh->env, "PS2"));
+
+        if (g_got_sigint)
+        {
+            free(line);
+            close(wfd);
+            exit(SIGNALED_CODE + SIGINT);
+        }
+
+        if (!line)
+        {
+            print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG);
+            break;
+        }
+
+        if (strings_equal(line, hd->delim))
+        {
+            free(line);
+            break;
+        }
+
+        // write line (optionally expanding)
+        if (!hd->f_expand_body)
+        {
+            size_t len = ft_strlen(line);
+            if (write_all(wfd, line, len) != COMMON_SUCCESS ||
+                write_all(wfd, "\n", 1) != COMMON_SUCCESS)
+            {
+                free(line);
+                break;
+            }
+            free(line);
+            continue;
+        }
+        else
+        {
+            t_vector out;
+            size_t   i;
+
+            if (!vector_init(&out, CHAR, ft_strlen(line) + 1))
+            {
+                perror("malloc");
+                free(line);
+                close(wfd);
+                exit(EXIT_FAILURE);
+            }
+
+            i = 0;
+            while (line[i] != '\0')
+            {
+                if (line[i] == '$')
+                {
+                    char    var_name[MAX_ENV_VAL_LEN];
+                    size_t  j;
+                    char    *val;
+
+                    if (line[i + 1] == '\0')
+                    {
+                        vector_push_back_char(&out, '$');
+                        ++i;
+                        continue;
+                    }
+
+                    if (line[i + 1] == '$' || line[i + 1] == '?' ||
+                        line[i + 1] == '#' || line[i + 1] == '*')
+                    {
+                        var_name[0] = line[i + 1];
+                        var_name[1] = '\0';
+                        i += 2;
+
+                        val = env_get_val(&msh->env, var_name);
+                        if (!val)
+                            val = "";
+                        for (j = 0; val[j] != '\0'; ++j)
+                            vector_push_back_char(&out, val[j]);
+                        continue;
+                    }
+
+                    // If next char can't start a name treat '$' as literal
+                    if (!is_varname_symbol_permitted(line[i + 1]))
+                    {
+                        vector_push_back_char(&out, '$');
+                        ++i;
+                        continue;
+                    }
+
+                    // Normal $VARNAME
+                    j = 0;
+                    ++i; // skip '$'
+                    while (line[i] != '\0' && is_varname_symbol_permitted(line[i]))
+                    {
+                        if (j < MAX_ENV_VAL_LEN - 1)
+                            var_name[j++] = line[i];
+                        ++i;
+                    }
+                    var_name[j] = '\0';
+
+                    val = env_get_val(&msh->env, var_name);
+                    if (!val)
+                        val = "";
+                    for (j = 0; val[j] != '\0'; ++j)
+                        vector_push_back_char(&out, val[j]);
+
+                    continue; // `i` already points on the first non-symbol of the name 
+                }
+
+                vector_push_back_char(&out, line[i]);
+                ++i;
+            }
+
+            vector_push_back_char(&out, '\0');
+
+            if (write_all(wfd, (char *)out.data, ft_strlen((char *)out.data)) != COMMON_SUCCESS ||
+                write_all(wfd, "\n", 1) != COMMON_SUCCESS)
+            {
+                vector_free(&out);
+                free(line);
+                break;
+            }
+
+            vector_free(&out);
+            free(line);
+        }
+    }
+
+    close(wfd);
+    exit(EXIT_SUCCESS);
 }
 
 /* Parent reads pipe into hd->content */
 int	heredoc_parent_collect(int rfd, t_heredoc *hd)
 {
-	char	buf[4096];
+	char	buf[MAX_HD_CONTENT_LEN];
 	ssize_t	rlen;
 	size_t	i;
 

@@ -21,7 +21,7 @@ SRCS=main.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
-	 engine.c redirect_parser.c redirect.c heredoc.c \
+	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
@@ -49,7 +49,7 @@ OBJS=main.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
-	 engine.o redirect_parser.o redirect.o heredoc.o \
+	 engine.o redirect_parser.o redirect.o heredoc.o heredoc2.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
@@ -290,6 +290,11 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 	libft.h vector.h error.h debug.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
+
+heredoc2.o : heredoc2.c heredoc.h shell.h \
+	libft.h vector.h error.h debug.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c heredoc2.c
 
 # ======================= Variable expantion/assignment ======================
 

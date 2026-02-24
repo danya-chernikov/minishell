@@ -3,6 +3,24 @@
 static void	push_back1(t_vector *v, void *val);
 static void	push_back2(t_vector *v, void *val);
 
+int	vector_push_back_char(t_vector *v, char c)
+{
+	return (vector_push_back(v, &c));
+}
+
+void	vec_push_str(t_vector *v, const char *s)
+{
+	size_t	i = 0;
+
+	if (!s)
+		return ;
+	while (s[i])
+	{
+		vector_push_back_char(v, s[i]);
+		++i;
+	}
+}
+
 int	vector_push_back(t_vector *v, void *val)
 {
 	void	*tmp;
@@ -22,11 +40,6 @@ int	vector_push_back(t_vector *v, void *val)
 	v->front = v->data;
 	v->back = (t_uchar *)v->data + (v->size - 1) * v->esize;
 	return (1);
-}
-
-int	vector_push_back_char(t_vector *v, char c)
-{
-	return (vector_push_back(v, &c));
 }
 
 /* On error returns NULL */
@@ -89,3 +102,4 @@ static void	push_back2(t_vector *v, void *val)
 	else if (v->data_type == VOID)
 		((void **)v->data)[v->size] = (void *)val;
 }
+
