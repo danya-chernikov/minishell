@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   aux_shell.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 00:48:27 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 00:53:13 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 #include "aux_common.h"
 
@@ -6,7 +18,7 @@
 static int	get_username(char **username);
 static int	get_subdomain(char **subdomain);
 static int	form_invitation(t_shell *msh, char *subdomain,
-		char *username, char *pwd);
+				char *username, char *pwd);
 
 /* Generates prompt invitation user@host:pwd$ */
 int	gen_prompt_inv(t_shell *msh)
