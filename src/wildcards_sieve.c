@@ -76,7 +76,7 @@ void	wc_check_file_loop(t_wc_data *wcd, bool *f_cancel)
 			break ;
 		}
 		if (wcd->mask[wcd->mi] == '*' &&
-			*((t_ind_type *)vector_at(wcd->qmask, wcd->mi)) == IND_QNONE)
+			*((char *)vector_at(wcd->qmask, wcd->mi)) == (char)IND_QNONE)
 		{
 			if (wc_match_asterisk(wcd) == BREAK)
 				break ;
