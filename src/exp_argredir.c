@@ -48,27 +48,44 @@ int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_
 	// (it can be any redirection except heredoc)
 	if (*opt_i > 0 && exp_token_is_redirect(&op->tokens[*opt_i - 1]))
 	{
+		// Heredocs delimiter: never treat as a file path
+		if (exp_token_is_heredoc(&op->tokens[*opt_i - 1]))
+		{
+			wc_free_res(&wc_res);
+			exp_vectors_free(vec_pair);
+			return (COMMON_SUCCESS);
+		}
+
+		// Regular redirection path: need a valid redir_ind
+		if (op_tok->redir_ind < 0 || (size_t)op_tok->redir_ind >= op->red_cnt)
+		{
+			wc_free_res(&wc_res);
+			exp_vectors_free(vec_pair);
+			return (COMMON_SUCCESS);
+		}
+
 		// It means we were handling a redirection operand/path
 		// If globbing gave us more than one coincidence
 		if (wc_res[1][0] != '\0')
 		{
 			print_shell_error(NULL, AMBIG_REDIRECT_ERR_MSG);
+			wc_free_res(&wc_res);
+			exp_vectors_free(vec_pair);
 			return (COMMON_FAILURE);
 		}
 		// Update the corresponding redirection path (this case
 		// we have the unique wildcards expansion result)
-		if (op->redirs[op_tok->redir_ind].path)
+		free(op->redirs[op_tok->redir_ind].path);
+		op->redirs[op_tok->redir_ind].path = ft_strdup(wc_res[0]);
+		if (!op->redirs[op_tok->redir_ind].path)
 		{
-			free(op->redirs[op_tok->redir_ind].path);
-			op->redirs[op_tok->redir_ind].path = ft_strdup(wc_res[0]);
-			if (!op->redirs[op_tok->redir_ind].path)
-			{
-				perror("malloc");
-				wc_free_res(&wc_res);
-				exp_vectors_free(vec_pair);
-				return (COMMON_SYS_ERR);
-			}
+			perror("malloc");
+			wc_free_res(&wc_res);
+			exp_vectors_free(vec_pair);
+			return (COMMON_SYS_ERR);
 		}
+		wc_free_res(&wc_res);
+		exp_vectors_free(vec_pair);
 	}
 	else
 	{
