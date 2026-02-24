@@ -118,11 +118,20 @@ void	ops_free(t_operand *ops)
 		while (j < MAX_REDIRS_NUM)
 		{
 			if (ops[i].redirs[j].path)
+			{
 				free(ops[i].redirs[j].path);
+				ops[i].redirs[j].path = NULL;
+			}
 			if (ops[i].redirs[j].hd.content)
+			{
 				free(ops[i].redirs[j].hd.content);
+				ops[i].redirs[j].hd.content = NULL;
+			}
 			if (ops[i].redirs[j].hd.delim)
+			{
 				free(ops[i].redirs[j].hd.delim);
+				ops[i].redirs[j].hd.delim = NULL;
+			}
 			++j;
 		}
 		++i;

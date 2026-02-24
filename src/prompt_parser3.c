@@ -39,8 +39,6 @@ int		operand_push(t_parser_data *d, size_t plen)
 	i = 0;
 	while (d->pi < plen && !is_special_char_outside_quotes(d, d->pi))
 	{
-		if (d->prompt[d->pi] == '&' && d->prompt[d->pi + 1] == '&')
-			break ;
 		if (i > MAX_OP_LEN - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_OP_ERR_MSG);

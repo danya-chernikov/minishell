@@ -118,6 +118,7 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 {
 	size_t		i;
 	size_t		eqsign_ind;
+	bool		f_extract;
 	char		dlr_varname[MAX_ENV_VAL_LEN];
 	t_ind_type	state;
 
@@ -134,11 +135,17 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 			exp_expand_tilde(msh, vec_pair, state);
 		else if (tok_str[i] == '$' && state != IND_QSINGLE)
 		{
-			// We need to extract the variable name first
-			// Just go to the right of the $ and copy all the characters
-			// until we encounter an invalid one (that is not permitted)
-			exp_extract_dlr_varname(dlr_varname, tok_str, &i);
-			exp_expand_variable(msh, vec_pair, dlr_varname, state);
+
+			f_extract = exp_extract_dlr_varname(dlr_varname, tok_str, &i);
+			if (!f_extract)
+			{
+				vector_push_back_char(vec_pair[EXP_RES], '$');
+				vector_push_back_char(vec_pair[QMASK], (char)state);
+			}
+			else
+			{
+				exp_expand_variable(msh, vec_pair, dlr_varname, state);
+			}
 		}
 		else // Current symbol is just a regular symbol (except quote)
 		{

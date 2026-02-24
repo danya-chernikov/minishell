@@ -34,7 +34,7 @@ void	exp_process_double_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_
 void	exp_process_single_quote(char *tok_str, size_t *i, t_vector *vec_pair[], t_ind_type *state);
 void	exp_expand_tilde(t_shell *msh, t_vector *vec_pair[], t_ind_type state);
 void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_ind_type state);
-void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i);
+bool	exp_extract_dlr_varname(char *dlr_varname, const char *tok_str, size_t *i);
 
 /* exp_service.c */
 int		exp_vectors_init(t_vector *vec_pair[], size_t cap);

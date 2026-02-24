@@ -82,45 +82,64 @@ void	exp_expand_variable(t_shell *msh, t_vector *vec_pair[], char *var_name, t_i
 
 	exp_res = vec_pair[EXP_RES];
 	qmask = vec_pair[QMASK];
+
+	if (!var_name || var_name[0] == '\0')
+	{
+		vector_push_back_char(exp_res, '$');
+		vector_push_back_char(qmask, (char)state);
+		return ;
+	}
+
 	var = env_get_val(&msh->env, var_name);
 	if (!var)
-		var = ""; // Before it was `var = ft_strdup("")` but it was producing leaks
+		var = "";
+
 	j = 0;
-	// Expand $ by copying the value of `var` into the new array
 	while (j < ft_strlen(var))
 	{
-		vector_push_back_char(exp_res, var[j]); // Copying...
-		// Assign the corresponding index in qmask[] the curret `state` value
+		vector_push_back_char(exp_res, var[j]);
 		vector_push_back_char(qmask, (char)state);
 		++j;
 	}
 }
 
-/* I think overflow here is impossible, because when we create an environment
- * variable we check for its maximum length (See set_rest_env_vars() function)*/
-void	exp_extract_dlr_varname(char *dlr_varname, char *tok_str, size_t *i)
+bool	exp_extract_dlr_varname(char *dlr_varname, const char *tok_str, size_t *i)
 {
-	size_t	j;
+    size_t	len;
+    size_t	j;
+    size_t	k;
+	char	c;
+	size_t	p;
 
 	j = 0;
-	++(*i);
-	// Exceptions
-	if (*i < ft_strlen(tok_str) &&
-		(tok_str[*i] == '$' || tok_str[*i] == '?' ||
-		tok_str[*i] == '#' || tok_str[*i] == '*'))
-	{
-		dlr_varname[j] = tok_str[*i];
-		++j;
-	}
-	else
-	{
-		while (*i < ft_strlen(tok_str) && is_varname_symbol_permitted(tok_str[*i]))
-		{
-			dlr_varname[j] = tok_str[*i];
-			++(*i);
-			++j;
-		}
-		--(*i); // Because later `i` will be incremented in caller's loop
-	}
-	dlr_varname[j] = '\0';
+	k = *i;
+	len = ft_strlen(tok_str);
+    dlr_varname[0] = '\0';
+
+    if (k + 1 >= len)
+        return (false);
+
+    c = tok_str[k + 1];
+    if (c == '$' || c == '?' || c == '#' || c == '*')
+    {
+        dlr_varname[0] = c;
+        dlr_varname[1] = '\0';
+        *i = k + 1;
+        return (true);
+    }
+
+    p = k + 1;
+    while (p < len && is_varname_symbol_permitted(tok_str[p]))
+    {
+        if (j + 1 >= MAX_ENV_VAL_LEN)
+            break;
+        dlr_varname[j++] = tok_str[p++];
+    }
+    dlr_varname[j] = '\0';
+
+    if (j == 0)
+        return (false);
+
+    *i = p - 1;
+    return (true);
 }

@@ -120,6 +120,7 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 {
 	size_t		i;
 	size_t		slen;
+	bool		f_extract;
 	char		dlr_varname[MAX_ENV_VAL_LEN];
 	t_ind_type	state;
 
@@ -136,8 +137,16 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 			exp_expand_tilde(msh, vec_pair, state);
 		else if (tok_str[i] == '$' && state != IND_QSINGLE)
 		{
-			exp_extract_dlr_varname(dlr_varname, tok_str, &i);
-			exp_expand_variable(msh, vec_pair, dlr_varname, state);
+			f_extract = exp_extract_dlr_varname(dlr_varname, tok_str, &i);
+			if (!f_extract)
+			{
+				vector_push_back_char(vec_pair[EXP_RES], '$');
+				vector_push_back_char(vec_pair[QMASK], (char)state);
+			}
+			else
+			{
+				exp_expand_variable(msh, vec_pair, dlr_varname, state);
+			}
 		}
 		else
 		{
