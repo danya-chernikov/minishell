@@ -1,0 +1,56 @@
+
+ # Daniil part start
+ shell.c shell_launcher.c aux_shell.c \
+
+ cmdargs_parser.c \
+
+ init_paramvars.c init_localvars.c init_localvars2.c \
+
+ init_localvars3.c init_localvars4.c init_localvars5.c \
+
+ init_envars.c init_envars2.c init_envars3.c \
+
+ env.c env_setters.c env_getters.c env_printers.c env_service.c \
+
+ env_exec.c \
+
+ history.c shell_history.c \
+
+ config.c shell_configs.c \
+
+ prompt_parser.c prompt_parser2.c prompt_parser3.c \
+
+ prompt_parser4.c prompt_parser5.c \
+
+ par.c quote.c token.c operand.c \
+# Daniil part ends here
+
+# Jhon part starts here
+ engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
+
+ exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
+
+ exp_service.c exp_service2.c exp_service3.c \
+
+ wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
+
+ wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
+
+ exec_expassign.c exec_ops.c exec_ops2.c \
+
+ exec_pipeline.c exec_pipeline2.c exec_pipeline3.c \
+
+ exec_execve.c exec_execve2.c exec_execve3.c \
+
+ exec_execve4.c exec_execve5.c exec_execve6.c \
+
+ builtin.c builtin_echo.c builtin_cd.c builtin_exit.c \
+
+ builtin_export.c builtin_others.c \
+
+ signals.c signals2.c \
+
+ aux_common.c aux_common2.c aux_common3.c \
+
+ aux_io.c error.c
+# Jhon part ends here
