@@ -1,4 +1,5 @@
 #include "prompt_parser.h"
+#include "expansion.h"
 
 /* Parses the user's prompt string by connecting all
  * operands with pipes and launching or exiting subshells

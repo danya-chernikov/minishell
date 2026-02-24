@@ -91,11 +91,10 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 
 void	msh_free(t_shell *msh)
 {
+	exp_free_all_ops_argv(msh->pd); // TO CORRECT LEAK
+	parser_free(msh->pd); // TO CORRECT LEAK
 	if (msh->pd)
-	{
-		//exp_free_all_ops_argv(msh->pd);
 		free(msh->pd);
-	}
 	if (msh->prompt_inv)
 		free(msh->prompt_inv);
 	env_free(&msh->env);

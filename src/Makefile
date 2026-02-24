@@ -6,7 +6,7 @@ LIBVECTOR_PATH=vector/
 NAME=minishell
 DEBUG_LVL=0
 
-CFLAGS=-Wall -Werror -Wextra
+CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c \
 	 shell.c shell_launcher.c aux_shell.c \

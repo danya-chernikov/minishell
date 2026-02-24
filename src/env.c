@@ -22,6 +22,8 @@ int	env_init(t_env *env, char **inh_env)
 {
 	size_t	i;
 
+	if (!env)
+		return (COMMON_SUCCESS);
 	env->vars_num = 0;
 	env->inh_env = inh_env;
 	env->vars = malloc(MAX_TOTAL_VARS_NUM * sizeof *env->vars);

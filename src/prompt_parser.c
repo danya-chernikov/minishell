@@ -1,4 +1,5 @@
 #include "prompt_parser.h"
+#include "env.h" // NEW
 
 /* The first token is always NONE because
  * we always check previous token value */

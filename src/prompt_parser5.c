@@ -33,6 +33,8 @@ bool	is_special_char_outside_quotes(t_parser_data *d, size_t pi)
 		return (false);
 	if (is_inside_quotes(d, pi))
 		return (false);
+	if (d->prompt[pi] == '&' && d->prompt[pi + 1] != '&')
+		return (false);
 	return (true);
 }
 
