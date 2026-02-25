@@ -48,15 +48,14 @@
 
  exp_common.c+ exp_preparation.c+ EXP_ASSIGNMENT.C EXP_ARGREDIR.C
 
- EXP_SERVICE.C EXP_SERVICE2.C EXP_SERVICE3.C
- 
+ exp_service.c exp_service2.c exp_service3.c (Daniil)
+ +++++++++++++++++++++++++++++++++++++++++++
 
  wildcards.c wildcards_filesclt.c wildcards_filesclt2.c
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  wildcards_sieve.c wildcards_sieve2.c wildcards_common.c
  +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
  exec_expassign.c exec_ops.c exec_ops2.c
  +++++++++++++++++++++++++++++++++++++++
