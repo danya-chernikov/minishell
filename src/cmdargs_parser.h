@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:17 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:50:18 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:13:20 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ int		handle_c_opt(t_shell *msh, int opt_i);
 int		handle_script(t_shell *msh, int opt_i);
 
 /* cmdargs_parser2.c */
-int		set_script_args(t_shell *msh, int opt_i, size_t *allargv_len, int *arg_i);
+int		set_script_args(t_shell *msh, int opt_i,
+			size_t *allargv_len, int *arg_i);
 int		set_allargs_var(t_shell *msh, size_t allargv_len, int arg_i);
 int		set_argv0_login(t_shell *msh);
 int		erase_quotes(char *str);

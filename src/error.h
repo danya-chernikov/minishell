@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:33 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:50:34 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:19:53 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@
 # define EXIT_TOO_MANY_ARGS		"too many arguments"
 
 /* Redirection errors */
-# define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+# define REDIRECT_ERR_MSG		"syntax error near unexpected token"
 # define TOO_MANY_REDIRECTS		"too many redirections"
 # define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
 # define TOO_LONG_HD_DELIM		"heredoc's delimiter is too long"
@@ -79,7 +79,7 @@
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
 # define GETUID_ERR_MSG			"Could not get my UID/EUID"
-# define GETPWUID_ERR_MSG		"Could not get info about the user who is running me"
+# define GETPWUID_ERR_MSG		"Could not get info about the user who runs me"
 
 /* Errors that should not occur in practice, but are still handled */
 # define OP_ARGV_IS_NULL		"Operand's argv is NULL"
@@ -87,9 +87,7 @@
 
 /* Common error our shell may return.
  *     CMD_LOCATED_BUT_NOT_EXEC_ERR - a file exists (it's path was
- *									  found), but does not have +x;
- *
- * */
+ *									  found), but does not have +x */
 typedef enum e_exit_code
 {
 	SUCCESS_CODE = 0,
@@ -99,7 +97,6 @@ typedef enum e_exit_code
 	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
 	CMD_NOT_LOCATED_ERR = 127,
 	SIGNALED_CODE = 128
-
 }	t_exit_code;
 
 void	print_sys_error(char *msg);

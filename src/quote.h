@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:13 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:52:13 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:32:27 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ typedef enum e_quote_type
 {
 	DOUBLE_QUOTE,
 	SINGLE_QUOTE
-
 }	t_quote_type;
 
 /* li - left-side index;
@@ -42,7 +41,7 @@ typedef struct s_quote_interval
 
 /* quote.c */
 bool	quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt);
-int		remove_syntax_quotes(char *str,  t_quote_int *quotes, size_t qpair_cnt);
+int		remove_syntax_quotes(char *str, t_quote_int *quotes, size_t qpair_cnt);
 
 /* quote2.c */
 bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind);

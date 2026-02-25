@@ -6,14 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:07 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:52:08 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:31:36 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PROMPT_PARSER_H
 # define PROMPT_PARSER_H
 
-#include <stdlib.h>
+# include <stdlib.h>
 
 # include "par.h"
 # include "quote.h"
@@ -55,7 +55,7 @@ typedef struct s_parser_data
 	t_operand	ops[MAX_OPS_NUM];
 	size_t		token_cnt;
 	t_token		tokens[MAX_TOKENS_NUM];
-	t_quote_int quotes[MAX_QUOTES_NUM];
+	t_quote_int	quotes[MAX_QUOTES_NUM];
 	size_t		qpair_cnt;
 	size_t		opar_num;
 	size_t		all_open_pars[MAX_PAR_NUM][2];	

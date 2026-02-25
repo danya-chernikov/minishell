@@ -6,14 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:34 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:52:35 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:33:25 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REDIRECT_PARSER_H
 # define REDIRECT_PARSER_H
 
-#include "prompt_parser.h"
+# include "prompt_parser.h"
 
 typedef struct s_operand	t_operand;
 

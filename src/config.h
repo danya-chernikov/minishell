@@ -6,12 +6,12 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:23 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:50:24 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:13:15 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIG_H
-#define CONFIG_H
+# define CONFIG_H
 
 # define HOSTNAME_PATH					"/etc/hostname"
 
@@ -61,7 +61,6 @@ typedef enum s_conf_type
 {
 	LOGIN_CONF,
 	NONLOGIN_CONF
-
 }	t_conf_type;
 
 typedef struct s_configs

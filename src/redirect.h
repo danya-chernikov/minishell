@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:25 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:52:26 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:32:49 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ typedef enum e_redir_type
 	REDIR_OUT,
 	REDIR_APP,
 	REDIR_HEREDOC
-
 }	t_redir_type;
 
 /* In case if the redirection is heredoc

@@ -6,12 +6,12 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:39 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:50:40 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:20:17 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EXEC_H
-#define EXEC_H
+# define EXEC_H
 
 # include <stdbool.h>
 # include <stddef.h>
@@ -53,7 +53,7 @@ typedef struct s_pipeline
 /* exec_expassign.c */
 int		do_all_expansions_assignments(t_shell *msh, t_token *token);
 int		do_expansions_assignments_2nd_lvl_token(t_shell *msh, t_operand *op,
-		size_t *opt_i, int *redir_cnt);
+			size_t *opt_i, int *redir_cnt);
 
 /* exec_ops.c */
 int		exec_ops(t_shell *msh, int *ret_code);

@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:51:54 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:51:55 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:29:21 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ typedef enum e_ind_type
 	IND_QDOUBLE,
 	IND_QSINGLE,
 	IND_QNONE
-
 }	t_ind_type;
 
 /* Operand's token.
@@ -47,41 +46,43 @@ typedef enum e_ind_type
  *					  in redirections array. We need it so
  *					  we could update the corresponding
  *					  redirection */
-typedef struct	s_op_token
+typedef struct s_op_token
 {
 	int			redir_ind;
 	char		*cnt;
 	t_quote_int	quotes[MAX_QUOTES_NUM];
 	size_t		qpair_cnt;
-
 }	t_op_token;
 
 /* STDIN_FILENO always must be bonded with read-end;
- * STDOUT_FILENO always must be bonded with write-end */
+ * STDOUT_FILENO always must be bonded with write-end
+ *     name			- path to program with its arguments, redirections and etc;
+ *     read_end		- stdin;
+ *     write_end	- stdout;
+ *     redirs		- redirections of this operand-program;
+ *     red_cnt		- redirections counter;
+ *     quotes		- all quotes pairs found in `name`;
+ *     qpair_cnt	- counter of quote pairs;
+ *     argv			- on heap;
+ *     tokens		- tokens of this operand-program;
+ *     my_env		- variables we created parsing this operand-program;
+ *     f_per_cmd	- per-command flag for our variables */
 typedef struct s_operand
 {
-	char		*name;					// Path to program with its arguments, redirections and etc.
-
-	int			read_end;				// stdin
-	int			write_end;				// stdout
-	
-	t_redir		redirs[MAX_REDIRS_NUM]; // Redirections of this operand-program
-	size_t		red_cnt;				// Redirections counter
-
-	t_quote_int quotes[MAX_QUOTES_NUM];	// All quotes pairs found in `name`
-	size_t		qpair_cnt;				// Counter of quote pairs
-
-	char		**argv;					// On heap
+	char		*name;
+	int			read_end;
+	int			write_end;
+	t_redir		redirs[MAX_REDIRS_NUM];
+	size_t		red_cnt;
+	t_quote_int	quotes[MAX_QUOTES_NUM];
+	size_t		qpair_cnt;
+	char		**argv;
 	int			argc;
-
-	t_op_token	*tokens;				// Tokens of this operand-program
+	t_op_token	*tokens;
 	size_t		token_cnt;
-
-	t_env		*my_env;				// Variables we created parsing this operand-program
-	bool		f_per_cmd;				// Per-command flag for our variables
-
+	t_env		*my_env;
+	bool		f_per_cmd;
 	pid_t		pid;
-
 }	t_operand;
 
 /* operand.c */

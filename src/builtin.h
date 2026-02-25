@@ -6,14 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:13 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:50:14 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:12:22 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BUILTIN_H
 # define BUILTIN_H
 
-#include <stdbool.h>
+# include <stdbool.h>
 
 /* Just built-ins ._. Yeah.. nothing more.
  *
