@@ -3,17 +3,20 @@
  main.c+
  ++++++++++
 
- shell.c shell_launcher.c+ shell_launch_script.c+ shell_launch_int.c+ aux_shell.c+
+ shell.c shell_launcher.c shell_launch_script.c shell_launch_int.c aux_shell.c
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  cmdargs_parser.c cmdargs_parser2.c cmdargs_parser3.c cmdarg_parser4.c
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  init_paramvars.c init_localvars.c init_localvars2.c
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  init_localvars3.c init_localvars4.c init_localvars5.c
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  init_envars.c init_envars2.c init_envars3.c
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  env.c env_setters.c env_getters.c env_printers.c env_service.c
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_envars.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:13:53 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 11:14:00 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
@@ -37,7 +49,6 @@ int	msh_set_env_vars(t_env *env)
 	ret = set_rest_env_vars(env);
 	if (ret != COMMON_SUCCESS)
 		return (ret);
-	// Check for memory errors
 	if (check_mem_errors(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 	return (COMMON_SUCCESS);
