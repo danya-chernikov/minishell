@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_setters.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:29:26 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 11:30:26 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 #include "error.h"
 
@@ -21,7 +33,7 @@ static void	create_new_var(t_env *env, char *name, char *val, t_var_type type);
 int	env_set(t_env *env, char *name, char *value, t_var_type type)
 {
 	t_env_var	*var;
-	
+
 	if (!name || !value)
 	{
 		free(name);
