@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 18:09:26 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 20:09:42 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:11:18 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,6 @@
 #include "libft.h"
 #include "vector.h"
 #include "error.h"
-
-// Pegar en el .h
-typedef struct s_exp_ctx
-{
-	t_shell		*msh;
-	char		*tok_str;
-	t_vector	**vec_pair;
-	size_t		*i;
-	t_ind_type	*state;
-}	t_exp_ctx;
 
 int	exp_process_argredir(t_shell *msh, t_operand *op,
 			t_op_token *op_tok, size_t *opt_i)
@@ -61,7 +51,7 @@ int	exp_process_argredir(t_shell *msh, t_operand *op,
 
 /* Updates the redirection path after expansion and wildcard processing.
  * Checks for ambiguous redirects if multiple files match a pattern.*/
-static int	update_redir_path(t_operand *op, t_op_token *tok, char **wc)
+int	update_redir_path(t_operand *op, t_op_token *tok, char **wc)
 {
 	if (tok->redir_ind < 0 || (size_t)tok->redir_ind >= op->red_cnt)
 		return (COMMON_SUCCESS);
@@ -81,7 +71,7 @@ static int	update_redir_path(t_operand *op, t_op_token *tok, char **wc)
 }
 
 /*Fills the operand's argv with results from wildcard expansion.*/
-static int	fill_argv(t_operand *op, char **wc)
+int	fill_argv(t_operand *op, char **wc)
 {
 	size_t	i;
 
@@ -134,7 +124,7 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str,
 
 /* Process a single character of tok_str handling quotes,
  * variable expansion, tilde expansion or literal push.*/
-static void	exp_handle_char(t_exp_ctx *ctx)
+void	exp_handle_char(t_exp_ctx *ctx)
 {
 	char	c;
 
@@ -153,22 +143,4 @@ static void	exp_handle_char(t_exp_ctx *ctx)
 		exp_handle_dollar(ctx);
 	else
 		push_char_mask(ctx->vec_pair, c, *ctx->state);
-}
-
-static void	exp_handle_dollar(t_exp_ctx *ctx)
-{
-	char	dlr_varname[MAX_ENV_VAL_LEN];
-
-	if (!exp_extract_dlr_varname(dlr_varname,
-			ctx->tok_str, ctx->i))
-		push_char_mask(ctx->vec_pair, '$', *ctx->state);
-	else
-		exp_expand_variable(ctx->msh,
-			ctx->vec_pair, dlr_varname, *ctx->state);
-}
-
-static void	push_char_mask(t_vector *vec_pair[], char c, t_ind_type state)
-{
-	vector_push_back_char(vec_pair[EXP_RES], c);
-	vector_push_back_char(vec_pair[QMASK], (char)state);
 }

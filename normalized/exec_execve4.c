@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 13:09:40 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 13:09:48 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 23:47:43 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 
 #include <unistd.h>
 #include <fcntl.h>
-
-static int	open_heredoc(t_redir *r, int *out_fd);
 
 int	apply_redirs(t_operand *op)
 {
@@ -66,7 +64,7 @@ int	redir_open_fd(t_redir *redir, int *out_fd)
 	return (COMMON_SUCCESS);
 }
 
-static int	open_heredoc(t_redir *r, int *out_fd)
+int	open_heredoc(t_redir *r, int *out_fd)
 {
 	int	p[2];
 	int	fret;
@@ -90,4 +88,26 @@ static int	open_heredoc(t_redir *r, int *out_fd)
 	}
 	*out_fd = p[READ_END];
 	return (COMMON_SUCCESS);
+}
+
+char	*key_value_to_str(const char *key, const char *value)
+{
+	size_t	key_len;
+	size_t	val_len;
+	size_t	total_len;
+	char	*str;
+
+	key_len = ft_strlen(key);
+	val_len = 0;
+	if (value)
+		val_len = ft_strlen(value);
+	total_len = key_len + val_len + 2;
+	str = (char *)malloc(total_len * sizeof (char));
+	if (!str)
+		return (NULL);
+	ft_strlcpy(str, key, total_len);
+	ft_strlcat(str, "=", total_len);
+	if (value)
+		ft_strlcat(str, value, total_len);
+	return (str);
 }

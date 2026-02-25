@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 10:15:08 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 10:34:18 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:20:37 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,17 +140,4 @@ bool	exp_extract_dlr_varname(char *dlr_varname, const char *tok_str,
 		return (false);
 	*i = p - 1;
 	return (true);
-}
-
-/* Checks if the character after $ is a special shell variable.*/
-static bool	extract_special_var(char *dlr_varname, char c, size_t *i, size_t k)
-{
-	if (c == '$' || c == '?' || c == '#' || c == '*')
-	{
-		dlr_varname[0] = c;
-		dlr_varname[1] = '\0';
-		*i = k + 1;
-		return (true);
-	}
-	return (false);
 }

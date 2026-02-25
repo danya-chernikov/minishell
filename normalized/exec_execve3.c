@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:59:18 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 13:08:43 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 23:44:11 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ char	*resolve_in_path(t_shell *msh, const char *cmd)
 
 /* Extracts a single directory from the PATH string and checks if the
  * command exists within it. Updates the index for the next iteration.*/
-static char	*check_next_path(const char *path, size_t *i, const char *cmd)
+char	*check_next_path(const char *path, size_t *i, const char *cmd)
 {
 	size_t	start;
 	char	*dir;

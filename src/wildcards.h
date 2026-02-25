@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:57 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 22:36:41 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:18:14 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,13 @@ int		wc_check_zero_matches(t_wc_data *wcd, char **res_files,
 
 /* wildcards_common.c */
 void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask);
+void	wc_update_vectors(t_vector *exp_res, t_vector *qmask_char,
+				size_t *w, size_t r)
 bool	wc_is_asterisk(char expres_char, char qmask_char);
 void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len);
 int		wc_alloc_res(char ***wc_res);
+
+/* wildcards_common2.c */
 void	wc_free_res(char ***wc_res);
 
 #endif

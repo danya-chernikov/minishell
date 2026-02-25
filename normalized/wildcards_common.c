@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:11:27 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 20:58:47 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:21:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "error.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 /* Collapse consequtive unquoted asterisks in `exp_res` and update `qmask`.
@@ -46,7 +47,7 @@ void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask)
 		qmask_char = *((char *)vector_at(qmask, read_ind));
 		if (!wc_is_asterisk(expres_char, qmask_char) && f_prev_ast)
 		{
-			update_vectors(exp_res, qmask_char, &write_ind, read_ind);
+			wc_update_vectors(exp_res, qmask_char, &write_ind, read_ind);
 			f_prev_ast = wc_is_asterisk(expres_char, qmask_char);
 		}
 		++read_ind;
@@ -54,7 +55,7 @@ void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask)
 	wc_trim_vectors(exp_res, qmask, write_ind);
 }
 
-static void	update_vectors(t_vector *exp_res, t_vector *qmask_char,
+void	wc_update_vectors(t_vector *exp_res, t_vector *qmask_char,
 				size_t *w, size_t r)
 {
 	char	c;
@@ -114,17 +115,4 @@ int	wc_alloc_res(char ***wc_res)
 		++i;
 	}
 	return (COMMON_SUCCESS);
-}
-
-void	wc_free_res(char ***wc_res)
-{
-	size_t	i;	
-
-	i = 0;
-	while (i < WC_MAX_FILES_NUM)
-	{
-		free((*wc_res)[i]);
-		++i;
-	}
-	free(*wc_res);
 }

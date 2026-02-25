@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 18:39:56 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 20:30:39 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 23:19:32 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,6 @@
 #include "libft.h"
 #include "vector.h"
 #include "error.h"
-
-// Colocar en el .h
-typedef struct s_exp_assign_ctx
-{
-	t_shell		*msh;
-	char		*tok_str;
-	t_vector	**vec_pair;
-	size_t		*i;
-	t_ind_type	*state;
-	size_t		eqsing_ind;
-}	t_exp_assign_ctx;
 
 /* Here we consider only the first '=' found.
  * For example:
@@ -102,7 +91,7 @@ int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok,
 
 /* Handles the assignment of expanded values to a variable name.
  * Only sets the variable if the f_per_cmd flag is false.*/
-static int	set_expanded_var(t_operand *op, char *name, t_vector *vec_pair[])
+int	set_expanded_var(t_operand *op, char *name, t_vector *vec_pair[])
 {
 	int	res;
 
@@ -142,7 +131,7 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str,
 	vector_push_back_char(vec_pair[EXP_RES], '\0');
 }
 
-static void	exp_handle_assign_char(t_exp_assign_ctx *ctx)
+void	exp_handle_assign_char(t_exp_assign_ctx *ctx)
 {
 	char	c;
 
@@ -161,23 +150,4 @@ static void	exp_handle_assign_char(t_exp_assign_ctx *ctx)
 		exp_handle_assign_dollar(ctx);
 	else
 		push_assign_mask(ctx->vec_pair, c, *ctx->state);
-}
-
-static void	exp_handle_assign_dollar(t_exp_assign_ctx *ctx)
-{
-	char	dlr_varname[MAX_ENV_VAL_LEN];
-
-	if (!exp_extract_dlr_varname(dlr_varname,
-			ctx->tok_str, ctx->i))
-		push_assign_mask(ctx->vec_pair, '$', *ctx->state);
-	else
-		exp_expand_variable(ctx->msh,
-			ctx->vec_pair, dlr_varname, *ctx->state);
-}
-
-/* Helper to push character and mask to vectors */
-static void	push_assign_mask(t_vector *vec_pair[], char c, t_ind_type state)
-{
-	vector_push_back_char(vec_pair[EXP_RES], c);
-	vector_push_back_char(vec_pair[QMASK], (char)state);
 }

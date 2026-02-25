@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:34:12 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 12:46:15 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 23:33:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,6 @@
 #include "error.h"
 
 #include <stdio.h>
-
-int		parent_run_with_redirs(t_shell *msh, t_token *token);
-int		save_stdio(int *save_in, int *save_out);
-void	restore_stdio(int save_in, int save_out);
 
 int	parent_run_with_redirs(t_shell *msh, t_token *token)
 {
