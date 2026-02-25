@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int		exp_alloc_argv(t_operand *op)
+int	exp_alloc_argv(t_operand *op)
 {
 	op->argv = (char **)ft_calloc(MAX_ARGC_NUM, sizeof (char *));
 	if (!op->argv)
