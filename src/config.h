@@ -1,11 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Where to put it if not here?
 # define HOSTNAME_PATH					"/etc/hostname"
 
 /* LOGIN SHELL*/
-
 # define LOGIN_CONFIGS_NUM				6
 
 /* Original bash default configs paths */
@@ -56,7 +54,6 @@ typedef enum s_conf_type
 
 typedef struct s_configs
 {
-	// Login
 	char	*etc_prof_path;
 	char	*home_prof_path;
 	char	*home_login_path;
@@ -64,7 +61,6 @@ typedef struct s_configs
 	char	*home_logout_path;
 	char	*etc_logout_path;
 	char	*login[LOGIN_CONFIGS_NUM];
-	// Non-login
 	char	*etc_rc_path;
 	char	*home_rc_path;
 	char	*nonlogin[NONLOGIN_CONFIGS_NUM];

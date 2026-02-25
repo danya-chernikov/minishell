@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   history.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:34:15 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 11:35:00 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "history.h"
 
 #include <stdio.h>
@@ -26,7 +38,7 @@ int	history_init(t_history *history)
 	history->lines_num = 0;
 	history->histsize = DEF_HISTSIZE;
 	history->histfilesize = DEF_HISTFILESIZE;
-	history->lines = malloc(MAX_HIST_LINES_NUM * sizeof *history->lines);
+	history->lines = malloc(MAX_HIST_LINES_NUM * sizeof (t_hist_cmd));
 	history->histfile_path = NULL;
 	if (!history->lines)
 	{
@@ -43,7 +55,7 @@ int	history_init(t_history *history)
 }
 
 void	history_free(t_history *history)
-{	
+{
 	size_t	i;
 
 	if (!history)

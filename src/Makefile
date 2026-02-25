@@ -19,7 +19,7 @@ SRCS=main.c \
 	 env.c env_setters.c env_getters.c env_printers.c env_service.c \
 	 env_exec.c \
 	 history.c shell_history.c \
-	 config.c shell_configs.c \
+	 config.c shell_configs.c shell_login_configs.c shell_nonlogin_configs.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
