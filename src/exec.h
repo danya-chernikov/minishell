@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:50:39 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 23:52:03 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:50:44 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	child_exec_operand(t_shell *msh, t_token *token);
 void	child_exec_builtin(t_shell *msh, t_token *token);
 void	child_exec_external(t_shell *msh, t_token *token);
 void	child_cleanup_exit(t_token *token, char **envp, char *path,
-		int stat);
+			int stat);
 char	**build_envp_for_operand(t_shell *msh, t_operand *op);
 
 /* exec_execve3.c */
@@ -132,6 +132,5 @@ int		copy_operand_env(t_operand *op, char **envp, size_t *ei);
 int		copy_shell_env(t_shell *msh, char **envp, size_t *ei);
 size_t	count_operand_envp(t_env *env);
 size_t	count_shell_envp(t_shell *msh, t_env *op_env);
-
 
 #endif

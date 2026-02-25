@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:34 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 00:07:51 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:48:36 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ typedef struct s_operand	t_operand;
 
 /* redirect_parser.c */
 int	redirections_parser(t_parser_data *d);
-int	process_redir_types(t_operand *op, size_t *op_i)
+int	process_redir_types(t_operand *op, size_t *op_i);
 int	validate_redir(t_operand *op, size_t *op_i, int size);
 int	extr_redir_path(t_operand *op, size_t *wi, char *path, size_t max);
 
@@ -32,6 +32,5 @@ int	get_hd_delimiter(t_operand *op, size_t *wi);
 
 /* redirect_parser3.c */
 int	get_hd_delimiter(t_operand *op, size_t *wi);
-
 
 #endif
