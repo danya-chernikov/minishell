@@ -20,8 +20,9 @@ SRCS=main.c \
 	 env_exec.c \
 	 history.c shell_history.c \
 	 config.c shell_configs.c shell_login_configs.c shell_nonlogin_configs.c \
-	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
-	 prompt_parser4.c prompt_parser5.c \
+	 prompt_parser.c \
+	 prompt_parser_proc_spec_char.c prompt_parser_proc_nonspec_char.c \
+	 prompt_parser2.c prompt_parser3.c prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \

@@ -1,7 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   prompt_parser3.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 15:52:24 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 16:42:11 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "prompt_parser.h"
+
+#include "libft.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+static int	copy_operand(t_parser_data *d, char *opname, size_t plen);
 
 void	token_push(t_parser_data *d, t_token_type type)
 {
@@ -26,15 +42,36 @@ void	token_push(t_parser_data *d, t_token_type type)
  * a new operand (program built-in name/path plus
  * its arguments or variables assignments). Also
  * it checks for potential buffer overflows.
- *
  *     plen	- promopt length;
  *     pi	- prompt index */
-int		operand_push(t_parser_data *d, size_t plen)
+int	operand_push(t_parser_data *d, size_t plen)
 {
-	size_t	i;
 	int		fret;
 	size_t	opname_len;
 	char	opname[MAX_OPS_NUM];
+
+	fret = copy_operand(d, opname, plen);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
+	remove_right_spaces(opname);
+	opname_len = ft_strlen(opname);
+	d->ops[d->op_cnt].name = (char *)malloc((opname_len + 1) * sizeof (char));
+	if (!d->ops[d->op_cnt].name)
+		return (perror("malloc"), COMMON_SYS_ERR);
+	ft_strlcpy(d->ops[d->op_cnt].name, opname, opname_len + 1);
+	fret = op_token_init(&d->ops[d->op_cnt]);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
+	fret = op_env_init(&d->ops[d->op_cnt]);
+	if (fret != COMMON_SUCCESS)
+		return (fret);
+	++d->op_cnt;
+	return (COMMON_SUCCESS);
+}
+
+static int	copy_operand(t_parser_data *d, char *opname, size_t plen)
+{
+	size_t	i;
 
 	i = 0;
 	while (d->pi < plen && !is_special_char_outside_quotes(d, d->pi))
@@ -54,26 +91,6 @@ int		operand_push(t_parser_data *d, size_t plen)
 		++i;
 	}
 	opname[i] = '\0';
-	remove_right_spaces(opname); // DUCT TAPE! ( but works :3 )
-	opname_len = ft_strlen(opname);
-	d->ops[d->op_cnt].name = (char *)malloc((opname_len + 1) * sizeof (char));
-	if (!d->ops[d->op_cnt].name)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
-	ft_strlcpy(d->ops[d->op_cnt].name, opname, opname_len + 1);
-	// Initialize tokens of this operand
-	fret = op_token_init(&d->ops[d->op_cnt]);
-	if (fret != COMMON_SUCCESS)
-		return (fret);
-	// Initialize local environment of this operand
-	fret = op_env_init(&d->ops[d->op_cnt]);
-	if (fret != COMMON_SUCCESS)
-		return (fret);
-
-	++d->op_cnt;
-
 	return (COMMON_SUCCESS);
 }
 
@@ -94,17 +111,16 @@ bool	check_empty_par(t_parser_data *d)
 		{
 			++pi;
 			skip_spaces(d->prompt, &pi);
-			// Parsing error
-			if (pi == plen ||
-				(d->prompt[pi] == ')' && !is_inside_quotes(d, pi)))
+			if (pi == plen
+				|| (d->prompt[pi] == ')' && !is_inside_quotes(d, pi)))
 			{
 				print_shell_error(NULL, EMPTY_PARS_ERR_MSG);
-				return false;
+				return (false);
 			}
 		}
 		++pi;
 	}
-	return true;
+	return (true);
 }
 
 /* Checks whether there is an opening parenthesis
@@ -123,11 +139,11 @@ int	later_goes_open_par(char *str, size_t ind)
 	while (ind < slen)
 	{
 		if (str[ind] == '(')
-			return ind;
+			return (ind);
 		if (str[ind] == ' ')
 			++ind;
 		else
-			return -1;
+			return (-1);
 	}
 	return (-1);
 }

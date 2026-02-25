@@ -16,46 +16,70 @@
 # define NONE_INDEX			-1
 # define NONE_PIPE			-1
 
+/* Describes first-level token parser data.
+ * Main definitions:
+ *     prompt		- prompt string entered by user;
+ *     pi			- prompt index;
+ *     op_cnt		- operand counter;
+ *     ops			- operands (programs to launch);
+ *     token_cnt	- token counter;
+ *     tokens		- here we store all tokens we found during parsing;
+ *     quotes		- all quotes pairs found in the prompt;
+ *     qpair_cnt	- counter of quote pairs;
+ * Auxiliary definitions:
+ *     opar_num		- number of all opening-parentheses;
+ *	   all_open_pars- indexes of all opening-parentheses;
+ *	   opar_cnt		- opening-parentheses counter (must be signed type);
+ *	   open_par		- opening-parentheses indexes found and thier flags;
+ *	   cpar_cnt		- closing-parentheses counter (for now let it be int);
+ *     close_par	- closing-parentheses indexes found and their flags;
+ *     pars			- a member that represents each parentheses pair;
+ *     par_cnt		- parentheses pair counter */
 typedef struct s_parser_data
 {
-	char		*prompt;					// Prompt entered by user
-	size_t		pi;							// Prompt index
-
-	size_t		pipe_cnt;					// Pipe counter
-	int			pipes[MAX_PIPES_NUM][2];	// All pipes array
-	
-	size_t		op_cnt;						// Operand counter
-	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
-	
-	size_t		token_cnt;					// Token counter
-	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
-	
-	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
-	size_t		qpair_cnt;					// Counter of quote pairs
-
-
-	/* Auxiliary things */
-	size_t		opar_num;					// Number of all opening-parentheses
-	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
-	
-	t_ll		opar_cnt;					// Opening-parentheses counter (must be int)
-	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found and thier flags
-	
-	t_ll		cpar_cnt;					// Closing-parentheses counter (for now let it be int)
-	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
-	
-	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
-	size_t		par_cnt;					// Parentheses pair counter
-
+	char		*prompt;
+	size_t		pi;
+	size_t		op_cnt;
+	t_operand	ops[MAX_OPS_NUM];
+	size_t		token_cnt;
+	t_token		tokens[MAX_TOKENS_NUM];
+	t_quote_int quotes[MAX_QUOTES_NUM];
+	size_t		qpair_cnt;
+	size_t		opar_num;
+	size_t		all_open_pars[MAX_PAR_NUM][2];	
+	t_ll		opar_cnt;
+	size_t		open_par[MAX_PAR_NUM];	
+	t_ll		cpar_cnt;
+	size_t		close_par[MAX_PAR_NUM][2];
+	t_pair		pars[MAX_PAR_NUM];
+	size_t		par_cnt;
 }	t_parser_data;
 
 /* prompt_parser.c */
 int		parser_init(t_parser_data *d, char *rline_buf);
 void	parser_free(t_parser_data *d);
+int		parser_engine(t_parser_data *d);
+int		parser_engine_loop_body(t_parser_data *d, int *opar_ind, size_t plen);
+
+/* prompt_parser_proc_spec_char.c */
+int		process_special_char(t_parser_data *d, size_t prompt_len);
+int		process_special_char_check_pars(t_parser_data *d);
+
+/* prompt_parser_proc_spec_char2.c */
+int		process_pipe_and_logical_operators(t_parser_data *d, size_t prompt_len);
+int		process_special_char_handle_pipe(t_parser_data *d);
+int		process_special_char_handle_and(t_parser_data *d);
+int		process_special_char_handle_or(t_parser_data *d);
+
+/* prompt_parser_proc_nonspec_char.c */
+int		process_nonspecial_char(t_parser_data *d, int *opi, size_t plen);
+int		process_nonspecial_char_prep(t_parser_data *d, size_t prompt_len);
+int		process_nonspecial_char_handle_pipe(t_parser_data *d, int *i, size_t l);
+int		process_nonspecial_char_handle_nonpipe(t_parser_data *d, size_t plen);
 
 /* prompt_parser2.c */
-int		parser_engine(t_parser_data *d); // Main function
-int		handle_open_par(t_parser_data *d, int opar_ind);
+int		handle_open_par(t_parser_data *d, int *opar_ind);
+int		handle_open_par_check_errors(t_parser_data *d, size_t *lpi, size_t pl);
 int		handle_close_par(t_parser_data *d);
 
 /* prompt_parser3.c */
@@ -65,13 +89,13 @@ bool	check_empty_par(t_parser_data *d);
 int		later_goes_open_par(char *str, size_t ind);
 
 /* prompt_parser4.c */
-bool	its_logical_AND(char *prompt, size_t plen, size_t pi);
-bool	its_logical_OR(char *prompt, size_t plen, size_t pi);
-bool	its_PIPE(char *prompt, size_t plen, size_t pi);
+bool	its_logical_and(char *prompt, size_t plen, size_t pi);
+bool	its_logical_or(char *prompt, size_t plen, size_t pi);
+bool	its_pipe(char *prompt, size_t plen, size_t pi);
+void	skip_spaces(char *prompt, size_t *pi);
 
 /* prompt_parser5.c */
-void	skip_spaces(char *prompt, size_t *pi);
-bool	is_special_char(char sym);
+bool	is_spec_char(char sym);
 bool	is_inside_quotes(t_parser_data *d, size_t pi);
 bool	is_special_char_outside_quotes(t_parser_data *d, size_t pi);
 void	remove_right_spaces(char *prompt);

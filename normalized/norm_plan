@@ -31,8 +31,10 @@
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  prompt_parser.c prompt_parser2.c prompt_parser3.c
+ +++++++++++++++++++++++++++++++++++++++++++++++++
 
  prompt_parser4.c prompt_parser5.c
+ +++++++++++++++++++++++++++++++++
 
  par.c quote.c token.c operand.c
 # Daniil part ends here
