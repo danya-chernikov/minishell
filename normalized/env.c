@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:23:13 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 11:24:42 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:05:46 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,10 @@ void	env_free(t_env *env)
 	}
 	env->vars_num = 0;
 	env->inh_env = NULL;
+}
+
+char	*env_get_def_path(void)
+{
+	return ("/usr/local/sbin:/usr/local/bin:"
+		"/usr/sbin:/usr/bin:/sbin:/bin");
 }

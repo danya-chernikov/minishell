@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:15:37 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 11:16:21 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 22:05:37 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	set_env_path(t_env *env)
 	env->vars[SE_PATH].name = ft_strdup("PATH");
 	path = getenv("PATH");
 	if (!path)
-		env->vars[SE_PATH].value = ft_strdup(DEF_PATH);
+		env->vars[SE_PATH].value = ft_strdup(env_get_def_path());
 	else
 		env->vars[SE_PATH].value = ft_strdup(path);
 }
