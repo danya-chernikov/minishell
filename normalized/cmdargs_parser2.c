@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 04:54:29 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 04:54:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 04:59:48 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,13 @@ int	erase_quotes(char *str)
 {
 	size_t	i;
 
-	if ((str[0] == '\'' && str[ft_strlen(str) - 1] != '\'') ||
-		(str[0] == '"' && str[ft_strlen(str) - 1] != '"'))
+	if ((str[0] == '\'' && str[ft_strlen(str) - 1] != '\'')
+		|| (str[0] == '"' && str[ft_strlen(str) - 1] != '"'))
 	{
 		return (COMMON_FAILURE);
 	}
-	if ((str[ft_strlen(str) - 1] == '\'' && str[0] != '\'') ||
-		(str[ft_strlen(str) - 1] == '"' && str[0] != '"'))
+	if ((str[ft_strlen(str) - 1] == '\'' && str[0] != '\'')
+		|| (str[ft_strlen(str) - 1] == '"' && str[0] != '"'))
 	{
 		return (COMMON_FAILURE);
 	}

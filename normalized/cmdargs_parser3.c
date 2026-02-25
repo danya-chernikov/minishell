@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 04:54:30 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 04:54:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 05:01:47 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,17 @@ bool	is_version_opt(char *opt)
 
 bool	is_verbose_opt(char *opt)
 {
-	if (!ft_strncmp(opt, VERBOSE_LONG_OPT, ft_strlen(VERBOSE_LONG_OPT)) ||
-		!ft_strncmp(opt, VERBOSE_SHORT_OPT, ft_strlen(VERBOSE_SHORT_OPT)))
-			return (true);
+	if (!ft_strncmp(opt, VERBOSE_LONG_OPT, ft_strlen(VERBOSE_LONG_OPT))
+		|| !ft_strncmp(opt, VERBOSE_SHORT_OPT, ft_strlen(VERBOSE_SHORT_OPT)))
+		return (true);
 	return (false);
 }
 
 bool	is_login_opt(char *opt)
 {
-	if (!ft_strncmp(opt, LOGIN_LONG_OPT, ft_strlen(LOGIN_LONG_OPT)) ||
-		!ft_strncmp(opt, LOGIN_SHORT_OPT, ft_strlen(LOGIN_SHORT_OPT)))
-			return (true);
+	if (!ft_strncmp(opt, LOGIN_LONG_OPT, ft_strlen(LOGIN_LONG_OPT))
+		|| !ft_strncmp(opt, LOGIN_SHORT_OPT, ft_strlen(LOGIN_SHORT_OPT)))
+		return (true);
 	return (false);
 }
 

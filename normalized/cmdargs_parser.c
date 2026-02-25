@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 04:54:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 04:54:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 04:59:14 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static int	parser_loop_second_part(t_shell *msh)
 			print_shell_error(msh->argv[opt_i], INV_OPT_ERR_MSG);
 			print_help();
 			return (SYNTAX_ERR);
-		}		
+		}
 		return (handle_script(msh, opt_i));
 	}
 	return (COMMON_SUCCESS);

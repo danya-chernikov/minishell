@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 04:54:32 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 04:54:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 05:02:33 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	print_version(void)
 		MSH_NAME_LONG, MSH_VERSION, MSH_ARCH, MSH_OSTYPE);
 	printf("Copyleft (C) 2026 Urduliz 42\n");
 	printf("License 42 Educational: <https://42.fr>\n");
-	printf("\nThis is free software; you are free to change and redistribute it.\n");
+	printf("\nThis is free software; you are free to change ");
+	printf("and redistribute it.\n");
 	printf("There is NO WARRANTY, to the extent permitted by law.\n");
 }

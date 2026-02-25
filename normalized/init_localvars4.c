@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_localvars4.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 05:10:24 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 05:10:38 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
@@ -34,7 +46,7 @@ char	*get_hostname(void)
 	gnlerr = 0;
 	hostname = get_next_line(fd, &gnlerr);
 	if (!hostname && gnlerr)
-	{	
+	{
 		print_shell_error("get_next_line()", GNL_ERR_MSG);
 		gnl_finish(fd);
 		return (NULL);

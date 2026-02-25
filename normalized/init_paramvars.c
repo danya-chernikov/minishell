@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_paramvars.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 04:58:50 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 04:58:51 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
@@ -19,11 +31,8 @@ int	msh_init_param_vars(t_env *env)
 	prelim_vars_init(env);
 	set_var_names(env);
 	env->vars_num = PARAM_VARS_NUM;
-	// Check for memory errors
 	if (check_mem_errors(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	// Why not to set $$, $#, $0 and $? immediately...
-	// Set $$
 	res = ft_getpid(&pid);
 	if (res == -1)
 	{
@@ -31,9 +40,7 @@ int	msh_init_param_vars(t_env *env)
 		return (COMMON_SYS_ERR);
 	}
 	env->vars[PV_PID].value = ft_itoa((int)pid);
-	// Set $#
 	env->vars[PV_ARGNUM].value = ft_strdup("0");
-	// Set $?
 	env->vars[PV_RETCODE].value = ft_strdup("0");
 	return (COMMON_SUCCESS);
 }
@@ -43,7 +50,6 @@ static void	prelim_vars_init(t_env *env)
 	t_paramvar	vi;
 
 	vi = PV_HOME;
-	// Init ~, $?
 	while (vi < PV_PID)
 	{
 		env->vars[vi].type = PARAM;
@@ -52,7 +58,6 @@ static void	prelim_vars_init(t_env *env)
 		env->vars[vi].value = NULL;
 		++vi;
 	}
-	// Init all the rest variables
 	while (vi < PARAM_VARS_NUM)
 	{
 		env->vars[vi].type = PARAM;
@@ -66,8 +71,8 @@ static void	prelim_vars_init(t_env *env)
 
 static void	set_var_names(t_env *env)
 {
-	env->vars[PV_HOME].name = ft_strdup("~"); // may be changed!
-	env->vars[PV_RETCODE].name = ft_strdup("?");// may be changed!
+	env->vars[PV_HOME].name = ft_strdup("~");
+	env->vars[PV_RETCODE].name = ft_strdup("?");
 	env->vars[PV_PID].name = ft_strdup("$");
 	env->vars[PV_ARGNUM].name = ft_strdup("#");
 	env->vars[PV_ALLARGS].name = ft_strdup("*");

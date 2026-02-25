@@ -12,7 +12,7 @@ SRCS=main.c \
 	 shell.c aux_shell.c \
 	 shell_launcher.c \
 	 shell_launch_script.c shell_launch_int.c \
-	 cmdargs_parser.c \
+	 cmdargs_parser.c cmdargs_parser2.c cmdargs_parser3.c cmdargs_parser4.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
