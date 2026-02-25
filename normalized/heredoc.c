@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:42:08 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 19:43:13 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 19:50:49 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,17 +81,6 @@ static int	hd_finish(t_hd_ctx *ctx)
 	return (ctx->ret_code);
 }
 
-static int	hd_fork_error(t_hd_ctx *ctx, int p[2])
-{
-	perror("fork");
-	close(p[HD_READ]);
-	close(p[HD_WRITE]);
-	parent_restore_signals(&ctx->old_int, &ctx->old_quit);
-	if (ctx->f_have_tty)
-		tcsetattr(STDIN_FILENO, TCSANOW, &ctx->saved);
-	return (COMMON_SYS_ERR);
-}
-
 int	read_one_heredoc(t_shell *msh, t_heredoc *hd)
 {
 	t_hd_ctx	ctx;
@@ -117,6 +106,17 @@ int	read_one_heredoc(t_shell *msh, t_heredoc *hd)
 	ctx.ret_code = heredoc_parent_collect(p[HD_READ], hd);
 	waitpid(pid, &ctx.status, 0);
 	return (hd_finish(&ctx));
+}
+
+static int	hd_fork_error(t_hd_ctx *ctx, int p[2])
+{
+	perror("fork");
+	close(p[HD_READ]);
+	close(p[HD_WRITE]);
+	parent_restore_signals(&ctx->old_int, &ctx->old_quit);
+	if (ctx->f_have_tty)
+		tcsetattr(STDIN_FILENO, TCSANOW, &ctx->saved);
+	return (COMMON_SYS_ERR);
 }
 
 void	hd_expand_var(t_shell *msh, t_vector *out, const char *line,
@@ -248,22 +248,6 @@ int	hd_write_raw(int wfd, char *line)
 	return (COMMON_SUCCESS);
 }
 
-static char	*hd_read_line(t_shell *msh, int wfd)
-{
-	char	*line;
-
-	line = readline(env_get_val(&msh->env, "PS2"));
-	if (g_got_sigint)
-	{
-		free(line);
-		close(wfd);
-		exit(SIGNALED_CODE + SIGINT);
-	}
-	if (!line)
-		print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG);
-	return (line);
-}
-
 void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
 {
 	char	*line;
@@ -292,24 +276,20 @@ void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
 	exit(EXIT_SUCCESS);
 }
 
-static int	hd_collect_chunk(t_heredoc *hd, const char *buf, ssize_t rlen)
+static char	*hd_read_line(t_shell *msh, int wfd)
 {
-	size_t	i;
+	char	*line;
 
-	if (hd->cnt_len + (size_t)rlen >= (MAX_HD_CONTENT_LEN - 1))
+	line = readline(env_get_val(&msh->env, "PS2"));
+	if (g_got_sigint)
 	{
-		print_shell_error(NULL, TOO_LONG_HD_CONTENT);
-		return (COMMON_FAILURE);
+		free(line);
+		close(wfd);
+		exit(SIGNALED_CODE + SIGINT);
 	}
-	i = 0;
-	while (i < (size_t)rlen)
-	{
-		hd->content[hd->cnt_len + i] = buf[i];
-		++i;
-	}
-	hd->cnt_len += (size_t)rlen;
-	hd->content[hd->cnt_len] = '\0';
-	return (COMMON_SUCCESS);
+	if (!line)
+		print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG);
+	return (line);
 }
 
 /* Parent reads pipe into hd->content */
@@ -337,5 +317,25 @@ int	heredoc_parent_collect(int rfd, t_heredoc *hd)
 		perror("read");
 		return (COMMON_SYS_ERR);
 	}
+	return (COMMON_SUCCESS);
+}
+
+static int	hd_collect_chunk(t_heredoc *hd, const char *buf, ssize_t rlen)
+{
+	size_t	i;
+
+	if (hd->cnt_len + (size_t)rlen >= (MAX_HD_CONTENT_LEN - 1))
+	{
+		print_shell_error(NULL, TOO_LONG_HD_CONTENT);
+		return (COMMON_FAILURE);
+	}
+	i = 0;
+	while (i < (size_t)rlen)
+	{
+		hd->content[hd->cnt_len + i] = buf[i];
+		++i;
+	}
+	hd->cnt_len += (size_t)rlen;
+	hd->content[hd->cnt_len] = '\0';
 	return (COMMON_SUCCESS);
 }
