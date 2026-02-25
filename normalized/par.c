@@ -39,7 +39,8 @@ void	open_par_init(t_parser_data *d)
 	}
 }
 
-/* Counts all closing parentheses and remembers their indexes */
+/* Counts all closing parentheses
+ * and remembers their indexes */
 void	close_par_init(t_parser_data *d)
 {
 	size_t	i;
@@ -71,7 +72,6 @@ t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t pind, t_par_type ptype)
 	pars_ind = 0;
 	while ((size_t)pars_ind < d->par_cnt)
 	{
-		// Go through opening-parentheses `d->pars[i].first`
 		if (ptype == OPENING_PAR)
 		{
 			if (pind == (size_t)d->pars[pars_ind].first)
@@ -79,7 +79,6 @@ t_ll	get_par_by_prompt_ind(t_parser_data *d, size_t pind, t_par_type ptype)
 		}
 		else if (ptype == CLOSING_PAR)
 		{
-			// Go through closing-parentheses `d->pars[i].second`
 			if (pind == (size_t)d->pars[pars_ind].second)
 				return (pars_ind);
 		}
