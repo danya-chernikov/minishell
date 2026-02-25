@@ -23,7 +23,10 @@ SRCS=main.c \
 	 prompt_parser.c \
 	 prompt_parser_proc_spec_char.c prompt_parser_proc_nonspec_char.c \
 	 prompt_parser2.c prompt_parser3.c prompt_parser4.c prompt_parser5.c \
-	 par.c quote.c token.c operand.c \
+	 par.c \
+	 quote.c quote2.c \
+	 token.c \
+	 operand.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \

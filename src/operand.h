@@ -72,9 +72,12 @@ typedef struct s_operand
 
 }	t_operand;
 
+/* operand.c */
 int		ops_init(t_operand *ops);
 int		op_token_init(t_operand *op);
 int		op_env_init(t_operand *op);
+
+/* operand2.c */
 void	ops_free(t_operand *ops);
 
 #endif
