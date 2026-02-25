@@ -9,7 +9,9 @@ DEBUG_LVL=0
 CFLAGS=-Wall -Werror -Wextra -O0 -g3
 
 SRCS=main.c \
-	 shell.c shell_launcher.c aux_shell.c \
+	 shell.c aux_shell.c \
+	 shell_launcher.c \
+	 shell_launch_script.c shell_launch_int.c \
 	 cmdargs_parser.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
