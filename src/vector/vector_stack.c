@@ -10,8 +10,9 @@ int	vector_push_back_char(t_vector *v, char c)
 
 void	vec_push_str(t_vector *v, const char *s)
 {
-	size_t	i = 0;
+	size_t	i;
 
+	i = 0;
 	if (!s)
 		return ;
 	while (s[i])
@@ -26,7 +27,7 @@ int	vector_push_back(t_vector *v, void *val)
 	void	*tmp;
 
 	if (v->size + 1 > v->capacity)
-	{			
+	{
 		v->capacity += v->enlarger;
 		tmp = vector_realloc(v->data, v->bcapacity, v->capacity * v->esize);
 		if (!tmp)
@@ -42,31 +43,8 @@ int	vector_push_back(t_vector *v, void *val)
 	return (1);
 }
 
-/* On error returns NULL */
-void	*vector_pop_back(t_vector *v)
-{
-	void	*ret;
-
-	if (v->size == 0)
-		return (NULL);
-	ret = (t_uchar *)v->data + ((v->size - 1) * v->esize);
-	--v->size;
-	if (v->size == 0)
-	{
-		v->front = NULL;
-		v->back = NULL;
-	}
-	else
-	{
-		v->front = v->data;
-		v->back = (t_uchar *)v->data + (v->size - 1) * v->esize;
-	}
-	return (ret);
-}
-
 static void	push_back1(t_vector *v, void *val)
 {
-
 	if (v->data_type == CHAR)
 		((char *)v->data)[v->size] = ((char *)val)[0];
 	else if (v->data_type == U_CHAR)
@@ -102,4 +80,3 @@ static void	push_back2(t_vector *v, void *val)
 	else if (v->data_type == VOID)
 		((void **)v->data)[v->size] = (void *)val;
 }
-

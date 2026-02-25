@@ -8,7 +8,7 @@ static void	vector_si2(t_vector *v, size_t ind, void *val);
 void	vector_si(t_vector *v, size_t ind, void *val)
 {
 	if (ind >= v->size)
-		return;
+		return ;
 	vector_si1(v, ind, val);
 	vector_si2(v, ind, val);
 }
