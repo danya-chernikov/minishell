@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:33:10 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 19:34:36 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 20:44:58 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,4 +86,3 @@ int	op_env_init(t_operand *op)
 	}
 	return (COMMON_SUCCESS);
 }
-

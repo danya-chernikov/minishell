@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 10:36:55 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 10:58:40 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 21:02:18 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,7 @@ int	exp_divide_op_str_on_tokens(t_operand *op)
 			++i;
 		res = create_token(op, start, i - start);
 		if (res != COMMON_SUCCESS)
-		{
-			exp_free_op_tokens(op);
-			return (res);
-		}
+			return (exp_free_op_tokens(op), res);
 	}
 	return (COMMON_SUCCESS);
 }

@@ -6,10 +6,9 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:29:36 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 19:30:16 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 20:46:12 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
 {

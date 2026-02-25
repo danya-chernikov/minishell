@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:11:27 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 11:16:31 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 20:58:47 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,21 +44,27 @@ void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask)
 	{
 		expres_char = *((char *)vector_at(exp_res, read_ind));
 		qmask_char = *((char *)vector_at(qmask, read_ind));
-		if (wc_is_asterisk(expres_char, qmask_char) && f_prev_ast)
+		if (!wc_is_asterisk(expres_char, qmask_char) && f_prev_ast)
 		{
-			++read_ind;
-			continue ;
+			update_vectors(exp_res, qmask_char, &write_ind, read_ind);
+			f_prev_ast = wc_is_asterisk(expres_char, qmask_char);
 		}
-		if (write_ind != read_ind)
-		{
-			vector_si(exp_res, write_ind, &expres_char);
-			vector_si(qmask, write_ind, &qmask_char);
-		}
-		f_prev_ast = wc_is_asterisk(expres_char, qmask_char);
-		++write_ind;
 		++read_ind;
 	}
 	wc_trim_vectors(exp_res, qmask, write_ind);
+}
+
+static void	update_vectors(t_vector *exp_res, t_vector *qmask_char,
+				size_t *w, size_t r)
+{
+	char	c;
+	char	m;
+
+	c = *((char *)vector_at(exp, r));
+	m = *((char *)vector_at(qmk, r));
+	vector_si(exp, *w, &c);
+	vector_si(qmk, *w, &m);
+	(*w)++;
 }
 
 bool	wc_is_asterisk(char expres_char, char qmask_char)

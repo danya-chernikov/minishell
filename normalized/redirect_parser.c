@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 09:33:00 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 10:08:31 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 21:23:37 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,45 @@ int	redirections_parser(t_parser_data *d)
 			op_i = 0;
 			while (op_i < ft_strlen(op->name))
 			{
-				if (is_redir_app(op, op_i) && add_redir_app(op, &op_i) == -1)
+				if (process_redir_types(op, &op_i) == -1)
 					return (COMMON_FAILURE);
-				else if (is_heredoc(op, op_i) && add_heredoc(op, &op_i) == -1)
-					return (COMMON_FAILURE);
-				else if (is_redir_out(op, op_i) && add_redir_out(op, &op_i) == -1)
-					return (COMMON_FAILURE);
-				else if (is_redir_in(op, op_i) && add_redir_in(op, &op_i) == -1)
+				++op_i;
+			}
+		}
+		++ti;
+	}
+	return (COMMON_SUCCESS);
+}
+
+static int	process_redir_types(t_operand *op, size_t *op_i)
+{
+	if (is_redir_app(op, *op_i))
+		return (add_redir_app(op, op_i));
+	if (is_heredoc(op, *op_i))
+		return (add_heredoc(op, *op_i));
+	if (is_redir_out(op, *op_i))
+		return (add_redir_out(op, *op_i));
+	if (is_redir_in(op, *op_i))
+		return (add_redir_in(op, *op_i));
+	return (0);
+}
+
+int	redirections_parser(t_parser_data *d)
+{
+	size_t		ti;
+	size_t		op_i;
+	t_operand	*op;
+
+	ti = 0;
+	while (ti < d->token_cnt)
+	{
+		if (d->tokens[ti].type == OPERAND)
+		{
+			op = d->tokens[ti].op;
+			op_i = 0;
+			while (op_i < ft_strlen(op->name))
+			{
+				if (process_redir_types(op, &op_i) == -1)
 					return (COMMON_FAILURE);
 				++op_i;
 			}
@@ -200,9 +232,7 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 
 	if (validate_redir(op, op_i, 2) != COMMON_SUCCESS)
 		return (COMMON_FAILURE);
-	op->redirs[op->red_cnt].type = REDIR_HEREDOC;
-	op->redirs[op->red_cnt].target_fd = STDIN_FILENO;
-	op->redirs[op->red_cnt].hd.cnt_len = 0;
+	init_heredoc(op);
 	wi = *op_i + 2;
 	skip_spaces(op->name, &wi);
 	if ((op->name[wi] == '>' || op->name[wi] == '<')
@@ -225,6 +255,13 @@ int	add_heredoc(t_operand *op, size_t *op_i)
 	return (COMMON_SUCCESS);
 }
 
+static void	init_heredoc(t_operand *op)
+{
+	op->redirs[op->red_cnt].type = REDIR_HEREDOC;
+	op->redirs[op->red_cnt].target_fd = STDIN_FILENO;
+	op->redirs[op->red_cnt].hd.cnt_len = 0;
+}
+
 /* Extracts and cleans the heredoc delimiter.
  * Sets expansion flag based on presence of quotes.*/
 int	get_hd_delimiter(t_operand *op, size_t *wi)
@@ -234,13 +271,9 @@ int	get_hd_delimiter(t_operand *op, size_t *wi)
 	size_t		qpair_cnt;
 	t_quote_int	*quotes;
 
-	op->redirs[op->red_cnt].hd.delim = (char *)malloc(MAX_HD_DELIM_LEN
-			* sizeof(char));
-	if (!op->redirs[op->red_cnt].hd.delim)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
+	delim = malloc(MAX_HD_DELIM_LEN);
+	if (!delim)
+		return (perror("malloc"), COMMON_SYS_ERR);
 	op->redirs[op->red_cnt].hd.delim = delim;
 	if (extract_redir_path(op, wi, delim, MAX_HD_DELIM_LEN) == -1)
 		return (COMMON_FAILURE);
@@ -250,10 +283,7 @@ int	get_hd_delimiter(t_operand *op, size_t *wi)
 		op->redirs[op->red_cnt].hd.f_expand_body = true;
 	quotes = malloc(MAX_QUOTES_NUM * sizeof (*quotes));
 	if (!quotes)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
+		return (perror("malloc"), COMMON_SYS_ERR);
 	fret = quotes_parser(delim, quotes, &qpair_cnt);
 	if (fret == COMMON_SUCCESS)
 		fret = remove_syntax_quotes(delim, quotes, qpair_cnt);

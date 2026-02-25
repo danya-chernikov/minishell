@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:47:11 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 12:58:19 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/25 20:43:18 by jhvalenc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,27 +34,41 @@ static size_t	count_shell_envp(t_shell *msh, t_env *op_env);
  * completion of the child process anyway */
 void	child_exec_operand(t_shell *msh, t_token *token)
 {
+	if (prepare_operand(msh, token) != COMMON_SUCCESS)
+		exit(RET_CMD_FAILURE);
+	if (apply_redirs(token->op) != COMMON_SUCCESS
+		|| token->op->argc == 0)
+		child_cleanup_exit(token, NULL, NULL,
+			(token->op->argc != 0));
+	if (is_any_builtin(token->op->argv[0]))
+		child_exec_builtin(msh, token);
+	child_exec_external(msh, token);
+}
+
+static void	child_exec_builtin(t_shell *msh, t_token *token)
+{
+	int	status;
+
+	if (token->op->f_per_cmd)
+		env_apply_as_env(&msh->env, token->op->my_env);
+	status = run_builtin(msh, token->op, BUILTIN_IN_CHILD);
+	child_cleanup_exit(token, NULL, NULL, status);
+}
+
+static void	child_exec_external(t_shell *msh, t_token *token)
+{
 	char	*path;
 	char	**envp;
 	int		status;
 
-	if (prepare_operand(msh, token) != COMMON_SUCCESS)
-		exit(RET_CMD_FAILURE);
-	if (apply_redirs(token->op) != COMMON_SUCCESS || token->op->argc == 0)
-		child_cleanup_exit(token, NULL, NULL, (token->op->argc != 0));
-	if (is_any_builtin(token->op->argv[0]))
-	{
-		if (token->op->f_per_cmd)
-			env_apply_as_env(&msh->env, token->op->my_env);
-		status = run_builtin(msh, token->op, BUILTIN_IN_CHILD);
-		child_cleanup_exit(token, NULL, NULL, status);
-	}
 	envp = build_envp_for_operand(msh, token->op);
 	path = resolve_cmd_path(msh, token->op->argv[0]);
 	if (!path)
 	{
-		print_shell_error(token->op->argv[0], CMD_NOT_FOUND_ERR_MSG);
-		child_cleanup_exit(token, envp, NULL, CMD_NOT_LOCATED_ERR);
+		print_shell_error(token->op->argv[0],
+			CMD_NOT_FOUND_ERR_MSG);
+		child_cleanup_exit(token, envp, NULL,
+			CMD_NOT_LOCATED_ERR);
 	}
 	execve(path, token->op->argv, envp);
 	status = map_exec_errno(errno);
