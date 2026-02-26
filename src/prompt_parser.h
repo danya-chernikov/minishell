@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:07 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 02:20:17 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:09:24 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ int		process_special_char_handle_and(t_parser_data *d);
 int		process_special_char_handle_or(t_parser_data *d);
 
 /* prompt_parser_proc_nonspec_char.c */
-int		process_nonspecial_char(t_parser_data *d, size_t prompt_len);
+int		process_nonspecial_char(t_parser_data *d, int *opar_ind, size_t prompt_len);
 int		process_nonspecial_char_prep(t_parser_data *d, size_t prompt_len);
-int		process_nonspecial_char_handle_pipe(t_parser_data *d, size_t plen);
+int		process_nonspecial_char_handle_pipe(t_parser_data *d, int *opar_ind);
 int		process_nonspecial_char_handle_nonpipe(t_parser_data *d, size_t plen);
 
 /* prompt_parser2.c */

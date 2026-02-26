@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 04:54:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 04:59:14 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:03:27 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int	parser_loop_first_part(t_shell *msh);
-static int	parser_loop_second_part(t_shell *msh);
+static int	parser_loop_first_part(t_shell *msh, int opt_i);
+static int	parser_loop_second_part(t_shell *msh, int opt_i);
 
 /* In fact, our command-line argument
  * parser also sets the values of almost
@@ -34,12 +34,12 @@ int	cmdargs_parser(t_shell *msh)
 	opt_i = 1;
 	while (opt_i < msh->argc)
 	{
-		fret = parser_loop_first_part(msh);
+		fret = parser_loop_first_part(msh, opt_i);
 		if (fret == BREAK)
 			break ;
 		else if (fret != COMMON_SUCCESS)
 			return (fret);
-		fret = parser_loop_second_part(msh);
+		fret = parser_loop_second_part(msh, opt_i);
 		if (fret != COMMON_SUCCESS)
 			return (fret);
 		++opt_i;
@@ -47,7 +47,7 @@ int	cmdargs_parser(t_shell *msh)
 	return (COMMON_SUCCESS);
 }
 
-static int	parser_loop_first_part(t_shell *msh)
+static int	parser_loop_first_part(t_shell *msh, int opt_i)
 {
 	if (is_help_opt(msh->argv[opt_i]))
 	{
@@ -70,7 +70,7 @@ static int	parser_loop_first_part(t_shell *msh)
 	return (COMMON_SUCCESS);
 }
 
-static int	parser_loop_second_part(t_shell *msh)
+static int	parser_loop_second_part(t_shell *msh, int opt_i)
 {
 	if (is_norc_opt(msh->argv[opt_i]))
 		msh->opts.f_norc = true;

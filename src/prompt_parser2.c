@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:44:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 01:44:54 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:26:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ int	handle_open_par(t_parser_data *d, int opar_ind)
 {
 	size_t	last_opar_ind;
 	size_t	prompt_len;
-	size_t	i;
 	int		fret;
 
 	if (d->tokens[d->token_cnt - 1].type != PIPE
@@ -46,7 +45,7 @@ int	handle_open_par(t_parser_data *d, int opar_ind)
 int	handle_open_par_check_errors(t_parser_data *d, size_t *last_opar_ind,
 		size_t prompt_len)
 {
-	int	i;
+	size_t	i;
 
 	if (d->pi == prompt_len)
 		return (print_shell_error(NULL, PARSER_ERR_MSG), COMMON_FAILURE);

@@ -6,12 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 00:41:38 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 00:41:39 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:58:32 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "heredoc.h"
 #include "shell.h"
+#include "signals.h"
+#include "aux_io.h"
 
 #include "libft.h"
 #include "vector.h"

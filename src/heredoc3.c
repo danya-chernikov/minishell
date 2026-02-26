@@ -6,17 +6,19 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 00:40:58 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 00:40:59 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:57:35 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "heredoc.h"
 #include "shell.h"
+#include "signals.h"
 
 #include "libft.h"
 #include "vector.h"
 #include "error.h"
 
+#include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>

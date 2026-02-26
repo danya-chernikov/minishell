@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 00:39:33 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 00:39:34 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:50:39 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	add_redir_in(t_operand *op, size_t *op_i)
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	if (extr_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
+	if (extract_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
 		return (COMMON_FAILURE);
 	*op_i = --wi;
 	++op->red_cnt;
@@ -75,7 +75,7 @@ int	add_redir_out(t_operand *op, size_t *op_i)
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	if (extr_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
+	if (extract_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
 		return (COMMON_FAILURE);
 	*op_i = --wi;
 	++op->red_cnt;
@@ -106,7 +106,7 @@ int	add_redir_app(t_operand *op, size_t *op_i)
 		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	if (extr_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
+	if (extract_redir_path(op, &wi, op->redirs[op->red_cnt].path, PATH_MAX) == -1)
 		return (COMMON_FAILURE);
 	*op_i = --wi;
 	++op->red_cnt;

@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 09:33:00 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/26 00:21:13 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:58:10 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,11 @@ int	process_redir_types(t_operand *op, size_t *op_i)
 	if (is_redir_app(op, *op_i))
 		return (add_redir_app(op, op_i));
 	if (is_heredoc(op, *op_i))
-		return (add_heredoc(op, *op_i));
+		return (add_heredoc(op, op_i));
 	if (is_redir_out(op, *op_i))
-		return (add_redir_out(op, *op_i));
+		return (add_redir_out(op, op_i));
 	if (is_redir_in(op, *op_i))
-		return (add_redir_in(op, *op_i));
+		return (add_redir_in(op, op_i));
 	return (0);
 }
 
@@ -80,7 +80,7 @@ int	validate_redir(t_operand *op, size_t *op_i, int size)
 
 /* Extracts the path or delimiter string, stopping at spaces 
  * or new redirection symbols outside of quotes.*/
-int	extr_redir_path(t_operand *op, size_t *wi, char *path, size_t max)
+int	extract_redir_path(t_operand *op, size_t *wi, char *path, size_t max)
 {
 	size_t	i;
 	size_t	op_slen;

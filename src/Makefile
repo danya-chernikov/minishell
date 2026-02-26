@@ -65,7 +65,7 @@ OBJS=main.o \
 	 prompt_parser_proc_nonspec_char.o \
 	 prompt_parser2.o prompt_parser3.o prompt_parser4.o prompt_parser5.o \
 	 par.o \
-	 quote.c quote2.o \
+	 quote.o quote2.o \
 	 token.o \
 	 operand.o \
 	 engine.o redirect_parser.o redirect_parser2.o redirect_parser3.o \
@@ -307,10 +307,16 @@ par.o : par.c par.h prompt_parser.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c par.c
 
-quote.o : quote.c prompt_parser.h quote.h \
+quote.o : quote.c quote.h prompt_parser.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c quote.c
+
+quote2.o : quote2.c quote.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c quote2.c
+
 
 token.o : token.c token.h prompt_parser.h \
 	libft.h error.h
@@ -355,17 +361,17 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
 
-heredoc2.o : heredoc2.c heredoc.h shell.h \
+heredoc2.o : heredoc2.c heredoc.h shell.h aux_io.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc2.c
 
-heredoc3.o : heredoc3.c heredoc.h shell.h \
+heredoc3.o : heredoc3.c heredoc.h shell.h signals.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc3.c
 
-heredoc4.o : heredoc4.c heredoc.h shell.h \
+heredoc4.o : heredoc4.c heredoc.h shell.h signals.h aux_io.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc4.c

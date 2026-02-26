@@ -6,12 +6,13 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 13:48:12 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 23:23:33 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:55:04 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "heredoc.h"
 #include "shell.h"
+#include "aux_io.h"
 
 #include "libft.h"
 #include "vector.h"
@@ -62,7 +63,6 @@ char	*heredoc_expand_line(t_shell *msh, const char *line)
 {
 	t_vector	v;
 	size_t		i;
-	const char	*val;
 	char		*res;
 
 	if (!line || !vector_init(&v, CHAR, ft_strlen(line) + 1))

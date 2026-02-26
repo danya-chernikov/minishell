@@ -6,9 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:29:36 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:46:12 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:34:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "quote.h"
+#include "operand.h"
+
+#include <stdbool.h>
 
 bool	is_inside_quotes_uni(t_quote_int *quotes, size_t qpair_cnt, size_t ind)
 {

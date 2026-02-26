@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:51:27 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 01:05:05 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 03:52:30 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ typedef struct s_vector			t_vector;
 typedef struct s_hd_ctx
 {
 	int					status;
-	int					jret_code;
+	int					ret_code;
 	bool				f_have_tty;
 	struct termios		saved;
 	struct sigaction	old_int;

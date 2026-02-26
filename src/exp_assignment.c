@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 18:39:56 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 23:19:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 04:07:19 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,12 @@ int	exp_process_assignment(t_shell *msh, t_operand *op,
 int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok,
 			char *var_name)
 {
+	char		*tok_str;
 	size_t		i;
 	size_t		eqsign_ind;
 	t_vector	*vec_pair[2];
 
+	tok_str = op_tok->cnt;
 	eqsign_ind = ft_abs(ft_strchr(op_tok->cnt, '=') - op_tok->cnt);
 	i = eqsign_ind + 1;
 	if (i == ft_strlen(tok_str))
@@ -84,7 +86,7 @@ int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok,
 	if (!exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1))
 		return (COMMON_SYS_ERR);
 	exp_expand_varname_loop(msh, op_tok->cnt, vec_pair);
-	if (set_expanded_var(op, var_name, v) != COMMON_SUCCESS)
+	if (set_expanded_var(op, var_name, vec_pair) != COMMON_SUCCESS)
 		return (COMMON_FAILURE);
 	return (COMMON_SUCCESS);
 }
@@ -124,8 +126,7 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str,
 	i = eqsing_ind + 1;
 	while (tok_str[i])
 	{
-		exp_handle_assign_char(msh, tok_str,
-			vec_pair, &i, &state, eqsing_ind);
+		exp_handle_assign_char(msh, tok_str, vec_pair, &i, &state, eqsing_ind);
 		i++;
 	}
 	vector_push_back_char(vec_pair[EXP_RES], '\0');
