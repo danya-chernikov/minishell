@@ -3,7 +3,6 @@
 #include "heredoc.h"
 #include "exec.h"
 #include "quote.h"
-#include "debug.h"
 #include "expansion.h"
 
 #include <linux/limits.h> // For PATH_MAX
@@ -51,9 +50,6 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		if (fres != COMMON_SUCCESS) // If we got non-critical parser error
 			break ; // Just prompt user to enter another command(s)
 
-#if DEBUG == 1
-		dbg_prompt_parser_print_all(pdata);
-#endif
 
 		// Let's parser all quotes intervals for each
 		// operand-program, i.e. we're kinda updating them
@@ -68,14 +64,6 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		fres = read_heredocs(msh);
 		if (fres != COMMON_SUCCESS)
 			break ;
-
-#if DEBUG == 1
-		dbg_print_redirs(pdata);
-		dbg_print_operand_tokens(pdata);
-		dbg_print_redirs(pdata);
-		dbg_print_operands_env(pdata);
-		dbg_print_operands_args(pdata);
-#endif
 
 		fres = exec_ops(msh, ret_code);
 		if (fres != COMMON_SUCCESS)

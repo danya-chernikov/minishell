@@ -1,6 +1,5 @@
 #include "shell.h"
 #include "engine.h"
-#include "debug.h"
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -42,9 +41,6 @@ int	msh_load_configs(t_shell *msh)
 				}
 				++i;
 			}
-#if DEBUG == 1
-			dbg_print_configs(c, LOGIN_CONF);
-#endif
 			if (load_login_configs(msh) == COMMON_SYS_ERR)
 				return (COMMON_SYS_ERR);
 		}
@@ -59,9 +55,6 @@ int	msh_load_configs(t_shell *msh)
 				perror("malloc");
 				return (COMMON_SYS_ERR);
 			}
-#if DEBUG == 1
-			dbg_print_configs(c, NONLOGIN_CONF);
-#endif
 			if (load_nonlogin_configs(msh) == COMMON_SYS_ERR)
 				return (COMMON_SYS_ERR);
 		}

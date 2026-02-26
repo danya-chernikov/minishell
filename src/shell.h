@@ -75,10 +75,14 @@ void	msh_free(t_shell *msh);
 
 /* shell_launcher.c */
 int		msh_launch(t_shell *msh, int *ret_code);
-int		launch_script(t_shell *msh, int *ret_code);
 int		launch_cmd(t_shell *msh, int *ret_code);
 int		launch_stdin_cmd(t_shell *msh, int *ret_code);
+
+/* shell_launch_int.c */
 int		launch_int_session(t_shell *msh, int *ret_code);
+
+/* shell_launch_script.c */
+int		launch_script(t_shell *msh, int *ret_code);
 
 /* aux_shell.c */
 int		gen_prompt_inv(t_shell *msh);

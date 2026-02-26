@@ -1,5 +1,4 @@
 #include "shell.h"
-#include "debug.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -79,8 +78,5 @@ int msh_load_history(t_shell *msh)
 			return (COMMON_SYS_ERR);
 		}
 	}
-#if DEBUG == 1
-	dbg_print_filehistory(&msh->history);
-#endif
 	return (COMMON_SUCCESS);
 }
