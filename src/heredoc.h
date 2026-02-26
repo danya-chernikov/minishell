@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:51:27 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 23:41:28 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:05:05 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include <sys/types.h>
 # include <stdbool.h>
+# include <signal.h>
+# include <termios.h>
 
 /* MAX_HEREDOC_NUM	- Maxinum number of heredocs
  *					  in one operand;
@@ -28,6 +30,7 @@
 
 typedef struct s_parser_data	t_parser_data;
 typedef struct s_shell			t_shell;
+typedef struct s_vector			t_vector;
 
 typedef struct s_hd_ctx
 {

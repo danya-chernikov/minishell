@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:17:50 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 11:19:51 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:05:57 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include "prompt_parser.h"
 #include "expansion.h"
 
-#include "debug.h"
 #include "error.h"
 #include "libft.h"
 

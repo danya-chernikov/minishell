@@ -6,11 +6,12 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 03:12:00 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 03:12:12 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:19:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
+#include "engine.c"
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -18,7 +19,7 @@
 #include <fcntl.h>
 
 static int	launch_script_check_access(t_shell *msh, char *script_path);
-static int	launch_script_loop(int *fd, int *gnlerr, int *ret_code);
+static int	launch_script_loop(t_shell *msh, int *fd, int *gnlerr, int *ret_code);
 static void	apply_verbose_flag(t_shell *msh, char *line);
 
 int	launch_script(t_shell *msh, int *ret_code)
@@ -28,6 +29,7 @@ int	launch_script(t_shell *msh, int *ret_code)
 	int		fd;
 	int		fres;
 
+	script_path = NULL;
 	*ret_code = EXIT_SUCCESS;
 	fres = launch_script_check_access(msh, script_path);
 	if (fres != COMMON_SUCCESS)
@@ -39,7 +41,7 @@ int	launch_script(t_shell *msh, int *ret_code)
 		return (perror("open"), COMMON_SYS_ERR);
 	}
 	gnlerr = 0;
-	fres = launch_script_loop(&fd, &gnlerr, ret_code);
+	fres = launch_script_loop(msh, &fd, &gnlerr, ret_code);
 	if (fres != COMMON_SUCCESS)
 		return (fres);
 	if (close(fd) == -1)
@@ -70,7 +72,7 @@ static int	launch_script_check_access(t_shell *msh, char *script_path)
 	return (COMMON_SUCCESS);
 }
 
-static int	launch_script_loop(int *fd, int *gnlerr, int *ret_code)
+static int	launch_script_loop(t_shell *msh, int *fd, int *gnlerr, int *ret_code)
 {
 	char	*line;
 	int		fres;

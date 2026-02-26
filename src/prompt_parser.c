@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:43:58 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 16:37:48 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 02:22:38 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int	parser_engine_loop_body(t_parser_data *d, int *opar_ind, size_t prompt_len)
 		return (BREAK);
 	if (!is_spec_char(d->prompt[d->pi])
 		|| (is_spec_char(d->prompt[d->pi]) && is_inside_quotes(d, d->pi)))
-		fret = process_nonspecial_char(d, opar_ind, prompt_len);
+		fret = process_nonspecial_char(d, prompt_len);
 	else if (is_spec_char(d->prompt[d->pi]) && !is_inside_quotes(d, d->pi))
 		fret = process_special_char(d, prompt_len);
 	return (fret);

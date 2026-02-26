@@ -6,13 +6,13 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:47:05 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:47:06 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:02:47 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-#include <linux/limits.h> /* For PATH_MAX */
+#include <linux/limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -23,6 +23,9 @@
 #include <errno.h>
 
 static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid);
+static void	passwd_attempt_clearner(char ***ptokens, char *line, int fd);
+static int	check_and_split(char **ptokens, char *line, int *fd);
+static void	free_line_and_split(char ***ptokens, char *line);
 static void	passwd_attempt_clearner(char ***ptokens, char *line, int fd);
 
 /* Attempts to fill the pwd structure with
@@ -75,7 +78,7 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 	line = get_next_line(fd, &err);
 	while (line)
 	{
-		if (check_and_split(line, &fd) == -1)
+		if (check_and_split(ptokens, line, &fd) == -1)
 			return (-1);
 		if (split_size(ptokens) > 2 && ft_atoi(ptokens[2]) == (int)uid)
 		{
@@ -83,7 +86,7 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 				return (passwd_attempt_clearner(&ptokens, line, fd), -1);
 			return (passwd_attempt_clearner(&ptokens, line, fd), 1);
 		}
-		free_split_and_line(&ptokens, line);
+		free_line_and_split(&ptokens, line);
 		line = get_next_line(fd, &err);
 	}
 	if (!line && err)
@@ -94,7 +97,7 @@ static int	passwd_attempt(t_passwd *pwd, int fd, uid_t uid)
 	return (gnl_finish(fd), 0);
 }
 
-static int	check_and_split(char *line, int *fd)
+static int	check_and_split(char **ptokens, char *line, int *fd)
 {
 	if (line[ft_strlen(line) - 1] == '\n')
 		line[ft_strlen(line) - 1] = '\0';

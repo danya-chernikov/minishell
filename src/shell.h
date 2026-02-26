@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:41 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 22:34:18 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:45:18 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,8 @@ void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */
 int		msh_load_configs(t_shell *msh);
-int		init_login_configs(t_shell *msh, t_configs *c);
-int		init_nonlogin_configs(t_shell *msh, t_configs *c);
+int		init_login_configs(t_shell *msh, t_configs *c, char *home);
+int		init_nonlogin_configs(t_shell *msh, t_configs *c, char *home);
 
 /* shell_login_configs.c */
 int		load_login_configs(t_shell *msh);

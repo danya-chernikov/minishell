@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:18:02 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:58:17 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 # define LIBFT_H
 
 # include <stddef.h>
-# include <sys/types.h>
 # include <dirent.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <stdbool.h>
 
 /* ==================== get_next_line() DEFINITIONS  ==================== */

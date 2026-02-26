@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 13:56:39 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 16:38:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:41:49 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	process_special_char_check_pars(t_parser_data *d)
 {
 	if (d->prompt[d->pi] == '(')
 	{
-		if (handle_open_par(d, *d->pi) == COMMON_FAILURE)
+		if (handle_open_par(d, d->pi) == COMMON_FAILURE)
 		{
 			print_shell_error(NULL, PARSER_ERR_MSG);
 			return (COMMON_FAILURE);

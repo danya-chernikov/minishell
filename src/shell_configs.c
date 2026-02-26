@@ -6,20 +6,20 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:55:37 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 12:16:06 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:25:22 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 #include "engine.h"
-#include "debug.h"
 
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-/* In all non-interactive modes, we do NOT read any configs */
+/* In all non-interactive modes,
+ * we do NOT read any configs */
 int	msh_load_configs(t_shell *msh)
 {
 	int			fret;
@@ -32,13 +32,13 @@ int	msh_load_configs(t_shell *msh)
 	{
 		if (msh->opts.f_login)
 		{
-			fret = init_login_configs(msh, c);
+			fret = init_login_configs(msh, c, home);
 			if (fret != COMMON_SUCCESS)
 				return (fret);
 		}
 		else
 		{
-			fret = init_nonlogin_configs(msh, c);
+			fret = init_nonlogin_configs(msh, c, home);
 			if (fret != COMMON_SUCCESS)
 				return (fret);
 		}
@@ -46,7 +46,7 @@ int	msh_load_configs(t_shell *msh)
 	return (COMMON_SUCCESS);
 }
 
-int	init_login_configs(t_shell *msh, t_configs *c)
+int	init_login_configs(t_shell *msh, t_configs *c, char *home)
 {
 	size_t	i;
 
@@ -71,7 +71,7 @@ int	init_login_configs(t_shell *msh, t_configs *c)
 	return (COMMON_SUCCESS);
 }
 
-int	init_nonlogin_configs(t_shell *msh, t_configs *c)
+int	init_nonlogin_configs(t_shell *msh, t_configs *c, char *home)
 {
 	c->etc_rc_path = expand_homedir(DEF_MSH_ETC_RC_PATH, home);
 	c->nonlogin[0] = c->etc_rc_path;

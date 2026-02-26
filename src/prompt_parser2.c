@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:44:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 16:40:04 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:44:54 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "expansion.h"
 
 /* Handles opening-parenthesis */
-int	handle_open_par(t_parser_data *d, int *opar_ind)
+int	handle_open_par(t_parser_data *d, int opar_ind)
 {
 	size_t	last_opar_ind;
 	size_t	prompt_len;
@@ -28,13 +28,13 @@ int	handle_open_par(t_parser_data *d, int *opar_ind)
 		&& d->tokens[d->token_cnt - 1].type != NONE)
 		return (print_shell_error(NULL, PARSER_ERR_MSG), COMMON_FAILURE);
 	d->tokens[d->token_cnt].type = OPEN_PAR;
-	d->tokens[d->token_cnt].start_pi = *opar_ind;
+	d->tokens[d->token_cnt].start_pi = opar_ind;
 	++d->token_cnt;
 	prompt_len = ft_strlen(d->prompt);
-	d->open_par[d->opar_cnt] = *opar_ind;
-	d->pars[d->par_cnt].first = *opar_ind;
+	d->open_par[d->opar_cnt] = opar_ind;
+	d->pars[d->par_cnt].first = opar_ind;
 	++d->par_cnt;
-	d->pi = *opar_ind + 1;
+	d->pi = opar_ind + 1;
 	++d->opar_cnt;
 	fret = handle_open_par_check_errors(d, &last_opar_ind, prompt_len);
 	if (fret != COMMON_SUCCESS)

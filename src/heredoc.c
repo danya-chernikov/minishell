@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:42:08 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 23:20:13 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:05:09 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,10 @@
 #include "signals.h"
 #include "aux_io.h"
 
-#include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <stdio.h>
-#include <termios.h>
 #include <readline/readline.h>
 
 #include "libft.h"

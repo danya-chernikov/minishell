@@ -6,7 +6,7 @@
 /*   By: jhvalenc <jhvalenc@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 01:40:12 by jhvalenc          #+#    #+#             */
-/*   Updated: 2026/02/25 03:41:42 by jhvalenc         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:18:02 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 #include "heredoc.h"
 #include "exec.h"
 #include "quote.h"
-//#include "debug.h"
 #include "expansion.h"
+#include "redirect_parser.h"
 
-#include <linux/limits.h> // For PATH_MAX
+#include <linux/limits.h>
 
 /* If the function returns -1, it means a critical error occurred,
  * and the caller should react by calling exit(EXIT_FAILURE);
@@ -32,9 +32,7 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 {
 	t_parser_data	*pdata;
 	int				fres;
-	int				try;
 
-	try = 0;
 	fres = COMMON_SUCCESS;
 	pdata = msh->pd;
 	ft_bzero(pdata, sizeof(t_parser_data));

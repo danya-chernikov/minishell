@@ -6,12 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 03:21:07 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 03:53:28 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:21:47 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 #include "aux_common.h"
+#include "signals.h"
+#include "engine.c"
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -53,6 +55,8 @@ int	launch_int_session(t_shell *msh, int *ret_code)
 
 static int	process_prompt(t_shell *msh, char *rline_buf, int *ret_code)
 {
+	int	fres;
+
 	if (!rline_buf)
 	{
 		write(STDOUT_FILENO, "exit\n", 5);

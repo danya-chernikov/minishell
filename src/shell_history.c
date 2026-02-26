@@ -6,12 +6,11 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:35:30 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 11:53:40 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:22:32 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
-#include "debug.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -37,7 +36,7 @@ int	msh_load_history(t_shell *msh)
 	fd = open(msh->history.histfile_path, O_RDONLY);
 	if (fd == -1)
 		return (perror("open"), COMMON_SYS_ERR);
-	fret = load_history_loop(msh, fd);
+	fret = load_history_loop(msh, &fd);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
 	if (close(fd) == -1)

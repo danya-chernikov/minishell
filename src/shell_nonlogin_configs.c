@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:08:39 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 12:41:08 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:28:33 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ static int	load_nonlogin_configs_loop(t_shell *msh, int *fd);
  * read ~/.bashrc config */
 int	load_nonlogin_configs(t_shell *msh)
 {
+	int		fret;
 	int		fd;
 	int		cnf_i;
-	char	*line;
 
 	cnf_i = 0;
 	while (cnf_i < NONLOGIN_CONFIGS_NUM)
@@ -41,7 +41,7 @@ int	load_nonlogin_configs(t_shell *msh)
 		fd = open(msh->configs.nonlogin[cnf_i], O_RDONLY);
 		if (fd == -1)
 			return (perror("open"), COMMON_SYS_ERR);
-		fret = load_nonlogin_configs_loop(msh, &fd, &ret_code);
+		fret = load_nonlogin_configs_loop(msh, &fd);
 		if (fret != COMMON_SUCCESS)
 			return (fret);
 		if (close(fd) == -1)

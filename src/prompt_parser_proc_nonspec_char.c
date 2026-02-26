@@ -6,14 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 13:57:48 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 16:08:14 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 02:20:02 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "prompt_parser.h"
 #include "aux_common.h"
 
-int	process_nonspecial_char(t_parser_data *d, int *opar_ind, size_t prompt_len)
+int	process_nonspecial_char(t_parser_data *d, size_t prompt_len)
 {
 	int	fret;
 
@@ -22,7 +22,7 @@ int	process_nonspecial_char(t_parser_data *d, int *opar_ind, size_t prompt_len)
 		return (fret);
 	if (its_pipe(d->prompt, prompt_len, d->pi))
 	{
-		fret = process_nonspecial_char_handle_pipe(d, opar_ind, prompt_len);
+		fret = process_nonspecial_char_handle_pipe(d, prompt_len);
 		if (fret != COMMON_SUCCESS)
 			return (fret);
 	}
@@ -61,8 +61,7 @@ int	process_nonspecial_char_prep(t_parser_data *d, size_t prompt_len)
 	return (COMMON_SUCCESS);
 }
 
-int	process_nonspecial_char_handle_pipe(t_parser_data *d, int *opar_ind,
-		size_t prompt_len)
+int	process_nonspecial_char_handle_pipe(t_parser_data *d, int *opar_ind)
 {
 	if (d->tokens[d->token_cnt - 1].type != OPERAND
 		&& d->tokens[d->token_cnt - 1].type != CLOSE_PAR)
@@ -74,7 +73,7 @@ int	process_nonspecial_char_handle_pipe(t_parser_data *d, int *opar_ind,
 	*opar_ind = later_goes_open_par(d->prompt, d->pi);
 	if (*opar_ind != -1)
 	{
-		if (handle_open_par(d, opar_ind) == COMMON_FAILURE)
+		if (handle_open_par(d, *opar_ind) == COMMON_FAILURE)
 		{
 			print_shell_error(NULL, PARSER_ERR_MSG);
 			return (COMMON_FAILURE);

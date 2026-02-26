@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:46:30 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:46:31 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 01:02:47 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 /* Returns -1 on a malloc() error, 0 if no match is
  * found, and 1 on success. The loop exits if
