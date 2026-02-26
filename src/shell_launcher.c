@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 02:18:38 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 03:54:27 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 23:49:10 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ int	msh_launch(t_shell *msh, int *ret_code)
 {
 	int	fres;
 
+	fres = COMMON_SYS_ERR;
 	if (msh->mode == NONINT_SCRIPT_MODE)
 		fres = launch_script(msh, ret_code);
 	else if (msh->mode == NONINT_CMD_MODE)
@@ -69,8 +70,8 @@ int	launch_stdin_cmd(t_shell *msh, int *ret_code)
 
 	fres = COMMON_SUCCESS;
 	*ret_code = EXIT_SUCCESS;
-	line = get_next_line(STDIN_FILENO, &gnlerr);
 	gnlerr = 0;
+	line = get_next_line(STDIN_FILENO, &gnlerr);
 	while (line)
 	{
 		remove_newline(line);

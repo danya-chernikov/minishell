@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 18:40:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/18 01:05:09 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/26 00:58:17 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 # define LIBFT_H
 
 # include <stddef.h>
-# include <sys/types.h>
 # include <dirent.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include <stdbool.h>
 
 /* ==================== get_next_line() DEFINITIONS  ==================== */
@@ -67,7 +68,6 @@ void	gnl_check_reaching_end(long long *v, int *flags);
 void	gnl_clear_func_state(char **line, long long *v, int *flags);
 void	gnl_finish(int fd);
 
-
 /* ==================== SYSTEM CALLS COPYCAT DEFINITIONS ================ */
 
 /* UNKNOWN_STR - A value that may be assigned to any `char *`
@@ -75,12 +75,12 @@ void	gnl_finish(int fd);
  *				 other entity if we did not manage to find
  *				 its real value, or any other data we were
  *				 looking for */
-#define COMMON_HOME_DIR		"/home"
-#define PASSWD_PATH			"/etc/passwd"
-#define PROC_INFO_SOURCE	"/proc/self/status"
-#define PROC_PID_TOKEN		"Pid"
-#define PROC_PPID_TOKEN		"PPid"
-#define UNKNOWN_USER_NAME	"unknown" 
+# define COMMON_HOME_DIR		"/home"
+# define PASSWD_PATH			"/etc/passwd"
+# define PROC_INFO_SOURCE	"/proc/self/status"
+# define PROC_PID_TOKEN		"Pid"
+# define PROC_PPID_TOKEN		"PPid"
+# define UNKNOWN_USER_NAME	"unknown" 
 
 /* The analogue of system
  * `passwd` structure.
@@ -100,7 +100,7 @@ typedef struct s_passwd
 	char	*pw_gecos;
 	char	*pw_dir;
 	char	*pw_shell;
-} t_passwd;
+}	t_passwd;
 
 int		ft_getpid(pid_t *pid);
 int		ft_getppid(pid_t *ppid);
@@ -109,6 +109,9 @@ int		ft_getgid(gid_t *gid);
 int		ft_getpwuid(t_passwd *pwd, uid_t uid);
 
 /* ft_getpwuid_aux.c */
+int		home_attempt(t_passwd *pwd, uid_t uid);
+int		home_loop_body(t_passwd *pwd, struct dirent *entry,
+			struct stat *st, uid_t uid);
 int		fill_pwd_struct(t_passwd *pwd, char **ptokens, uid_t uid);
 int		fill_pwd_struct2(t_passwd *pwd, struct dirent *entry,
 			char *user_dir, uid_t uid);
@@ -116,8 +119,8 @@ void	free_pwd(t_passwd *pwd);
 
 /* ==================== Libft DEFINITIONS =============================== */
 
-#define SPLIT_ERR_MSG	"Error: ft_split()\n"
-#define GNL_ERR_MSG		"Error: get_next_line()\n"
+# define SPLIT_ERR_MSG	"Error: ft_split()\n"
+# define GNL_ERR_MSG	"Error: get_next_line()\n"
 
 typedef struct s_list
 {
@@ -176,7 +179,6 @@ void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-void	ft_list_remove_if(t_list **beg_list, void *data_ref, int (*cmp)());
 
 /* Math */
 size_t	ft_abs(long long num);

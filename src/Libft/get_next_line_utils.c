@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/19 19:48:44 by dchernik          #+#    #+#             */
-/*   Updated: 2026/01/24 00:30:59 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/25 19:50:58 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,9 @@ int	gnl_init(char *buf, char **line, long long *v, int *flags)
 		return (GNL_BREAK);
 	if (flags[GNL_READ])
 	{
-		if (v[GNL_RLEN] == GNL_BUFFER_SIZE &&
-			!flags[GNL_AGAIN] && buf[v[GNL_RLEN] - 1] != '\n')
-		{
+		if (v[GNL_RLEN] == GNL_BUFFER_SIZE
+			&& !flags[GNL_AGAIN] && buf[v[GNL_RLEN] - 1] != '\n')
 			flags[GNL_EXIT] = 1;
-		}
 		flags[GNL_AGAIN] = 0;
 		v[GNL_BUF_POS] = 0;
 		v[GNL_RLEN] = 0;

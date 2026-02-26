@@ -1,22 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vector_msi.c                                       :+:      :+:    :+:   */
+/*   vector_stack2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/25 20:48:27 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 20:48:28 by dchernik         ###   ########.fr       */
+/*   Created: 2026/02/25 20:49:00 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:49:01 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "vector.h"
 
-/* Change the value of the vector's cell at raw index
- * `ri` and column index `ci`, i.e. v->data[ri][ci] */
-void	vector_msi(t_vector *v, size_t ri, size_t ci)
+/* On error returns NULL */
+void	*vector_pop_back(t_vector *v)
 {
-	(void)v;
-	(void)ri;
-	(void)ci;
+	void	*ret;
+
+	if (v->size == 0)
+		return (NULL);
+	ret = (t_uchar *)v->data + ((v->size - 1) * v->esize);
+	--v->size;
+	if (v->size == 0)
+	{
+		v->front = NULL;
+		v->back = NULL;
+	}
+	else
+	{
+		v->front = v->data;
+		v->back = (t_uchar *)v->data + (v->size - 1) * v->esize;
+	}
+	return (ret);
 }

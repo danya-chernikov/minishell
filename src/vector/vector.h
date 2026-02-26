@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 20:48:10 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:48:10 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef VECTOR_H
 # define VECTOR_H
 
@@ -18,13 +30,13 @@
 
 # define DEFAULT_VEC_ENLARGER	16
 
-typedef unsigned char       t_uchar;
-typedef unsigned short      t_ushort;
-typedef unsigned int        t_uint;
-typedef unsigned long       t_ul;
-typedef long long           t_ll;
-typedef unsigned long long  t_ull;
-typedef long double         t_ld;
+typedef unsigned char		t_uchar;
+typedef unsigned short		t_ushort;
+typedef unsigned int		t_uint;
+typedef unsigned long		t_ul;
+typedef long long			t_ll;
+typedef unsigned long long	t_ull;
+typedef long double			t_ld;
 
 typedef enum e_data_type
 {
@@ -117,6 +129,8 @@ void	vector_msi(t_vector *v, size_t ri, size_t ci);
 int		vector_push_back_char(t_vector *v, char c);
 void	vec_push_str(t_vector *v, const char *s);
 int		vector_push_back(t_vector *v, void *val);
+
+/* vector_stack2.c */
 void	*vector_pop_back(t_vector *v);
 
 /* vector_settings.c

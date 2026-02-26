@@ -16,8 +16,7 @@ MAIN_SRCS=ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c \
 	 
 BONUS_SRCS=ft_lstnew_bonus.c ft_lstsize_bonus.c ft_lstadd_front_bonus.c \
 	ft_lstlast_bonus.c ft_lstadd_back_bonus.c ft_lstdelone_bonus.c \
-	ft_lstclear_bonus.c ft_lstiter_bonus.c ft_lstmap_bonus.c \
-	ft_list_remove_if.c
+	ft_lstclear_bonus.c ft_lstiter_bonus.c ft_lstmap_bonus.c
 
 MAIN_OBJS=ft_isalpha.o ft_isdigit.o ft_isalnum.o ft_isascii.o ft_isprint.o \
 	 ft_strlen.o ft_memset.o ft_bzero.o ft_memcpy.o ft_memmove.o \
@@ -33,8 +32,7 @@ MAIN_OBJS=ft_isalpha.o ft_isdigit.o ft_isalnum.o ft_isascii.o ft_isprint.o \
 
 BONUS_OBJS=ft_lstnew_bonus.o ft_lstsize_bonus.o ft_lstadd_front_bonus.o \
 	ft_lstlast_bonus.o ft_lstadd_back_bonus.o ft_lstdelone_bonus.o \
-	ft_lstclear_bonus.o ft_lstiter_bonus.o ft_lstmap_bonus.o \
-	ft_list_remove_if.o
+	ft_lstclear_bonus.o ft_lstiter_bonus.o ft_lstmap_bonus.o
 
 $(NAME) : $(MAIN_OBJS)
 	ar rcs $(NAME) $(MAIN_OBJS)
