@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_service.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:28:40 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 11:29:09 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 #include "error.h"
 
@@ -67,9 +79,9 @@ size_t	env_count_all_vars(t_env *env)
 	var_cnt = 0;
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name &&
-			env->vars[vi].value &&
-			env->vars[vi].type != PARAM)
+		if (env->vars[vi].name
+			&& env->vars[vi].value
+			&& env->vars[vi].type != PARAM)
 		{
 			++var_cnt;
 		}

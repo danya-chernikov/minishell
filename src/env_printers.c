@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_printers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:25:51 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 11:28:13 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 
 #include <stdio.h>
@@ -23,13 +35,13 @@ void	env_print_value(t_env *env, char *name)
 void	env_print_env(t_env *env)
 {
 	size_t	vi;
-	
-	vi = 0;	
+
+	vi = 0;
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name &&
-			env->vars[vi].value &&
-			env->vars[vi].type == ENV)
+		if (env->vars[vi].name
+			&& env->vars[vi].value
+			&& env->vars[vi].type == ENV)
 		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
 		}
@@ -44,13 +56,13 @@ void	env_print_env(t_env *env)
 void	env_print_all(t_env *env)
 {
 	size_t	vi;
-	
-	vi = 0;	
+
+	vi = 0;
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name &&
-			env->vars[vi].value &&
-			env->vars[vi].type != PARAM)
+		if (env->vars[vi].name
+			&& env->vars[vi].value
+			&& env->vars[vi].type != PARAM)
 		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
 		}
@@ -68,13 +80,13 @@ void	env_print_all(t_env *env)
 void	env_print_locals(t_env *env)
 {
 	size_t	vi;
-	
-	vi = 0;	
+
+	vi = 0;
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name &&
-			env->vars[vi].value &&
-			env->vars[vi].type == LOCAL)
+		if (env->vars[vi].name
+			&& env->vars[vi].value
+			&& env->vars[vi].type == LOCAL)
 		{
 			printf("%s=%s\n", env->vars[vi].name, env->vars[vi].value);
 		}
