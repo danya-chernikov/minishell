@@ -7,130 +7,156 @@
 #include "vector.h"
 #include "error.h"
 
-int		exp_process_argredir(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i)
+static int	update_redir_path(t_operand *op, t_op_token *op_tok, char **wc_res);
+static int	append_wc_matches(t_operand *op, char **wc_res);
+static int	expand_one_field(t_operand *op, t_vector *vec_pair[],
+				size_t start, size_t end);
+static int	append_split_fields(t_operand *op, t_vector *vec_pair[]);
+
+int	exp_process_argredir(t_shell *msh, t_operand *op,
+		t_op_token *op_tok, size_t *opt_i)
 {
 	int			fret;
-	char		*tok_str;
 	char		**wc_res;
 	t_vector	*vec_pair[2];
 
-	fret = COMMON_SUCCESS;
-
-	tok_str = op_tok->cnt;
-
-	if (!exp_vectors_init(vec_pair, ft_strlen(tok_str) + 1))
+	if (exp_vectors_init(vec_pair, ft_strlen(op_tok->cnt) + 1)
+		!= COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
-
-	exp_expand_argredir_loop(msh, tok_str, vec_pair);
-
-	// Now `exp_res` is a wildcard mask. Let's eliminate
-	// all asterisks that go consequtively in the `exp_res`
-	// updating corresponding indecies in `qmask`	
+	exp_expand_argredir_loop(msh, op_tok->cnt, vec_pair);
 	wc_collapse_conseq_asterisks(vec_pair[EXP_RES], vec_pair[QMASK]);
-
-	// Then we'll just pass `exp_res` as
-	// wildcard mask into expand_wildcards()
 	if (wc_alloc_res(&wc_res) != COMMON_SUCCESS)
 	{
 		exp_vectors_free(vec_pair);
 		return (COMMON_SYS_ERR);
 	}
-
-	fret = expand_wildcards(wc_res,
-		(char *)vec_pair[EXP_RES]->data, vec_pair[QMASK]);
-	if (fret != COMMON_SUCCESS)
-	{
-		exp_vectors_free(vec_pair);
-		return (fret);
-	}
-
-	// If previous token was a redirection
-	// (it can be any redirection except heredoc)
 	if (*opt_i > 0 && exp_token_is_redirect(&op->tokens[*opt_i - 1]))
 	{
-		// Heredocs delimiter: never treat as a file path
 		if (exp_token_is_heredoc(&op->tokens[*opt_i - 1]))
+			fret = COMMON_SUCCESS;
+		else
 		{
-			wc_free_res(&wc_res);
-			exp_vectors_free(vec_pair);
-			return (COMMON_SUCCESS);
+			fret = expand_wildcards(wc_res,
+					(char *)vec_pair[EXP_RES]->data, vec_pair[QMASK]);
+			if (fret == COMMON_SUCCESS)
+				fret = update_redir_path(op, op_tok, wc_res);
 		}
-
-		// Regular redirection path: need a valid redir_ind
-		if (op_tok->redir_ind < 0 || (size_t)op_tok->redir_ind >= op->red_cnt)
-		{
-			wc_free_res(&wc_res);
-			exp_vectors_free(vec_pair);
-			return (COMMON_SUCCESS);
-		}
-
-		// It means we were handling a redirection operand/path
-		// If globbing gave us more than one coincidence
-		if (wc_res[1][0] != '\0')
-		{
-			print_shell_error(NULL, AMBIG_REDIRECT_ERR_MSG);
-			wc_free_res(&wc_res);
-			exp_vectors_free(vec_pair);
-			return (COMMON_FAILURE);
-		}
-		// Update the corresponding redirection path (this case
-		// we have the unique wildcards expansion result)
-		free(op->redirs[op_tok->redir_ind].path);
-		op->redirs[op_tok->redir_ind].path = ft_strdup(wc_res[0]);
-		if (!op->redirs[op_tok->redir_ind].path)
-		{
-			perror("malloc");
-			wc_free_res(&wc_res);
-			exp_vectors_free(vec_pair);
-			return (COMMON_SYS_ERR);
-		}
-		wc_free_res(&wc_res);
-		exp_vectors_free(vec_pair);
 	}
 	else
-	{
-		// We were handling an argument
-		size_t	arg_i;
-			
-		// Mark that all variables created while parsing
-		// current operand were per-command variables.
-		// It implies we'll not be creating any more
-		// variables while parsing the current operand
-		op->f_per_cmd = true;
-
-		// Add all globbing results into arguments
-		// (if there was no globbing performed
-		// the expans_wildcards() will just put
-		// into wc_res[0] its mask vec_pair[QMASK])
-	
-		arg_i = 0;
-		while (arg_i < WC_MAX_FILES_NUM && wc_res[arg_i][0] != '\0')
-		{
-			if (arg_i >= MAX_ARGC_NUM - 1)
-			{
-				print_shell_error(NULL, MAX_ARGC_NUM_ERR_MSG);
-				return (COMMON_FAILURE);
-			}
-			if (ft_strlen(wc_res[arg_i]) >= MAX_ARGV_LEN - 1)
-			{
-				print_shell_error(NULL, MAX_ARGV_LEN_ERR_MSG);
-				return (COMMON_FAILURE);
-			}
-			op->argv[op->argc] = ft_strdup(wc_res[arg_i]);
-			if (!op->argv[op->argc])
-			{
-				perror("malloc");
-				fret = COMMON_SYS_ERR;
-				break ;
-			}
-			++op->argc;
-			++arg_i;
-		}
-	}
-
+		fret = append_split_fields(op, vec_pair);
 	wc_free_res(&wc_res);
 	exp_vectors_free(vec_pair);
 	return (fret);
+}
+
+static int	update_redir_path(t_operand *op, t_op_token *op_tok, char **wc_res)
+{
+	if (op_tok->redir_ind < 0 || (size_t)op_tok->redir_ind >= op->red_cnt)
+		return (COMMON_SUCCESS);
+	if (wc_res[1][0] != '\0')
+	{
+		print_shell_error(NULL, AMBIG_REDIRECT_ERR_MSG);
+		return (COMMON_FAILURE);
+	}
+	free(op->redirs[op_tok->redir_ind].path);
+	op->redirs[op_tok->redir_ind].path = ft_strdup(wc_res[0]);
+	if (!op->redirs[op_tok->redir_ind].path)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	return (COMMON_SUCCESS);
+}
+
+static int	append_wc_matches(t_operand *op, char **wc_res)
+{
+	size_t	i;
+
+	i = 0;
+	op->f_per_cmd = true;
+	while (i < WC_MAX_FILES_NUM && wc_res[i][0] != '\0')
+	{
+		if (op->argc >= MAX_ARGC_NUM - 1)
+		{
+			print_shell_error(NULL, MAX_ARGC_NUM_ERR_MSG);
+			return (COMMON_FAILURE);
+		}
+		if (ft_strlen(wc_res[i]) >= MAX_ARGV_LEN)
+		{
+			print_shell_error(NULL, MAX_ARGV_LEN_ERR_MSG);
+			return (COMMON_FAILURE);
+		}
+		op->argv[op->argc] = ft_strdup(wc_res[i]);
+		if (!op->argv[op->argc])
+			return (perror("malloc"), COMMON_SYS_ERR);
+		++op->argc;
+		++i;
+	}
+	return (COMMON_SUCCESS);
+}
+
+static int	expand_one_field(t_operand *op, t_vector *vec_pair[],
+				size_t start, size_t end)
+{
+	int			fret;
+	size_t		i;
+	char		**wc_res;
+	char		*exp_str;
+	char		*qmask_str;
+	t_vector	*field_pair[2];
+
+	if (end <= start)
+		return (COMMON_SUCCESS);
+	if (exp_vectors_init(field_pair, end - start + 1) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
+	exp_str = (char *)vec_pair[EXP_RES]->data;
+	qmask_str = (char *)vec_pair[QMASK]->data;
+	i = start;
+	while (i < end)
+	{
+		vector_push_back_char(field_pair[EXP_RES], exp_str[i]);
+		vector_push_back_char(field_pair[QMASK], qmask_str[i]);
+		++i;
+	}
+	vector_push_back_char(field_pair[EXP_RES], '\0');
+	wc_collapse_conseq_asterisks(field_pair[EXP_RES], field_pair[QMASK]);
+	if (wc_alloc_res(&wc_res) != COMMON_SUCCESS)
+		return (exp_vectors_free(field_pair), COMMON_SYS_ERR);
+	fret = expand_wildcards(wc_res,
+			(char *)field_pair[EXP_RES]->data, field_pair[QMASK]);
+	if (fret == COMMON_SUCCESS)
+		fret = append_wc_matches(op, wc_res);
+	wc_free_res(&wc_res);
+	exp_vectors_free(field_pair);
+	return (fret);
+}
+
+static int	append_split_fields(t_operand *op, t_vector *vec_pair[])
+{
+	int		fret;
+	size_t	i;
+	size_t	start;
+	char	*exp_str;
+	char	*qmask_str;
+
+	exp_str = (char *)vec_pair[EXP_RES]->data;
+	qmask_str = (char *)vec_pair[QMASK]->data;
+	i = 0;
+	while (exp_str[i] != '\0')
+	{
+		while (exp_str[i] == ' ' && qmask_str[i] == (char)IND_QNONE)
+			++i;
+		if (exp_str[i] == '\0')
+			break ;
+		start = i;
+		while (exp_str[i] != '\0'
+			&& !(exp_str[i] == ' ' && qmask_str[i] == (char)IND_QNONE))
+			++i;
+		fret = expand_one_field(op, vec_pair, start, i);
+		if (fret != COMMON_SUCCESS)
+			return (fret);
+	}
+	return (COMMON_SUCCESS);
 }
 
 void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
