@@ -106,8 +106,8 @@ int	prepare_operand(t_shell *msh, t_token *token)
 		if (op->my_env)
 		{
 			env_free(op->my_env);
-			op->my_env = NULL;
-			env_init(op->my_env, NULL);
+			if (env_init(op->my_env, NULL) != COMMON_SUCCESS)
+				return (COMMON_SYS_ERR);
 		}
 		return (fres);
 	}

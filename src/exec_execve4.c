@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <stdio.h>
+
 static int	open_heredoc(t_redir *r, int *out_fd);
 
 int	apply_redirs(t_operand *op)
@@ -27,9 +29,14 @@ int	apply_redirs(t_operand *op)
 			return (COMMON_FAILURE);
 		}
 		if (dup2(fd, op->redirs[ri].target_fd) == -1)
+		{
+			perror("dup2");
+			if (close(fd) == -1)
+				return (perror("close"), COMMON_SYS_ERR);
 			return (COMMON_SYS_ERR);
+		}
 		if (close(fd) == -1)
-			return (COMMON_SYS_ERR);
+			return (perror("close"), COMMON_SYS_ERR);
 		++ri;
 	}
 	return (COMMON_SUCCESS);
@@ -49,7 +56,7 @@ int	redir_open_fd(t_redir *redir, int *out_fd)
 	else if (redir->type == REDIR_HEREDOC)
 		return (open_heredoc(redir, out_fd));
 	if (fd == -1)
-		return (COMMON_SYS_ERR);
+		return (COMMON_FAILURE);
 	*out_fd = fd;
 	return (COMMON_SUCCESS);
 }
