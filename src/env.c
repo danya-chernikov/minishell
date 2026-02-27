@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/27 15:01:53 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/27 17:41:14 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 #include "error.h"
 
@@ -26,7 +38,7 @@ int	env_init(t_env *env, char **inh_env)
 		return (COMMON_SUCCESS);
 	env->vars_num = 0;
 	env->inh_env = inh_env;
-	env->vars = malloc(MAX_TOTAL_VARS_NUM * sizeof *env->vars);
+	env->vars = ft_calloc(MAX_TOTAL_VARS_NUM, sizeof (t_env_var));
 	if (!env->vars)
 	{
 		perror("malloc");

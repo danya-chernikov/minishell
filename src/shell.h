@@ -137,15 +137,15 @@ int		set_local_ps4(t_env *env);
 int		msh_set_env_vars(t_env *env);
 
 /* init_envars2.c */
-void	set_env_path(t_env *env);
-void	set_env_shelevel(t_env *env);
+int		set_env_path(t_env *env);
+int		set_env_shelevel(t_env *env);
 int		set_env_pwd(t_env *env);
-void	set_env_oldpwd(t_env *env);
-int		set_env_pwd_user_data(t_env *env);
+int		set_env_oldpwd(t_env *env);
 
 /* init_envars3.c */
-void	set_env_logname(t_env *env);
+int		set_env_logname(t_env *env);
 int		set_rest_env_vars(t_env *env);
+int		set_env_pwd_user_data(t_env *env);
 
 /* NONINT_SCRIPT_MODE - non-interactive script executing:
  * In this mode we do NOT read any configs (check this)

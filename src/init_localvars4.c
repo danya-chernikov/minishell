@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_localvars4.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 05:10:24 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/27 17:15:00 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
@@ -11,7 +23,17 @@
 int	set_local_hosttype(t_env *env)
 {
 	env->vars[SL_HOSTTYPE].name = ft_strdup("HOSTTYPE");
+	if (!env->vars[SL_HOSTTYPE].name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	env->vars[SL_HOSTTYPE].value = ft_strdup(MSH_ARCH);
+	if (!env->vars[SL_HOSTTYPE].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	return (COMMON_SUCCESS);
 }
 
@@ -27,23 +49,23 @@ char	*get_hostname(void)
 
 	fd = open(HOSTNAME_PATH, O_RDONLY);
 	if (fd == -1)
-	{
-		perror("open");
-		return (NULL);
-	}
+		return (perror("open"), NULL);
 	gnlerr = 0;
 	hostname = get_next_line(fd, &gnlerr);
 	if (!hostname && gnlerr)
-	{	
+	{
 		print_shell_error("get_next_line()", GNL_ERR_MSG);
 		gnl_finish(fd);
+		if (close(fd) == -1)
+			return (perror("close"), NULL);
 		return (NULL);
 	}
 	if (close(fd) == -1)
-	{
-		perror("close");
+		return (free(hostname), perror("close"), NULL);
+	if (!hostname)
 		return (NULL);
-	}
+	if (ft_strlen(hostname) == 0)
+		return (free(hostname), NULL);
 	remove_newline(hostname);
 	return (hostname);
 }
@@ -57,6 +79,12 @@ int	set_local_hostname(t_env *env)
 	if (!hostname)
 		return (COMMON_SYS_ERR);
 	env->vars[SL_HOSTNAME].name = ft_strdup("HOSTNAME");
+	if (!env->vars[SL_HOSTNAME].name)
+	{
+		perror("malloc");
+		free(hostname);
+		return (COMMON_SYS_ERR);
+	}
 	env->vars[SL_HOSTNAME].value = hostname;
 	return (COMMON_SUCCESS);
 }
@@ -65,7 +93,17 @@ int	set_local_hostname(t_env *env)
 int	set_local_ostype(t_env *env)
 {
 	env->vars[SL_OSTYPE].name = ft_strdup("OSTYPE");
+	if (!env->vars[SL_OSTYPE].name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	env->vars[SL_OSTYPE].value = ft_strdup(MSH_OSTYPE);
+	if (!env->vars[SL_OSTYPE].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	return (COMMON_SUCCESS);
 }
 
@@ -77,10 +115,21 @@ int	set_local_hostmach(t_env *env)
 
 	mt_len = ft_strlen(MSH_ARCH) + 4 + ft_strlen(MSH_OSTYPE) + 1;
 	machtype = malloc(mt_len * sizeof(char));
+	if (!machtype)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	ft_strlcpy(machtype, MSH_ARCH, mt_len);
 	ft_strlcat(machtype, "-pc-", mt_len);
 	ft_strlcat(machtype, MSH_OSTYPE, mt_len);
 	env->vars[SL_MACHTYPE].name = ft_strdup("MACHTYPE");
+	if (!env->vars[SL_MACHTYPE].name)
+	{
+		perror("malloc");
+		free(machtype);
+		return (COMMON_SYS_ERR);
+	}
 	env->vars[SL_MACHTYPE].value = machtype;
 	return (COMMON_SUCCESS);
 }

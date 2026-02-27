@@ -18,6 +18,8 @@ bool	strings_equal(char *str1, char *str2)
 
 void	remove_newline(char *str)
 {
+	if (!str || str[0] == '\0')
+		return ;
 	if (str[ft_strlen(str) - 1] == '\n')
 		str[ft_strlen(str) - 1] = '\0';
 }

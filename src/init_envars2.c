@@ -1,41 +1,75 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_envars2.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:15:37 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/27 18:00:03 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-// PATH
-void	set_env_path(t_env *env)
+/* PATH */
+int	set_env_path(t_env *env)
 {
 	char	*path;
 
 	env->vars[SE_PATH].name = ft_strdup("PATH");
+	if (!env->vars[SE_PATH].name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	path = getenv("PATH");
-	if (!path)		
+	if (!path)
 		env->vars[SE_PATH].value = ft_strdup(DEF_PATH);
-	else	
+	else
 		env->vars[SE_PATH].value = ft_strdup(path);
+	if (!env->vars[SE_PATH].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	return (COMMON_SUCCESS);
 }
 
-// SHLVL
-void	set_env_shelevel(t_env *env)
+/* SHLVL
+ * If it exists in `env->ihn_env`, just copy it and
+ * increment it, otherwise create it with the value 1 */
+int	set_env_shelevel(t_env *env)
 {
 	char	*shlvl;
 	int		new_shlvl;
 
-	// If it exists in `env->ihn_env`, just copy it and
-	// increment it, otherwise create it with the value 1
 	env->vars[SE_SHLVL].name = ft_strdup("SHLVL");
+	if (!env->vars[SE_SHLVL].name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	shlvl = getenv("SHLVL");
 	if (!shlvl)
 		env->vars[SE_SHLVL].value = ft_strdup("1");
 	else
 	{
-		new_shlvl = ft_atoi(shlvl);	
+		new_shlvl = ft_atoi(shlvl);
 		env->vars[SE_SHLVL].value = ft_itoa(new_shlvl + 1);
 	}
+	if (!env->vars[SE_SHLVL].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	return (COMMON_SUCCESS);
 }
 
-// PWD
+/* PWD */
 int	set_env_pwd(t_env *env)
 {
 	char	cwd[PATH_MAX];
@@ -46,51 +80,34 @@ int	set_env_pwd(t_env *env)
 		return (COMMON_SYS_ERR);
 	}
 	env->vars[SE_PWD].name = ft_strdup("PWD");
+	if (!env->vars[SE_PWD].name)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	env->vars[SE_PWD].value = ft_strdup(cwd);
+	if (!env->vars[SE_PWD].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	return (COMMON_SUCCESS);
 }
 
 // OLDPWD
-void	set_env_oldpwd(t_env *env)
+int	set_env_oldpwd(t_env *env)
 {
 	env->vars[SE_OLDPWD].name = ft_strdup("OLDPWD");
-	env->vars[SE_OLDPWD].value = ft_strdup(env->vars[SE_PWD].value);
-}
-
-/* HOME and USER will always be set
- * if the call succeeds. SHELL may
- * be an empty string if the function
- * fails to determine it */
-int	set_env_pwd_user_data(t_env *env)
-{
-	t_passwd	pwd;
-	uid_t		uid;
-	int			res;
-
-	uid = (uid_t)ft_atoi(env->vars[SL_UID].value);
-	res = ft_getpwuid(&pwd, uid);
-	if (res) // Success
+	if (!env->vars[SE_OLDPWD].name)
 	{
-		// HOME	
-		env->vars[SE_HOME].name = ft_strdup("HOME");
-		env->vars[SE_HOME].value = ft_strdup(pwd.pw_dir);
-		// Let's also set ~ here
-		env->vars[PV_HOME].value = ft_strdup(env->vars[SE_HOME].value); // Intruder!
-		// USER
-		env->vars[SE_USER].name = ft_strdup("USER");
-		env->vars[SE_USER].value = ft_strdup(pwd.pw_name);
-		// SHELL
-		env->vars[SE_SHELL].name = ft_strdup("SHELL");
-		if (ft_strlen(pwd.pw_shell) == 0)
-			env->vars[SE_SHELL].value = ft_strdup(UNKNOWN_VALUE);
-		else
-			env->vars[SE_SHELL].value = ft_strdup(pwd.pw_shell);
-	}
-	else // res <= 0
-	{
-		print_shell_error("ft_getpwuid()", GETPWUID_ERR_MSG);
+		perror("malloc");
 		return (COMMON_SYS_ERR);
 	}
-	free_pwd(&pwd);	
+	env->vars[SE_OLDPWD].value = ft_strdup(env->vars[SE_PWD].value);
+	if (!env->vars[SE_OLDPWD].value)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
 	return (COMMON_SUCCESS);
 }

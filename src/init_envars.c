@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_envars.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:13:53 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/27 14:18:10 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 
 #include <stdio.h>
@@ -25,19 +37,22 @@ int	msh_set_env_vars(t_env *env)
 	int	ret;
 
 	prelim_vars_init(env);
-	set_env_path(env);
-	set_env_shelevel(env);
+	if (set_env_path(env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (set_env_shelevel(env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
 	if (set_env_pwd(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	set_env_oldpwd(env);
+	if (set_env_oldpwd(env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
 	if (set_env_pwd_user_data(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	set_env_logname(env);
+	if (set_env_logname(env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
 	env->vars_num += SENV_VARS_NUM;
 	ret = set_rest_env_vars(env);
 	if (ret != COMMON_SUCCESS)
 		return (ret);
-	// Check for memory errors
 	if (check_mem_errors(env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
 	return (COMMON_SUCCESS);

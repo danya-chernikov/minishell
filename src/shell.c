@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:17:50 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/27 01:46:52 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/27 17:00:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,12 @@ int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 
 void	msh_free(t_shell *msh)
 {
-	exp_free_all_ops_argv(msh->pd);
-	parser_free(msh->pd);
 	if (msh->pd)
+	{
+		exp_free_all_ops_argv(msh->pd);
+		parser_free(msh->pd);
 		free(msh->pd);
+	}
 	if (msh->prompt_inv)
 		free(msh->prompt_inv);
 	env_free(&msh->env);
