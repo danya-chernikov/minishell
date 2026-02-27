@@ -40,6 +40,7 @@
 # define PROMPT_TOO_LONG		"Prompt is too long"
 # define EXIT_NUM_ARG_REQ		"numeric argument required"
 # define EXIT_TOO_MANY_ARGS		"too many arguments"
+# define NOT_VALID_IDENTIFIER	"not a valid identifier"
 
 /* Redirection errors */
 # define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<

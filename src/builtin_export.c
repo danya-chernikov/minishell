@@ -14,10 +14,12 @@ int	builtin_export(t_shell *msh, t_operand *op)
 {
 	int		fret;
 	int		arg_i;
+	int		status;
 	char	*var_name;
 	char	*var_value;
 
 	arg_i = 1;
+	status = RET_CMD_SUCCESS;
 	while (arg_i < op->argc)
 	{
 		var_name = NULL;
@@ -25,6 +27,16 @@ int	builtin_export(t_shell *msh, t_operand *op)
 		fret = parse_export_assignment(op->argv[arg_i], &var_name, &var_value);
 		if (fret != COMMON_SUCCESS)
 			return (RET_CMD_FAILURE);
+		if (!is_variable_name_correct(var_name))
+		{
+			print_shell_error(var_name, NOT_VALID_IDENTIFIER);
+			free(var_name);
+			if (var_value)
+				free(var_value);
+			status = RET_CMD_FAILURE;
+			++arg_i;
+			continue ;
+		}
 		fret = builtin_export_alg(msh, var_name, var_value);
 		if (fret != COMMON_SUCCESS)
 		{
@@ -34,7 +46,7 @@ int	builtin_export(t_shell *msh, t_operand *op)
 		}
 		++arg_i;
 	}
-	return (RET_CMD_SUCCESS);
+	return (status);
 }
 
 static int	builtin_export_alg(t_shell *msh, char *var_name, char *var_value)
