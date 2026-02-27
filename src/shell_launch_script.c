@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 03:12:00 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 23:50:14 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/27 01:48:24 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,7 @@ int	launch_script(t_shell *msh, int *ret_code)
 		return (fres);
 	fd = open(script_path, O_RDONLY);
 	if (fd == -1)
-	{
-		free(script_path);
-		return (perror("open"), COMMON_SYS_ERR);
-	}
+		return (free(script_path), perror("open"), COMMON_SYS_ERR);
 	gnlerr = 0;
 	fres = launch_script_loop(msh, &fd, &gnlerr, ret_code);
 	if (fres != COMMON_SUCCESS)
@@ -73,7 +70,8 @@ static int	launch_script_check_access(t_shell *msh, char *script_path)
 	return (COMMON_SUCCESS);
 }
 
-static int	launch_script_loop(t_shell *msh, int *fd, int *gnlerr, int *ret_code)
+static int	launch_script_loop(t_shell *msh, int *fd, int *gnlerr,
+				int *ret_code)
 {
 	char	*line;
 	int		fres;

@@ -25,6 +25,7 @@
 # define VERBOSE_SHORT_OPT	"-v"
 # define C_SHORT_OPT		"-c"
 
+# define MUST_EXIT			-7
 # define PROMPT_INV_LEN		512	// Maximum length of user's prompt invitation string
 # define MAX_SUBDOMAIN_LEN	64
 
@@ -86,6 +87,8 @@ int		launch_script(t_shell *msh, int *ret_code);
 
 /* aux_shell.c */
 int		gen_prompt_inv(t_shell *msh);
+
+/* aux_shell2.c */
 void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */

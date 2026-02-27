@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 00:48:27 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/27 00:00:04 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/27 02:00:44 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 static int	get_username(char **username);
 static int	get_subdomain(char **subdomain);
+static int	extract_subdomain(char **subdomain, char *hostname, char *point);
 static int	form_invitation(t_shell *msh, char *subdomain,
 				char *username, char *pwd);
 
@@ -33,14 +34,14 @@ int	gen_prompt_inv(t_shell *msh)
 	fres = get_subdomain(&subdomain);
 	if (fres != COMMON_SUCCESS)
 		return (fres);
-	fres = get_username(&username);	
+	fres = get_username(&username);
 	if (fres != COMMON_SUCCESS)
 	{
 		free(subdomain);
 		return (fres);
 	}
 	pwd = msh->env.vars[SE_PWD].value;
-	fres = form_invitation(msh, username, subdomain, pwd);
+	fres = form_invitation(msh, subdomain, username, pwd);
 	free(username);
 	free(subdomain);
 	return (fres);
@@ -72,7 +73,6 @@ static int	get_username(char **username)
  * sd_len - subdomain length; */
 static int	get_subdomain(char **subdomain)
 {
-	size_t	sd_len;
 	char	*point;
 	char	*hostname;
 
@@ -88,17 +88,26 @@ static int	get_subdomain(char **subdomain)
 	point = ft_strchr(hostname, '.');
 	if (point)
 	{
-		sd_len = (ptrdiff_t)point - (ptrdiff_t)hostname;
-		if (sd_len > MAX_SUBDOMAIN_LEN - 1)
-		{
-			print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
-			return (free(hostname), free(*subdomain), COMMON_FAILURE);
-		}
-		ft_strlcpy(*subdomain, hostname, sd_len + 1);
+		if (extract_subdomain(subdomain, hostname, point) == COMMON_FAILURE)
+			return (COMMON_FAILURE);
 	}
 	else
 		ft_strlcpy(*subdomain, hostname, MAX_SUBDOMAIN_LEN);
 	free(hostname);
+	return (COMMON_SUCCESS);
+}
+
+static int	extract_subdomain(char **subdomain, char *hostname, char *point)
+{
+	size_t	sd_len;
+
+	sd_len = (ptrdiff_t)point - (ptrdiff_t)hostname;
+	if (sd_len > MAX_SUBDOMAIN_LEN - 1)
+	{
+		print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG);
+		return (free(hostname), free(*subdomain), COMMON_FAILURE);
+	}
+	ft_strlcpy(*subdomain, hostname, sd_len + 1);
 	return (COMMON_SUCCESS);
 }
 
@@ -124,16 +133,4 @@ static int	form_invitation(t_shell *msh, char *subdomain,
 		free(msh->prompt_inv);
 	msh->prompt_inv = new_prompt;
 	return (COMMON_SUCCESS);
-}
-
-void	msh_update_retcode(t_shell *msh, int status)
-{
-	char	*new_val;
-
-	new_val = ft_itoa(status);
-	if (!new_val)
-		return ;
-	if (msh->env.vars[PV_RETCODE].value)
-		free(msh->env.vars[PV_RETCODE].value);
-	msh->env.vars[PV_RETCODE].value = new_val;
 }

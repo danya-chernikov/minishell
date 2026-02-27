@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 00:17:58 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 00:17:59 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/27 01:34:18 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ int	main(int argc, char **argv, char **env)
 	if (fret != COMMON_SUCCESS)
 	{
 		ret_code = EXIT_FAILURE;
+		if (fret == MUST_EXIT)
+			ret_code = EXIT_SUCCESS;
 		return (ret_code);
 	}
 	fret = msh_launch(&msh, &ret_code);

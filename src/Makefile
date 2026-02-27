@@ -11,8 +11,8 @@ CFLAGS=-Wall -Werror -Wextra -O0 -g3
 SRCS=main.c \
 	 shell.c \
 	 shell_launcher.c shell_launch_int.c shell_launch_script.c \
-	 aux_shell.c \
-	 cmdargs_parser.c \
+	 aux_shell.c aux_shell2.c \
+	 cmdargs_parser.c cmdargs_parser2.c cmdargs_parser3.c cmdargs_parser4.c \
 	 init_paramvars.c init_localvars.c init_localvars2.c \
 	 init_localvars3.c init_localvars4.c init_localvars5.c \
 	 init_envars.c init_envars2.c init_envars3.c \
@@ -41,8 +41,8 @@ SRCS=main.c \
 OBJS=main.o \
 	 shell.o \
 	 shell_launcher.o shell_launch_int.o shell_launch_script.o \
-	 aux_shell.o \
-	 cmdargs_parser.o \
+	 aux_shell.o aux_shell2.o \
+	 cmdargs_parser.o cmdargs_parser2.o cmdargs_parser3.o cmdargs_parser4.o \
 	 init_paramvars.o init_localvars.o init_localvars2.o \
 	 init_localvars3.o init_localvars4.o init_localvars5.o \
 	 init_envars.o init_envars2.o init_envars3.o \
@@ -122,12 +122,31 @@ aux_shell.o : aux_shell.c shell.h aux_common.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell.c
 
+aux_shell2.o : aux_shell2.c shell.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c aux_shell2.c
 
 # ====================== Command line arguments parser =======================
-cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h \
+cmdargs_parser.o : cmdargs_parser.c cmdargs_parser.h shell.h aux_common.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c cmdargs_parser.c
+
+cmdargs_parser2.o : cmdargs_parser2.c cmdargs_parser.h shell.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c cmdargs_parser2.c
+
+cmdargs_parser3.o : cmdargs_parser3.c cmdargs_parser.h shell.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c cmdargs_parser3.c
+
+cmdargs_parser4.o : cmdargs_parser4.c cmdargs_parser.h shell.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c cmdargs_parser4.c
 
 
 # ==================== Parameter-variables initialization ====================

@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:17:50 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/26 22:22:37 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/27 01:46:52 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,24 @@
 
 #include <stdlib.h>
 
+static int	environment_and_history_init(t_shell *msh, char **env);
 static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
 
 int	msh_init(t_shell *msh, int argc, char **argv, char **env)
 {
-	int	fres;
+	int		fres;
+	bool	f_exit;
 
+	f_exit = false;
 	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
-	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
+	if (environment_and_history_init(msh, env) == COMMON_SYS_ERR)
 		return (COMMON_SYS_ERR);
-	if (history_init(&msh->history) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-	if (msh_init_param_vars(&msh->env) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-	fres = cmdargs_parser(msh);
+	fres = cmdargs_parser(msh, &f_exit);
 	if (fres != COMMON_SUCCESS)
 		return (fres);
+	if (f_exit)
+		return (MUST_EXIT);
 	if (!isatty(STDIN_FILENO))
 		if (msh->mode != NONINT_SCRIPT_MODE && msh->mode != NONINT_CMD_MODE)
 			msh->mode = NONINT_STDIN_MODE;
@@ -61,6 +62,17 @@ void	msh_free(t_shell *msh)
 	env_free(&msh->env);
 	history_free(&msh->history);
 	configs_free(&msh->configs);
+}
+
+static int	environment_and_history_init(t_shell *msh, char **env)
+{
+	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (history_init(&msh->history) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (msh_init_param_vars(&msh->env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	return (COMMON_SUCCESS);
 }
 
 /* Initialize shell options, configs and parser data  */
