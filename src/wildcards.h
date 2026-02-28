@@ -4,6 +4,8 @@
 # define WC_MAX_MASK_LEN		4096
 # define WC_MAX_FILES_NUM		8192
 # define WC_MAX_FILENAME_LEN	4096
+# define WC_READ_IND			0
+# define WC_WRITE_IND			1
 
 # include <stddef.h>
 # include <stdbool.h>

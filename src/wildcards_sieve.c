@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards_sieve.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 12:42:54 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 12:43:15 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wildcards.h"
 #include "operand.h"
 #include "aux_common.h"
@@ -13,7 +25,8 @@
  *     resf_cnt	- counter for the result files array;
  *     file		- pointer to the current file;
  *     fi		- file index */
-int	wc_sift_files_by_mask(t_wc_data *wcd, char **res_files, char *files[], size_t file_cnt)
+int	wc_sift_files_by_mask(t_wc_data *wcd, char **res_files,
+		char *files[], size_t file_cnt)
 {
 	size_t		resf_cnt;
 	size_t		fi;
@@ -44,7 +57,7 @@ int	wc_sift_files_by_mask(t_wc_data *wcd, char **res_files, char *files[], size_
 int	wc_check_file(t_wc_data	*wcd, char **res_files, size_t *resf_cnt)
 {
 	bool	f_cancel;
-	
+
 	wcd->mi = 0;
 	f_cancel = false;
 	wc_check_file_loop(wcd, &f_cancel);
@@ -52,13 +65,7 @@ int	wc_check_file(t_wc_data	*wcd, char **res_files, size_t *resf_cnt)
 		f_cancel = true;
 	if (!f_cancel)
 	{
-		//res_files[*resf_cnt] = ft_strdup(wcd->file);
 		ft_strlcpy(res_files[*resf_cnt], wcd->file, WC_MAX_FILENAME_LEN);
-		/*if (!res_files[*resf_cnt])
-		{
-			perror("malloc");
-			return (COMMON_SYS_ERR);
-		}*/
 		++(*resf_cnt);
 	}
 	return (COMMON_SUCCESS);
@@ -75,8 +82,8 @@ void	wc_check_file_loop(t_wc_data *wcd, bool *f_cancel)
 				*f_cancel = true;
 			break ;
 		}
-		if (wcd->mask[wcd->mi] == '*' &&
-			*((char *)vector_at(wcd->qmask, wcd->mi)) == (char)IND_QNONE)
+		if (wcd->mask[wcd->mi] == '*'
+			&& *((char *)vector_at(wcd->qmask, wcd->mi)) == (char)IND_QNONE)
 		{
 			if (wc_match_asterisk(wcd) == BREAK)
 				break ;

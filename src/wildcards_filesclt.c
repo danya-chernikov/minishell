@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards_filesclt.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 12:41:34 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 12:41:50 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wildcards.h"
 
 #include "libft.h"
@@ -55,8 +67,10 @@ int	wc_init_dir(DIR **dir, struct dirent **entry, char *cwd)
 	return (COMMON_SUCCESS);
 }
 
-/* Traverses all files in the current directory stores their names into `files` */
-int	wc_get_curdir_files_loop(DIR *dir, struct dirent *entry, char *files[], size_t *file_cnt)
+/* Traverses all files in the current directory stores
+ * their names into `files` */
+int	wc_get_curdir_files_loop(DIR *dir, struct dirent *entry,
+		char *files[], size_t *file_cnt)
 {
 	int	fret;
 

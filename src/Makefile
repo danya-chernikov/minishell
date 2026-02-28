@@ -29,7 +29,8 @@ SRCS=main.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
-	 wildcards_sieve.c wildcards_sieve2.c wildcards_common.c \
+	 wildcards_sieve.c wildcards_sieve2.c \
+	 wildcards_common.c wildcards_common2.c \
 	 exec_expassign.c exec_ops.c exec_ops2.c \
 	 exec_pipeline.c exec_pipeline2.c exec_pipeline3.c \
 	 exec_execve.c exec_execve2.c exec_execve3.c \
@@ -61,7 +62,8 @@ OBJS=main.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
-	 wildcards_sieve.o wildcards_sieve2.o wildcards_common.o \
+	 wildcards_sieve.o wildcards_sieve2.o \
+	 wildcards_common.o wildcards_common2.o \
 	 exec_expassign.o exec_ops.o exec_ops2.o \
 	 exec_pipeline.o exec_pipeline2.o exec_pipeline3.o \
 	 exec_execve.o exec_execve2.o exec_execve3.o \
@@ -443,10 +445,15 @@ wildcards_sieve2.o : wildcards_sieve2.c wildcards.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards_sieve2.c
 
-wildcards_common.o : wildcards_common.c wildcards.h operand.h \
+wildcards_common.o : wildcards_common.c wildcards.h operand.h aux_common.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c wildcards_common.c
+
+wildcards_common2.o : wildcards_common2.c wildcards.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c wildcards_common2.c
 
 
 # ================================ Execution =================================
