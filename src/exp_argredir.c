@@ -13,7 +13,8 @@ int	exp_process_argredir(t_shell *msh, t_operand *op,
 	int			fret;
 	t_vector	*vec_pair[2];
 
-	if (exp_vectors_init(vec_pair, ft_strlen(op_tok->cnt) + 1) != COMMON_SUCCESS)
+	if (exp_vectors_init(vec_pair, ft_strlen(op_tok->cnt) + 1)
+		!= COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
 	exp_expand_argredir_loop(msh, op_tok->cnt, vec_pair);
 	wc_collapse_conseq_asterisks(vec_pair[EXP_RES], vec_pair[QMASK]);
@@ -74,9 +75,11 @@ int	append_wc_matches(t_operand *op, char **wc_res)
 	while (i < WC_MAX_FILES_NUM && wc_res[i][0] != '\0')
 	{
 		if (op->argc >= MAX_ARGC_NUM - 1)
-			return (print_shell_error(NULL, MAX_ARGC_NUM_ERR_MSG), COMMON_FAILURE);
+			return (print_shell_error(NULL, MAX_ARGC_NUM_ERR_MSG),
+				COMMON_FAILURE);
 		if (ft_strlen(wc_res[i]) >= MAX_ARGV_LEN)
-			return (print_shell_error(NULL, MAX_ARGV_LEN_ERR_MSG), COMMON_FAILURE);
+			return (print_shell_error(NULL, MAX_ARGV_LEN_ERR_MSG),
+				COMMON_FAILURE);
 		op->argv[op->argc] = ft_strdup(wc_res[i]);
 		if (!op->argv[op->argc])
 			return (perror("malloc"), COMMON_SYS_ERR);

@@ -41,11 +41,13 @@ int	exp_expand_varname(t_shell *msh, t_operand *op,
 	i = exp_assign_eqind(tok_str) + 1;
 	if (tok_str[i] == '\0')
 	{
-		if (env_set(op->my_env, var_name, ft_strdup(""), LOCAL) != COMMON_SUCCESS)
+		if (env_set(op->my_env, var_name, ft_strdup(""), LOCAL)
+			!= COMMON_SUCCESS)
 			return (COMMON_FAILURE);
 		return (CONTINUE);
 	}
-	if (exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1) != COMMON_SUCCESS)
+	if (exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1)
+		!= COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
 	exp_expand_varname_loop(msh, tok_str, vec_pair);
 	fret = exp_store_var(op, var_name, vec_pair);
@@ -90,7 +92,8 @@ int	exp_store_var(t_operand *op, char *var_name,
 	if (op->f_per_cmd)
 		return (free(var_name), COMMON_SUCCESS);
 	if (env_set(op->my_env, var_name,
-			ft_strdup((char *)vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
+			ft_strdup((char *)vec_pair[EXP_RES]->data), LOCAL)
+		!= COMMON_SUCCESS)
 		return (COMMON_FAILURE);
 	return (COMMON_SUCCESS);
 }

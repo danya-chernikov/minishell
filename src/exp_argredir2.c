@@ -69,7 +69,8 @@ int	append_split_fields(t_operand *op, t_vector *vec_pair[])
 	return (COMMON_SUCCESS);
 }
 
-void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
+void	exp_expand_argredir_loop(t_shell *msh, char *tok_str,
+			t_vector *vec_pair[])
 {
 	t_exp_ar_loop	ctx;
 
