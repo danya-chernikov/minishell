@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:34:15 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 01:14:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 01:32:26 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,16 @@
 /* We assume lines is located on heap */
 int	history_push(t_history *history, char *line, t_hist_type type)
 {
+	if (!history || !history->lines)
+	{
+		free(line);
+		line = NULL;
+		return (COMMON_FAILURE);
+	}
 	if (history->lines_num >= MAX_HIST_LINES_NUM)
 	{
 		free(line);
+		line = NULL;
 		print_shell_error(NULL, MAX_HIST_LNUM_ERR_MSG);
 		return (COMMON_FAILURE);
 	}

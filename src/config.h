@@ -70,6 +70,7 @@ typedef struct s_configs
 	char	*nonlogin[NONLOGIN_CONFIGS_NUM];
 }	t_configs;
 
+/* config.c */
 void	configs_init(t_configs *cnf);
 void	configs_free(t_configs *cnf);
 

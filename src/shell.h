@@ -93,7 +93,13 @@ void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */
 int		msh_load_configs(t_shell *msh);
+int		init_login_configs(t_shell *msh, t_configs *c, char *home);
+int		init_nonlogin_configs(t_shell *msh, t_configs *c, char *home);
+
+/* shell_login_configs.c */
 int		load_login_configs(t_shell *msh);
+
+/* shell_nonlogin_configs.c */
 int		load_nonlogin_configs(t_shell *msh);
 
 /* shell_history.c */

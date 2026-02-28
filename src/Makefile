@@ -19,7 +19,7 @@ SRCS=main.c \
 	 env.c env_setters.c env_getters.c env_printers.c env_service.c \
 	 env_exec.c \
 	 history.c shell_history.c \
-	 config.c shell_configs.c \
+	 config.c shell_configs.c shell_login_configs.c shell_nonlogin_configs.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 par.c quote.c token.c operand.c \
@@ -49,7 +49,7 @@ OBJS=main.o \
 	 env.o env_setters.o env_getters.o env_printers.o env_service.o \
 	 env_exec.o \
 	 history.o shell_history.o \
-	 config.o shell_configs.o \
+	 config.o shell_configs.o shell_login_configs.o shell_nonlogin_configs.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 par.o quote.o token.o operand.o \
@@ -254,6 +254,16 @@ shell_configs.o : shell_configs.c shell.h engine.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_configs.c
+
+shell_login_configs.o : shell_login_configs.c shell.h engine.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_login_configs.c
+
+shell_nonlogin_configs.o : shell_nonlogin_configs.c shell.h engine.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c shell_nonlogin_configs.c
 
 
 # ============================== Prompt parser ===============================

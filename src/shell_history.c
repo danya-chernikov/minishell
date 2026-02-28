@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:35:30 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 01:14:42 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 01:31:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,10 @@ static int	load_history_loop(t_shell *msh, int fd)
 		remove_newline(hline);
 		fret = history_push(&msh->history, hline, FROM_FILE);
 		if (fret != COMMON_SUCCESS)
+		{
+			gnl_finish(fd);
 			return (fret);
+		}
 		hline = get_next_line(fd, &gnlerr);
 	}
 	if (!hline && gnlerr)
