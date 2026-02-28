@@ -579,7 +579,7 @@ builtin_exit.o : builtin_exit.c builtin.h shell.h operand.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin_exit.c
 
-builtin_export.o : builtin_export.c builtin.h shell.h operand.h \
+builtin_export.o : builtin_export.c builtin.h shell.h operand.h aux_common.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c builtin_export.c

@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 
+static void	check_arg_error(t_shell *msh, t_operand *op, bool f_in_parent);
 static int	parse_exit_code(const char *s);
 
 int	builtin_exit(t_shell *msh, t_operand *op, bool f_in_parent)
@@ -14,18 +15,9 @@ int	builtin_exit(t_shell *msh, t_operand *op, bool f_in_parent)
 	code = 0;
 	if (f_in_parent && isatty(STDIN_FILENO))
 		write(STDOUT_FILENO, "exit\n", 5);
-	if (op->argc >= 2 && !ft_isnum(op->argv[1]))
-	{
-		print_shell_error(op->argv[1], EXIT_NUM_ARG_REQ);
-		if (f_in_parent)
-			msh_free(msh);
-		exit(CMD_BUILTIN_ERR);
-	}
+	check_arg_error(msh, op, f_in_parent);
 	if (op->argc > 2)
-	{
-		print_shell_error(NULL, EXIT_TOO_MANY_ARGS);
-		return (CMD_BUILTIN_ERR);
-	}
+		return (print_shell_error(NULL, EXIT_TOO_MANY_ARGS), CMD_BUILTIN_ERR);
 	if (op->argc == 2)
 		code = parse_exit_code(op->argv[1]);
 	else
@@ -41,6 +33,17 @@ int	builtin_exit(t_shell *msh, t_operand *op, bool f_in_parent)
 	if (f_in_parent)
 		msh_free(msh);
 	exit(code);
+}
+
+static void	check_arg_error(t_shell *msh, t_operand *op, bool f_in_parent)
+{
+	if (op->argc >= 2 && !ft_isnum(op->argv[1]))
+	{
+		print_shell_error(op->argv[1], EXIT_NUM_ARG_REQ);
+		if (f_in_parent)
+			msh_free(msh);
+		exit(CMD_BUILTIN_ERR);
+	}
 }
 
 static int	parse_exit_code(const char *s)

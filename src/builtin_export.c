@@ -1,12 +1,16 @@
 #include "builtin.h"
 #include "shell.h"
 #include "operand.h"
+#include "aux_common.h"
 
 #include "error.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
+static int	check_varname(char *var_name, char *var_value, int *status,
+				int *arg_i);
+static int	launch_export_alg(t_shell *msh, char *var_name, char *var_value);
 static int	parse_export_assignment(char *s, char **var_name, char **var_value);
 static int	builtin_export_alg(t_shell *msh, char *var_name, char *var_value);
 
@@ -27,26 +31,44 @@ int	builtin_export(t_shell *msh, t_operand *op)
 		fret = parse_export_assignment(op->argv[arg_i], &var_name, &var_value);
 		if (fret != COMMON_SUCCESS)
 			return (RET_CMD_FAILURE);
-		if (!is_variable_name_correct(var_name))
-		{
-			print_shell_error(var_name, NOT_VALID_IDENTIFIER);
-			free(var_name);
-			if (var_value)
-				free(var_value);
-			status = RET_CMD_FAILURE;
-			++arg_i;
+		if (check_varname(var_name, var_value, &status, &arg_i) == CONTINUE)
 			continue ;
-		}
-		fret = builtin_export_alg(msh, var_name, var_value);
-		if (fret != COMMON_SUCCESS)
-		{
-			if (fret == COMMON_SYS_ERR)
-				perror("malloc");
+		fret = launch_export_alg(msh, var_name, var_value);
+		if (fret == RET_CMD_FAILURE)
 			return (RET_CMD_FAILURE);
-		}
 		++arg_i;
 	}
 	return (status);
+}
+
+static int	launch_export_alg(t_shell *msh, char *var_name, char *var_value)
+{
+	int	fret;
+
+	fret = builtin_export_alg(msh, var_name, var_value);
+	if (fret != COMMON_SUCCESS)
+	{
+		if (fret == COMMON_SYS_ERR)
+			perror("malloc");
+		return (RET_CMD_FAILURE);
+	}
+	return (COMMON_SUCCESS);
+}
+
+static int	check_varname(char *var_name, char *var_value, int *status,
+				int *arg_i)
+{
+	if (!is_variable_name_correct(var_name))
+	{
+		print_shell_error(var_name, NOT_VALID_IDENTIFIER);
+		free(var_name);
+		if (var_value)
+			free(var_value);
+		*status = RET_CMD_FAILURE;
+		++(*arg_i);
+		return (CONTINUE);
+	}
+	return (COMMON_SUCCESS);
 }
 
 static int	builtin_export_alg(t_shell *msh, char *var_name, char *var_value)
