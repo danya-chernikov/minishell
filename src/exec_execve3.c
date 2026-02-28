@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 
+static void	go_to_next_path_comp(char *path, size_t *i);
+
 int	map_exec_errno(int errnum)
 {
 	if (errnum == ENOENT || errnum == ENOTDIR)
@@ -69,10 +71,15 @@ char	*resolve_in_path(t_shell *msh, const char *cmd)
 		free(dir);
 		if (try)
 			return (try);
-		if (path[i] == ':')
-			++i;
+		go_to_next_path_comp(path, &i);
 	}
 	return (NULL);
+}
+
+static void	go_to_next_path_comp(char *path, size_t *i)
+{
+	if (path[*i] == ':')
+		++(*i);
 }
 
 char	*try_path_dir(const char *dir, const char *cmd)

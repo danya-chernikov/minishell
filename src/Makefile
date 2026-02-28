@@ -31,7 +31,8 @@ SRCS=main.c \
 	 heredoc.c heredoc2.c heredoc3.c heredoc4.c heredoc5.c \
 	 exp_common.c exp_common2.c \
 	 exp_preparation.c exp_preparation2.c \
-	 exp_assignment.c exp_argredir.c \
+	 exp_assignment.c exp_assignment2.c \
+	 exp_argredir.c exp_argredir2.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
 	 wildcards_sieve.c wildcards_sieve2.c \
@@ -69,7 +70,8 @@ OBJS=main.o \
 	 heredoc.o heredoc2.o heredoc3.o heredoc4.o heredoc5.o \
 	 exp_common.o exp_common2.o \
 	 exp_preparation.o exp_preparation2.o \
-	 exp_assignment.o exp_argredir.o \
+	 exp_assignment.o exp_assignment2.o \
+	 exp_argredir.o exp_argredir2.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
 	 wildcards_sieve.o wildcards_sieve2.o \
@@ -431,10 +433,21 @@ exp_assignment.o : exp_assignment.c expansion.h shell.h prompt_parser.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_assignment.c
 
+exp_assignment2.o : exp_assignment2.c expansion.h shell.h prompt_parser.h \
+	operand.h token.h aux_common.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exp_assignment2.c
+
 exp_argredir.o : exp_argredir.c expansion.h shell.h operand.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_argredir.c
+
+exp_argredir2.o : exp_argredir2.c expansion.h shell.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exp_argredir2.c
 
 exp_preparation.o : exp_preparation.c expansion.h shell.h prompt_parser.h \
 	operand.h \

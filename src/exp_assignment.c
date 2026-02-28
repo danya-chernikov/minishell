@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exp_assignment.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/28 13:55:28 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 14:01:21 by dchernik         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "expansion.h"
 #include "shell.h"
 #include "prompt_parser.h"
@@ -21,134 +9,88 @@
 #include "vector.h"
 #include "error.h"
 
-/* Here we consider only the first '=' found.
- * For example:
- *     # VAR'='=1
- * in this case we'll get VAR' and '=1 but
- * the variable name simply will not be
- * considered as correct later! So it's fine.
- * Another example:
- *     # VAR==1
- * here we'll just get VAR and =1 */
 int	exp_process_assignment(t_shell *msh, t_operand *op,
 		t_op_token *op_tok, size_t *opt_i)
 {
 	int		fret;
 	char	*var_name;
 	char	*var_value;
-	bool	f_varname_correct;
 
-	f_varname_correct = false;
 	fret = div2_str_by_delim(op_tok->cnt, '=', &var_name, &var_value);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
 	free(var_value);
-	if (is_variable_name_correct(var_name))
-	{
-		f_varname_correct = true;
-		fret = exp_expand_varname(msh, op, op_tok, var_name);
-		if (fret == CONTINUE)
-		{
-			++(*opt_i);
-			return (CONTINUE);
-		}
-		if (fret != COMMON_SUCCESS)
-			return (fret);
-	}
-	if (f_varname_correct)
-	{
-		++(*opt_i);
-		return (CONTINUE);
-	}
-	return (COMMON_SUCCESS);
+	if (!is_variable_name_correct(var_name))
+		return (free(var_name), COMMON_SUCCESS);
+	fret = exp_expand_varname(msh, op, op_tok, var_name);
+	if (fret != COMMON_SUCCESS && fret != CONTINUE)
+		return (fret);
+	++(*opt_i);
+	return (CONTINUE);
 }
 
-/* vec_pair[0] - exp_res - Quote mask;
- * vec_pair[1] - qmask - Array that stores expansion results.
- *
- * We do not have to expand anything in variable's name.
- * So let's start with the next symbol after '='.
- * Always search for the first '=' occurence.
- *
- * if (i == ft_strlen(tok_str))
- *     We don't have to expand anything.
- *     We just create a variable with empty value and we
- *     don't care about an error cause it can't be critical */
 int	exp_expand_varname(t_shell *msh, t_operand *op,
 		t_op_token *op_tok, char *var_name)
 {
 	size_t		i;
-	size_t		eqsign_ind;
+	int			fret;
 	char		*tok_str;
 	t_vector	*vec_pair[2];
-		
+
 	tok_str = op_tok->cnt;
-	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
-	i = eqsign_ind + 1;
-	if (i == ft_strlen(tok_str))
+	i = exp_assign_eqind(tok_str) + 1;
+	if (tok_str[i] == '\0')
 	{
 		if (env_set(op->my_env, var_name, ft_strdup(""), LOCAL) != COMMON_SUCCESS)
 			return (COMMON_FAILURE);
 		return (CONTINUE);
 	}
-	if (!exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1))
+	if (exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1) != COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
 	exp_expand_varname_loop(msh, tok_str, vec_pair);
-	if (!op->f_per_cmd)
-	{
-		if (env_set(op->my_env, var_name,
-			ft_strdup(vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
-			return (exp_vectors_free(vec_pair), COMMON_FAILURE);
-	}
+	fret = exp_store_var(op, var_name, vec_pair);
 	exp_vectors_free(vec_pair);
-	return (COMMON_SUCCESS);
+	return (fret);
 }
 
-/* Loop through token symbols.
- * Again, we already excluded cases like VAR"IABLE=VALUE"
- * here the variable name will not be considered as correct
- * and we'll be treating this token as an argument.
- *     i			- Operand's token index;
- *     state		- State of the current operand's token symbol;
- *     dlr_varname	- Dollar variable name */
 void	exp_expand_varname_loop(t_shell *msh, char *tok_str,
-			t_vector *vec_pair[])
+		t_vector *vec_pair[])
 {
-	size_t		i;
-	size_t		eqsign_ind;
-	bool		f_extract;
-	char		dlr_varname[MAX_ENV_VAL_LEN];
-	t_ind_type	state;
+	t_exp_as_loop	ctx;
 
-	state = IND_QNONE;
-	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
-	i = eqsign_ind + 1;
-	while (i < ft_strlen(tok_str))
-	{	
-		if (tok_str[i] == '"')
-			exp_process_double_quote(tok_str, &i, vec_pair, &state);
-		else if (tok_str[i] == '\'')
-			exp_process_single_quote(tok_str, &i, vec_pair, &state);
-		else if (exp_tilde_found_assign(tok_str, i, eqsign_ind, state))
-			exp_expand_tilde(msh, vec_pair, state);
-		else if (tok_str[i] == '$' && state != IND_QSINGLE)
-		{
-
-			f_extract = exp_extract_dlr_varname(dlr_varname, tok_str, &i);
-			if (!f_extract)
-			{
-				vector_push_back_char(vec_pair[EXP_RES], '$');
-				vector_push_back_char(vec_pair[QMASK], (char)state);
-			}
-			else
-				exp_expand_variable(msh, vec_pair, dlr_varname, state);
-		}
+	ctx.tok_str = tok_str;
+	ctx.i = exp_assign_eqind(tok_str) + 1;
+	ctx.state = IND_QNONE;
+	while (ctx.tok_str[ctx.i] != '\0')
+	{
+		if (ctx.tok_str[ctx.i] == '"')
+			exp_process_double_quote(ctx.tok_str, &ctx.i, vec_pair, &ctx.state);
+		else if (ctx.tok_str[ctx.i] == '\'')
+			exp_process_single_quote(ctx.tok_str, &ctx.i, vec_pair, &ctx.state);
+		else if (exp_tilde_found_assign(ctx.tok_str, ctx.i,
+				ctx.i - 1, ctx.state))
+			exp_expand_tilde(msh, vec_pair, ctx.state);
+		else if (ctx.tok_str[ctx.i] == '$' && ctx.state != IND_QSINGLE)
+			exp_assign_handle_dollar(msh, vec_pair, &ctx);
 		else
-		{
-			vector_push_back_char(vec_pair[EXP_RES], tok_str[i]);
-			vector_push_back_char(vec_pair[QMASK], (char)state);
-		}
-		++i;
+			exp_push_assign_char(vec_pair, ctx.tok_str[ctx.i], ctx.state);
+		++ctx.i;
 	}
 	vector_push_back_char(vec_pair[EXP_RES], '\0');
+}
+
+size_t	exp_assign_eqind(char *tok_str)
+{
+	return ((size_t)ft_abs(ft_strchr(tok_str, '=') - tok_str));
+}
+
+int	exp_store_var(t_operand *op, char *var_name,
+		t_vector *vec_pair[])
+{
+	if (op->f_per_cmd)
+		return (free(var_name), COMMON_SUCCESS);
+	if (env_set(op->my_env, var_name,
+			ft_strdup((char *)vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
+		return (COMMON_FAILURE);
+	return (COMMON_SUCCESS);
 }
