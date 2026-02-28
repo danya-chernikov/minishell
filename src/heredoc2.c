@@ -1,82 +1,77 @@
 #include "heredoc.h"
+#include "operand.h"
+#include "signals.h"
 #include "shell.h"
 
 #include "libft.h"
 #include "vector.h"
 #include "error.h"
 
-/* Expands only $-variables for heredoc body. Quotes
- * inside heredoc body do NOT disable expansion */
-char	*heredoc_expand_line(t_shell *msh, const char *line)
+#include <sys/wait.h>
+
+void	hd_restore_parent(bool flags[2], struct termios *saved,
+			struct sigaction old[2])
 {
-	t_vector	v;
-	size_t		i;
+	if (flags[HD_RESTORE])
+		parent_restore_signals(&old[0], &old[1]);
+	if (flags[HD_HAVE_TTY])
+		tcsetattr(STDIN_FILENO, TCSANOW, saved);
+}
 
-	if (!line)
-		return (NULL);
-	if (!vector_init(&v, CHAR, ft_strlen(line) + 1))
-		return (NULL);
+int	hd_wait_child(pid_t pid, int *status)
+{
+	if (waitpid(pid, status, 0) == -1)
+		return (perror("waitpid"), COMMON_SYS_ERR);
+	return (COMMON_SUCCESS);
+}
 
-	i = 0;
-	while (line[i])
+int	hd_finish_status(int status, int ret_code)
+{
+	if (WIFEXITED(status)
+		&& WEXITSTATUS(status) == (SIGNALED_CODE + SIGINT))
 	{
-		if (line[i] == '$')
-		{
-			const char	*val;
-			char		name[MAX_ENV_VAL_LEN];
-			size_t		j;
-
-			if (line[i + 1] == '\0')
-			{
-				vector_push_back_char(&v, '$');
-				break ;
-			}
-
-			// One-char params
-			if (line[i + 1] == '$' || line[i + 1] == '?' ||
-				line[i + 1] == '#' || line[i + 1] == '*')
-			{
-				name[0] = line[i + 1];
-				name[1] = '\0';
-				val = env_get_val(&msh->env, name);
-				if (!val)
-					val = "";
-				vec_push_str(&v, val);
-				i += 2;
-				continue ;
-			}
-
-			// If next char can't start varname -> literal '$'
-			if (!is_varname_symbol_permitted(line[i + 1]))
-			{
-				vector_push_back_char(&v, '$');
-				++i;
-				continue ;
-			}
-
-			// Read varname
-			j = 0;
-			i = i + 1;
-			while (line[i] && is_varname_symbol_permitted(line[i]))
-			{
-				if (j < MAX_ENV_VAL_LEN - 1)
-					name[j++] = line[i];
-				++i;
-			}
-			name[j] = '\0';
-
-			val = env_get_val(&msh->env, name);
-			if (!val)
-				val = "";
-			vec_push_str(&v, val);
-			continue ; // `i` already points to first non-var char
-		}
-		vector_push_back_char(&v, line[i]);
-		++i;
+		return (SIGNALED_CODE + SIGINT);
 	}
-	vector_push_back_char(&v, '\0');
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+		return (SIGNALED_CODE + SIGINT);
+	return (ret_code);
+}
 
-	char *res = ft_strdup((char *)v.data);
-	vector_free(&v);
-	return (res);
+void	heredoc_child_loop(t_shell *msh, int wfd, const t_heredoc *hd)
+{
+	char	*line;
+	int		rc;
+
+	g_got_sigint = 0;
+	child_set_heredoc_signals();
+	while (1)
+	{
+		line = readline(env_get_val(&msh->env, "PS2"));
+		rc = hd_handle_line(msh, wfd, hd, line);
+		if (rc == BREAK)
+			break ;
+		if (rc == (SIGNALED_CODE + SIGINT))
+			exit(rc);
+	}
+	close(wfd);
+	exit(EXIT_SUCCESS);
+}
+
+int	hd_handle_line(t_shell *msh, int wfd,
+		const t_heredoc *hd, char *line)
+{
+	if (g_got_sigint)
+	{
+		free(line);
+		close(wfd);
+		return (SIGNALED_CODE + SIGINT);
+	}
+	if (!line)
+		return (print_shell_warning(NULL, HEREDOC_EOF_WARN_MSG), BREAK);
+	if (strings_equal(line, hd->delim))
+	{
+		free(line);
+		return (BREAK);
+	}
+	return (hd_write_line(msh, wfd, hd, line));
 }

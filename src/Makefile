@@ -27,7 +27,8 @@ SRCS=main.c \
 	 par.c quote.c quote2.c quote3.c token.c operand.c operand2.c \
 	 engine.c \
 	 redirect_parser.c redirect_parser2.c redirect_parser3.c redirect_parser4.c \
-	 redirect.c heredoc.c heredoc2.c \
+	 redirect.c \
+	 heredoc.c heredoc2.c heredoc3.c heredoc4.c heredoc5.c \
 	 exp_common.c exp_common2.c \
 	 exp_preparation.c exp_preparation2.c \
 	 exp_assignment.c exp_argredir.c \
@@ -64,7 +65,8 @@ OBJS=main.o \
 	 par.o quote.o quote2.o quote3.o token.o operand.o operand2.o \
 	 engine.o \
 	 redirect_parser.o redirect_parser2.o redirect_parser3.o redirect_parser4.o \
-	 redirect.o heredoc.o heredoc2.o \
+	 redirect.o \
+	 heredoc.o heredoc2.o heredoc3.o heredoc4.o heredoc5.o \
 	 exp_common.o exp_common2.o \
 	 exp_preparation.o exp_preparation2.o \
 	 exp_assignment.o exp_argredir.o \
@@ -395,6 +397,26 @@ heredoc.o : heredoc.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c heredoc.c
+
+heredoc2.o : heredoc2.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c heredoc2.c
+
+heredoc3.o : heredoc3.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c heredoc3.c
+
+heredoc4.o : heredoc4.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c heredoc4.c
+
+heredoc5.o : heredoc5.c heredoc.h prompt_parser.h shell.h signals.h aux_io.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c heredoc5.c
 
 heredoc2.o : heredoc2.c heredoc.h shell.h \
 	libft.h vector.h error.h
