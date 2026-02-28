@@ -63,6 +63,7 @@
 # define MAX_WC_FN_LEN_ERR_MSG	"Filename is too long"
 # define MAX_ARGC_NUM_ERR_MSG	"Too many arguments were passed"
 # define MAX_ARGV_LEN_ERR_MSG	"Argument's value is too long"
+# define MAX_HIST_LNUM_ERR_MSG	"Too many history lines were read"
 
 /* Our system calls implementations errors */
 # define GETPID_ERR_MSG			"Could not get my PID"

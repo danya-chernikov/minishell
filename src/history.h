@@ -61,7 +61,7 @@ typedef struct e_history
 }	t_history;
 
 int		history_init(t_history *history);
-void	history_push(t_history *history, char *line, t_hist_type type);
+int		history_push(t_history *history, char *line, t_hist_type type);
 void	history_pop(t_history *history);
 void	history_free(t_history *history);
 

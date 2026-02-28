@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:17:50 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/27 17:00:12 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 01:10:07 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,9 @@ static int	prelim_struct_init(t_shell *msh, int argc, char **argv)
 	msh->opts.f_verbose = false;
 	msh->opts.f_norc = false;
 	msh->opts.f_c = false;
+	msh->history.lines_num = 0;
+	msh->history.lines = NULL;
+	msh->history.histfile_path = NULL;
 	configs_init(&msh->configs);
 	msh->pd = (t_parser_data *)ft_calloc(1, sizeof(t_parser_data));
 	if (!msh->pd)
