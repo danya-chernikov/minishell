@@ -5,19 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int		perror_and_return(char *where, int ret_code)
+int	perror_and_return(char *where, int ret_code)
 {
 	perror(where);
 	return (ret_code);
 }
 
-int		free_one_and_return(void *ptr, int ret_code)
+int	free_one_and_return(void *ptr, int ret_code)
 {
 	free(ptr);
 	return (ret_code);
 }
 
-int		free_two_and_return(void *ptr1, void *ptr2, int ret_code)
+int	free_two_and_return(void *ptr1, void *ptr2, int ret_code)
 {
 	free(ptr1);
 	free(ptr2);
@@ -27,8 +27,8 @@ int		free_two_and_return(void *ptr1, void *ptr2, int ret_code)
 /* We don't use it anymore, but let's keep it just in case */
 bool	is_surrounded_quotes(char *str)
 {
-	if ((str[0] == '\'' && str[ft_strlen(str) - 1] == '\'') ||
-		(str[0] == '"' && str[ft_strlen(str) - 1] == '"'))
+	if ((str[0] == '\'' && str[ft_strlen(str) - 1] == '\'')
+		|| (str[0] == '"' && str[ft_strlen(str) - 1] == '"'))
 	{
 		return (true);
 	}
