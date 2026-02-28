@@ -5,6 +5,7 @@
 #include "expansion.h"
 #include "aux_common.h"
 #include "prompt_parser.h"
+
 #include "error.h"
 #include "libft.h"
 
@@ -39,9 +40,7 @@ int	pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth)
 		return (pl_free(&pl), RET_CMD_FAILURE);
 	if (pl_make_pipes(&pl) != COMMON_SUCCESS)
 		return (pl_free(&pl), RET_CMD_FAILURE);
-
 	parent_ignore_sigint_sigquit(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-
 	if (pl_spawn_all(msh, &pl, depth) != COMMON_SUCCESS)
 	{
 		parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
@@ -59,7 +58,6 @@ int	pl_parent_single_try(t_shell *msh, t_token *token, int depth)
 
 	if (depth != 0 || token->type != OPERAND || token->op == NULL)
 		return (NOT_EXEC_IN_PARENT);
-
 	if (prepare_operand(msh, token) != COMMON_SUCCESS)
 		return (RET_CMD_FAILURE);
 	if (token->op->argc == 0)
@@ -99,42 +97,5 @@ int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth)
 	}
 	if (pl_close_all_pipes(pl) != COMMON_SUCCESS)
 		return (COMMON_SYS_ERR);
-	return (COMMON_SUCCESS);
-}
-
-/* The condition `close_i == CLOSE_PAR_NOT_FOUND` practically should
- * never happen, but just in case let's check it.. */
-int	pl_fill_stages(t_parser_data *pd, size_t l, size_t r, t_pipeline *pl)
-{
-	size_t	j;
-	int		st_i;
-	int		close_i;
-
-	j = l;
-	st_i = 0;
-	while (j <= r && st_i < pl->stages_num)
-	{
-		if (pd->tokens[j].type == OPERAND)
-		{
-			pl->stages[st_i].l = j;
-			pl->stages[st_i].r = j;
-			++st_i;
-			++j;
-		}
-		else if (pd->tokens[j].type == OPEN_PAR)
-		{
-			close_i = pl_find_close(pd, j, r);
-			if (close_i == CLOSE_PAR_NOT_FOUND)
-				return (COMMON_FAILURE);
-			pl->stages[st_i].l = j;
-			pl->stages[st_i].r = (size_t)close_i;
-			++st_i;
-			j = (size_t)close_i + 1;
-		}
-		else
-			++j;
-	}
-	if (st_i != pl->stages_num)
-		return (COMMON_FAILURE);
 	return (COMMON_SUCCESS);
 }

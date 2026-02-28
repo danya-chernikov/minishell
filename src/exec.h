@@ -40,7 +40,7 @@ typedef struct s_pipeline
 
 /* exec_expassign.c */
 int		do_all_expansions_assignments(t_shell *msh, t_token *token);
-int		do_expansions_assignments_2nd_lvl_token(t_shell *msh, t_operand *op,
+int		do_expassign_2nd_lvl_token(t_shell *msh, t_operand *op,
 		size_t *opt_i, int *redir_cnt);
 
 /* exec_ops.c */
@@ -58,7 +58,6 @@ int		check_depth_limit(t_parser_data *pd, size_t l, size_t r, int base);
 int		pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth);
 int		pl_parent_single_try(t_shell *msh, t_token *token, int depth);
 int		pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth);
-int		pl_fill_stages(t_parser_data *pd, size_t l, size_t r, t_pipeline *pl);
 
 /* exec_pipeline2.c */
 int		pl_fork_one_stage(t_shell *msh, t_pipeline *pl, int st_i, int depth);
@@ -73,6 +72,9 @@ int		pl_alloc(t_pipeline *pl);
 void	pl_free(t_pipeline *pl);
 int		pl_wait(t_pipeline *pl);
 int		pl_wait_status(int ws);
+
+/* exec_pipeline4.c */
+int		pl_fill_stages(t_parser_data *pd, size_t l, size_t r, t_pipeline *pl);
 
 /* exec_execve.c */
 int		parent_run_with_redirs(t_shell *msh, t_token *token);

@@ -100,8 +100,8 @@ int	find_term_stop(t_parser_data *pd, size_t i, size_t r)
 				return ((int)j);
 			--d;
 		}
-		else if (d == 0 && (pd->tokens[j].type == AND ||
-				pd->tokens[j].type == OR))
+		else if (d == 0 && (pd->tokens[j].type == AND
+				|| pd->tokens[j].type == OR))
 			return ((int)j);
 		++j;
 	}
