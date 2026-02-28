@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exp_argredir.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 13:55:30 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 14:01:58 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "expansion.h"
 #include "shell.h"
 #include "operand.h"
@@ -187,9 +199,7 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 				vector_push_back_char(vec_pair[QMASK], (char)state);
 			}
 			else
-			{
 				exp_expand_variable(msh, vec_pair, dlr_varname, state);
-			}
 		}
 		else
 		{

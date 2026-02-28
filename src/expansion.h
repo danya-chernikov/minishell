@@ -29,8 +29,10 @@ int		exp_process_argredir(t_shell *msh, t_operand *op,
 void	exp_expand_argredir_loop(t_shell *msh, char *tok_str,
 			t_vector *vec_pair[]);
 
-/* exec_preparation.c */
+/* exp_preparation.c */
 int		exp_divide_op_str_on_tokens(t_operand *op);
+
+/* exp_preparation2.c */
 int		exp_update_op_tokens_quote_intervals(t_operand *op);
 
 /* exp_common.c */

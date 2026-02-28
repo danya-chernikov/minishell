@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exp_assignment.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 13:55:28 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 14:01:21 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "expansion.h"
 #include "shell.h"
 #include "prompt_parser.h"
@@ -18,7 +30,8 @@
  * Another example:
  *     # VAR==1
  * here we'll just get VAR and =1 */
-int	exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size_t *opt_i)
+int	exp_process_assignment(t_shell *msh, t_operand *op,
+		t_op_token *op_tok, size_t *opt_i)
 {
 	int		fret;
 	char	*var_name;
@@ -26,17 +39,12 @@ int	exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size
 	bool	f_varname_correct;
 
 	f_varname_correct = false;
-
-	// Split operand's token string by '='
 	fret = div2_str_by_delim(op_tok->cnt, '=', &var_name, &var_value);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
-	free(var_value); // We'll never use it
-
-	// Check LHS (variable's name) for correctness
+	free(var_value);
 	if (is_variable_name_correct(var_name))
 	{
-		// We're gonna treat this token as an assignment
 		f_varname_correct = true;
 		fret = exp_expand_varname(msh, op, op_tok, var_name);
 		if (fret == CONTINUE)
@@ -44,16 +52,14 @@ int	exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size
 			++(*opt_i);
 			return (CONTINUE);
 		}
-		if (fret != COMMON_SUCCESS) // We consider CONTINUE here
+		if (fret != COMMON_SUCCESS)
 			return (fret);
 	}
 	if (f_varname_correct)
 	{
-		++(*opt_i); // Next token
+		++(*opt_i);
 		return (CONTINUE);
 	}
-	// If variable's name is not correct
-	// We're gonna treat this token as an argument	
 	return (COMMON_SUCCESS);
 }
 
@@ -68,40 +74,31 @@ int	exp_process_assignment(t_shell *msh, t_operand *op, t_op_token *op_tok, size
  *     We don't have to expand anything.
  *     We just create a variable with empty value and we
  *     don't care about an error cause it can't be critical */
-int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *var_name)
+int	exp_expand_varname(t_shell *msh, t_operand *op,
+		t_op_token *op_tok, char *var_name)
 {
-	size_t		i;				// Symbol index in operand's token
+	size_t		i;
 	size_t		eqsign_ind;
-	char		*tok_str;		// Pointer to operand's token string
-	t_vector	*vec_pair[2];	// To pass our lovely friend Norminette
+	char		*tok_str;
+	t_vector	*vec_pair[2];
 		
 	tok_str = op_tok->cnt;
 	eqsign_ind = ft_abs(ft_strchr(tok_str, '=') - tok_str);
 	i = eqsign_ind + 1;
-	// If after '=' goes nothing ( things like "VAR=" )
 	if (i == ft_strlen(tok_str))
 	{
-		// env_set() already has overflow checks
 		if (env_set(op->my_env, var_name, ft_strdup(""), LOCAL) != COMMON_SUCCESS)
 			return (COMMON_FAILURE);
-		return (CONTINUE); // Go to the next operand's token
+		return (CONTINUE);
 	}
-	// Initialize `qmask` and `exp_res` vectors
 	if (!exp_vectors_init(vec_pair, ft_strlen(tok_str) - i + 1))
 		return (COMMON_SYS_ERR);
-	// We actually can use op_tok->quotes because if we reach this point
-	// it means ALL quote intervals are located after the first '=' (unquoted)
 	exp_expand_varname_loop(msh, tok_str, vec_pair);
-	// Create a local environment variable and add it into
-	// the array of variables of this operand `vars`
-	if (!op->f_per_cmd) // We still have not found any arguments
+	if (!op->f_per_cmd)
 	{
 		if (env_set(op->my_env, var_name,
 			ft_strdup(vec_pair[EXP_RES]->data), LOCAL) != COMMON_SUCCESS)
-		{
-			exp_vectors_free(vec_pair);
-			return (COMMON_FAILURE);
-		}
+			return (exp_vectors_free(vec_pair), COMMON_FAILURE);
 	}
 	exp_vectors_free(vec_pair);
 	return (COMMON_SUCCESS);
@@ -114,7 +111,8 @@ int	exp_expand_varname(t_shell *msh, t_operand *op, t_op_token *op_tok, char *va
  *     i			- Operand's token index;
  *     state		- State of the current operand's token symbol;
  *     dlr_varname	- Dollar variable name */
-void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
+void	exp_expand_varname_loop(t_shell *msh, char *tok_str,
+			t_vector *vec_pair[])
 {
 	size_t		i;
 	size_t		eqsign_ind;
@@ -143,11 +141,9 @@ void	exp_expand_varname_loop(t_shell *msh, char *tok_str, t_vector *vec_pair[])
 				vector_push_back_char(vec_pair[QMASK], (char)state);
 			}
 			else
-			{
 				exp_expand_variable(msh, vec_pair, dlr_varname, state);
-			}
 		}
-		else // Current symbol is just a regular symbol (except quote)
+		else
 		{
 			vector_push_back_char(vec_pair[EXP_RES], tok_str[i]);
 			vector_push_back_char(vec_pair[QMASK], (char)state);
