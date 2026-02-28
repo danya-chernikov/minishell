@@ -25,7 +25,9 @@ SRCS=main.c \
 	 prompt_parser_proc_spec_char.c prompt_parser_proc_spec_char2.c \
 	 prompt_parser_proc_nonspec_char.c \
 	 par.c quote.c quote2.c quote3.c token.c operand.c operand2.c \
-	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
+	 engine.c \
+	 redirect_parser.c redirect_parser2.c redirect_parser3.c redirect_parser4.c \
+	 redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
@@ -58,7 +60,9 @@ OBJS=main.o \
 	 prompt_parser_proc_spec_char.o prompt_parser_proc_spec_char2.o \
 	 prompt_parser_proc_nonspec_char.o \
 	 par.o quote.o quote2.o quote3.o token.o operand.o operand2.o \
-	 engine.o redirect_parser.o redirect.o heredoc.o heredoc2.o \
+	 engine.o \
+	 redirect_parser.o redirect_parser2.o redirect_parser3.o redirect_parser4.o \
+	 redirect.o heredoc.o heredoc2.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
@@ -358,10 +362,25 @@ engine.o : engine.c engine.h shell.h heredoc.h exec.h quote.h expansion.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c engine.c
 
-redirect_parser.o : redirect_parser.c operand.h redirect_parser.h \
+redirect_parser.o : redirect_parser.c redirect_parser.h operand.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c redirect_parser.c
+
+redirect_parser2.o : redirect_parser2.c redirect_parser.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c redirect_parser2.c
+
+redirect_parser3.o : redirect_parser3.c redirect_parser.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c redirect_parser3.c
+
+redirect_parser4.o : redirect_parser4.c redirect_parser.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c redirect_parser4.c
 
 redirect.o : redirect.c redirect.h \
 	libft.h vector.h error.h

@@ -60,6 +60,8 @@ void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask);
 bool	wc_is_asterisk(char expres_char, char qmask_char);
 void	wc_trim_vectors(t_vector *exp_res, t_vector *qmask, size_t new_len);
 int		wc_alloc_res(char ***wc_res);
+
+/* wildcards_common2.c */
 void	wc_free_res(char ***wc_res);
 
 #endif
