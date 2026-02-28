@@ -28,7 +28,7 @@ SRCS=main.c \
 	 engine.c \
 	 redirect_parser.c redirect_parser2.c redirect_parser3.c redirect_parser4.c \
 	 redirect.c heredoc.c heredoc2.c \
-	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
+	 exp_common.c exp_common2.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \
 	 wildcards.c wildcards_filesclt.c wildcards_filesclt2.c \
 	 wildcards_sieve.c wildcards_sieve2.c \
@@ -63,7 +63,7 @@ OBJS=main.o \
 	 engine.o \
 	 redirect_parser.o redirect_parser2.o redirect_parser3.o redirect_parser4.o \
 	 redirect.o heredoc.o heredoc2.o \
-	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
+	 exp_common.o exp_common2.o exp_preparation.o exp_assignment.o exp_argredir.o \
 	 exp_service.o exp_service2.o exp_service3.o \
 	 wildcards.o wildcards_filesclt.o wildcards_filesclt2.o \
 	 wildcards_sieve.o wildcards_sieve2.o \
@@ -420,6 +420,11 @@ exp_common.o : exp_common.c expansion.h shell.h operand.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exp_common.c
+
+exp_common2.o : exp_common2.c expansion.h shell.h operand.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exp_common2.c
 
 exp_service.o : exp_service.c expansion.h operand.h \
 	libft.h vector.h error.h
