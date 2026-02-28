@@ -12,20 +12,13 @@ void	signals_init(void)
 	struct sigaction	sa;
 
 	rl_catch_signals = 0;
-
 	sigemptyset(&sa.sa_mask);
-
-	// SIGINT
 	sa.sa_handler = sigint_handler;
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
-
-	// SIGQUIT	
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGQUIT, &sa, NULL);
-
-	// SIGWINCH
 	sa.sa_handler = sigwinch_handler;
 	sa.sa_flags = SA_RESTART;
 	sigaction(SIGWINCH, &sa, NULL);
@@ -43,7 +36,7 @@ void	sigquit_handler(int signo)
 void	sigint_handler(int signo)
 {
 	(void)signo;
-	//write(STDOUT_FILENO, "^C\n", 3);
+	write(STDOUT_FILENO, "^C\n", 3);
 	g_got_sigint = 1;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();

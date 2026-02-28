@@ -17,15 +17,14 @@ void	child_set_heredoc_signals(void)
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-
 	sa.sa_handler = heredoc_sigint_handler;
 	sigaction(SIGINT, &sa, NULL);
-
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-void	parent_ignore_sigint_sigquit(struct sigaction *old_int, struct sigaction *old_quit)
+void	parent_ignore_sigint_sigquit(struct sigaction *old_int,
+			struct sigaction *old_quit)
 {
 	struct sigaction	sa;	
 
@@ -36,7 +35,8 @@ void	parent_ignore_sigint_sigquit(struct sigaction *old_int, struct sigaction *o
 	sigaction(SIGQUIT, &sa, old_quit);
 }
 
-void	parent_restore_signals(struct sigaction *old_int, struct sigaction *old_quit)
+void	parent_restore_signals(struct sigaction *old_int,
+			struct sigaction *old_quit)
 {
 	sigaction(SIGINT, old_int, NULL);
 	sigaction(SIGQUIT, old_quit, NULL);
