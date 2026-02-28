@@ -22,6 +22,8 @@ SRCS=main.c \
 	 config.c shell_configs.c shell_login_configs.c shell_nonlogin_configs.c \
 	 prompt_parser.c prompt_parser2.c prompt_parser3.c \
 	 prompt_parser4.c prompt_parser5.c \
+	 prompt_parser_proc_spec_char.c prompt_parser_proc_spec_char2.c \
+	 prompt_parser_proc_nonspec_char.c \
 	 par.c quote.c token.c operand.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
@@ -52,6 +54,8 @@ OBJS=main.o \
 	 config.o shell_configs.o shell_login_configs.o shell_nonlogin_configs.o \
 	 prompt_parser.o prompt_parser2.o prompt_parser3.o \
 	 prompt_parser4.o prompt_parser5.o \
+	 prompt_parser_proc_spec_char.o prompt_parser_proc_spec_char2.o \
+	 prompt_parser_proc_nonspec_char.o \
 	 par.o quote.o token.o operand.o \
 	 engine.o redirect_parser.o redirect.o heredoc.o heredoc2.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
@@ -291,6 +295,24 @@ prompt_parser5.o : prompt_parser5.c prompt_parser.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c prompt_parser5.c
+
+prompt_parser_proc_spec_char.o : prompt_parser_proc_spec_char.c prompt_parser.h \
+	aux_common.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser_proc_spec_char.c
+
+prompt_parser_proc_spec_char2.o : prompt_parser_proc_spec_char2.c prompt_parser.h \
+	aux_common.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser_proc_spec_char2.c
+
+prompt_parser_proc_nonspec_char.o : prompt_parser_proc_nonspec_char.c prompt_parser.h \
+	aux_common.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c prompt_parser_proc_nonspec_char.c
 
 par.o : par.c par.h prompt_parser.h \
 	libft.h vector.h error.h

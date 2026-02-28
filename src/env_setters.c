@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:29:26 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 11:30:26 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 03:50:59 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 #include <stdlib.h>
 
 /* Service functions for env_set() */
-static int	set_existing_var(t_env_var *var, char *name, char *value);
+static int	set_existing_var(t_env_var *var, char *name, char *value,
+				t_var_type type);
 static int	check_bounds(t_env *env, char *name, char *value);
 static void	create_new_var(t_env *env, char *name, char *val, t_var_type type);
 
@@ -45,7 +46,7 @@ int	env_set(t_env *env, char *name, char *value, t_var_type type)
 	var = env_get_ptr(env, name);
 	if (var)
 	{
-		if (!set_existing_var(var, name, value))
+		if (!set_existing_var(var, name, value, type))
 			return (COMMON_FAILURE);
 	}
 	else
@@ -88,7 +89,8 @@ int	env_unset(t_env *env, char *name)
 	return (COMMON_SUCCESS);
 }
 
-static int	set_existing_var(t_env_var *var, char *name, char *value)
+static int	set_existing_var(t_env_var *var, char *name, char *value,
+				t_var_type type)
 {
 	if (!var->f_readonly)
 	{
@@ -102,6 +104,16 @@ static int	set_existing_var(t_env_var *var, char *name, char *value)
 		if (var->value)
 			free(var->value);
 		var->value = value;
+		if (type == ENV || var->type == ENV)
+		{
+			var->type = ENV;
+			var->f_inherit = true;
+		}
+		else if (var->type != PARAM)
+		{
+			var->type = LOCAL;
+			var->f_inherit = false;
+		}
 		free(name);
 	}
 	else

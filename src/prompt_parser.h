@@ -52,10 +52,14 @@ typedef struct s_parser_data
 /* prompt_parser.c */
 int		parser_init(t_parser_data *d, char *rline_buf);
 void	parser_free(t_parser_data *d);
+int		parser_engine(t_parser_data *d);
+int		parser_engine_loop_body(t_parser_data *d, int *opar_ind,
+			size_t prompt_len);
 
 /* prompt_parser2.c */
-int		parser_engine(t_parser_data *d); // Main function
 int		handle_open_par(t_parser_data *d, int opar_ind);
+int		handle_open_par_check_errors(t_parser_data *d, size_t *last_opar_ind,
+			size_t prompt_len);
 int		handle_close_par(t_parser_data *d);
 
 /* prompt_parser3.c */
@@ -65,16 +69,34 @@ bool	check_empty_par(t_parser_data *d);
 int		later_goes_open_par(char *str, size_t ind);
 
 /* prompt_parser4.c */
-bool	its_logical_AND(char *prompt, size_t plen, size_t pi);
-bool	its_logical_OR(char *prompt, size_t plen, size_t pi);
-bool	its_PIPE(char *prompt, size_t plen, size_t pi);
+bool	its_logical_and(char *prompt, size_t plen, size_t pi);
+bool	its_logical_or(char *prompt, size_t plen, size_t pi);
+bool	its_pipe(char *prompt, size_t plen, size_t pi);
+void	skip_spaces(char *prompt, size_t *pi);
 
 /* prompt_parser5.c */
-void	skip_spaces(char *prompt, size_t *pi);
-bool	is_special_char(char sym);
+bool	is_spec_char(char sym);
 bool	is_inside_quotes(t_parser_data *d, size_t pi);
 bool	is_special_char_outside_quotes(t_parser_data *d, size_t pi);
 void	remove_right_spaces(char *prompt);
 void	remove_left_spaces(char *prompt);
+
+/* prompt_parser_proc_spec_char.c */
+int		process_special_char(t_parser_data *d, size_t prompt_len);
+int		process_special_char_check_pars(t_parser_data *d);
+
+/* prompt_parser_proc_spec_char2.c */
+int		process_pipe_and_logical_operators(t_parser_data *d, size_t prompt_len);
+int		process_special_char_handle_pipe(t_parser_data *d);
+int		process_special_char_handle_and(t_parser_data *d);
+int		process_special_char_handle_or(t_parser_data *d);
+
+/* prompt_parser_proc_nonspec_char.c */
+int		process_nonspecial_char(t_parser_data *d, int *opar_ind,
+			size_t prompt_len);
+int		process_nonspecial_char_prep(t_parser_data *d, size_t prompt_len);
+int		process_nonspecial_char_handle_pipe(t_parser_data *d, int *opar_ind);
+int		process_nonspecial_char_handle_nonpipe(t_parser_data *d,
+			size_t prompt_len);
 
 #endif
