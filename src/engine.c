@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   engine.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 11:13:45 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 11:56:49 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "engine.h"
 #include "shell.h"
 #include "heredoc.h"
@@ -5,7 +17,11 @@
 #include "quote.h"
 #include "expansion.h"
 
-#include <linux/limits.h> // For PATH_MAX
+#include <linux/limits.h>
+
+static int	first_part(t_parser_data *pdata, char *prompt, int *fret);
+static int	second_part(t_shell *msh, t_parser_data *pdata, int *fret,
+				int *ret_code);
 
 /* If the function returns -1, it means a critical error occurred,
  * and the caller should react by calling exit(EXIT_FAILURE);
@@ -18,67 +34,70 @@
 int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 {
 	t_parser_data	*pdata;
-	int				fres; // Returned code from function
+	int				fres;
+	int				fret;
 	int				try;
-	
+
 	try = 0;
 	fres = COMMON_SUCCESS;
 	pdata = msh->pd;
-	ft_bzero(pdata, sizeof(t_parser_data)); // We don't need it anymore..
+	ft_bzero(pdata, sizeof(t_parser_data));
 	while (try < 1)
 	{
 		if (!prompt || ft_strlen(prompt) == 0)
 			break ;
-
-		fres = parser_init(pdata, prompt);
-		if (fres != COMMON_SUCCESS) // Non-critial parser error
+		fres = first_part(pdata, prompt, &fret);
+		if (fres == BREAK)
 			break ;
-
-		// Let's parse all quotes intervals for entered prompt
-		fres = quotes_parser(pdata->prompt, pdata->quotes, &pdata->qpair_cnt);
-		if (fres != COMMON_SUCCESS)
+		fres = second_part(msh, pdata, &fret, ret_code);
+		if (fres == BREAK)
 			break ;
-
-		// May be launched only after quote intervals will be parsed
-		fres = comments_parser(pdata);
-
-		if (open_par_init(pdata) == COMMON_FAILURE)
-			return (COMMON_FAILURE);
-		if (close_par_init(pdata) == COMMON_FAILURE)
-			return (COMMON_FAILURE);
-
-		fres = check_empty_par(pdata);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
-		fres = parser_engine(pdata);
-		if (fres != COMMON_SUCCESS) // If we got non-critical parser error
-			break ; // Just prompt user to enter another command(s)
-
-
-		// Let's parser all quotes intervals for each
-		// operand-program, i.e. we're kinda updating them
-		fres = operands_quotes_parser(pdata);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
-		fres = redirections_parser(pdata);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
-		fres = read_heredocs(msh);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
-		fres = exec_ops(msh, ret_code);
-		if (fres != COMMON_SUCCESS)
-			break ;
-
 		++try;
-	} // End try block
-
+	}
 	parser_free(pdata);
-	return (fres);
+	return (fret);
+}
+
+static int	first_part(t_parser_data *pdata, char *prompt, int *fret)
+{
+	*fret = parser_init(pdata, prompt);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = quotes_parser(pdata->prompt, pdata->quotes, &pdata->qpair_cnt);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = comments_parser(pdata);
+	*fret = open_par_init(pdata);
+	if (*fret == COMMON_FAILURE)
+		return (BREAK);
+	*fret = close_par_init(pdata);
+	if (*fret == COMMON_FAILURE)
+		return (BREAK);
+	*fret = check_empty_par(pdata);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	return (COMMON_SUCCESS);
+}
+
+static int	second_part(t_shell *msh, t_parser_data *pdata, int *fret,
+				int *ret_code)
+{
+	*fret = parser_engine(pdata);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = operands_quotes_parser(pdata);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = redirections_parser(pdata);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = read_heredocs(msh);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	*fret = exec_ops(msh, ret_code);
+	if (*fret != COMMON_SUCCESS)
+		return (BREAK);
+	return (COMMON_SUCCESS);
 }
 
 /* Finds the first comment symbol #
@@ -98,7 +117,6 @@ int	comments_parser(t_parser_data *d)
 	{
 		if (d->prompt[pi] == '#' && !is_inside_quotes(d, pi))
 		{
-			// Exception for $# variable-parameter
 			if (pi == 0 || (pi > 0 && d->prompt[pi - 1] != '$'))
 			{
 				d->prompt[pi] = '\0';

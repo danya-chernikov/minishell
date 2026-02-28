@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 20:52:13 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/25 22:32:27 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 11:52:45 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,5 +49,8 @@ bool	is_inside_op_quotes(t_operand *op, size_t op_i);
 bool	is_inside_op_quotes_single(t_operand *op, size_t op_i);
 bool	is_inside_op_quotes_double(t_operand *op, size_t op_i);
 bool	is_syntax_quote(t_quote_int *quotes, size_t qpair_cnt, size_t ind);
+
+/* quote3.c */
+void	quotes_parser_init(bool *qflags, size_t *qpair_cnt, int *fret);
 
 #endif

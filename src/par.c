@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:26:03 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 05:39:18 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 11:40:28 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	open_par_init(t_parser_data *d)
 		{
 			if (d->opar_num >= MAX_PAR_NUM)
 			{
-				print_shell_error(NULL, MAX_PAR_NUM_ERR_MSG);	
+				print_shell_error(NULL, MAX_PAR_NUM_ERR_MSG);
 				return (COMMON_FAILURE);
 			}
 			d->all_open_pars[d->opar_num][0] = i;
@@ -70,7 +70,7 @@ int	close_par_init(t_parser_data *d)
 		{
 			if (d->cpar_cnt >= MAX_PAR_NUM)
 			{
-				print_shell_error(NULL, MAX_PAR_NUM_ERR_MSG);	
+				print_shell_error(NULL, MAX_PAR_NUM_ERR_MSG);
 				return (COMMON_FAILURE);
 			}
 			d->close_par[d->cpar_cnt][0] = i;

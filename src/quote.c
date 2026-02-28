@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:26:13 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 05:44:35 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 11:52:25 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,8 @@ bool	quotes_parser(char *str, t_quote_int *quotes, size_t *qpair_cnt)
 	size_t	slen;
 	size_t	i;
 
+	quotes_parser_init(qflags, qpair_cnt, &fret);
 	i = 0;
-	qflags[QSINGLE] = false;
-	qflags[QDOUBLE] = false;
-	*qpair_cnt = 0;
-	fret = COMMON_SUCCESS;
 	slen = ft_strlen(str);
 	while (i < slen)
 	{
@@ -68,10 +65,8 @@ static int	process_double_quote(t_quote_int *quotes, size_t *qpair_cnt,
 		if (!qflags[QSINGLE])
 		{
 			if (*qpair_cnt >= MAX_QUOTES_NUM)
-			{
-				print_shell_error(NULL, MAX_QUOTES_NUM_ERR_MSG);
-				return (COMMON_FAILURE);
-			}
+				return (print_shell_error(NULL, MAX_QUOTES_NUM_ERR_MSG),
+					COMMON_FAILURE);
 			quotes[*qpair_cnt].li = i;
 			quotes[*qpair_cnt].type = DOUBLE_QUOTE;
 			qflags[QDOUBLE] = true;
@@ -99,10 +94,8 @@ static int	process_single_quote(t_quote_int *quotes, size_t *qpair_cnt,
 		if (!qflags[QDOUBLE])
 		{
 			if (*qpair_cnt >= MAX_QUOTES_NUM)
-			{
-				print_shell_error(NULL, MAX_QUOTES_NUM_ERR_MSG);
-				return (COMMON_FAILURE);
-			}
+				return (print_shell_error(NULL, MAX_QUOTES_NUM_ERR_MSG),
+					COMMON_FAILURE);
 			quotes[*qpair_cnt].li = i;
 			quotes[*qpair_cnt].type = SINGLE_QUOTE;
 			qflags[QSINGLE] = true;

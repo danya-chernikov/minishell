@@ -24,7 +24,7 @@ SRCS=main.c \
 	 prompt_parser4.c prompt_parser5.c \
 	 prompt_parser_proc_spec_char.c prompt_parser_proc_spec_char2.c \
 	 prompt_parser_proc_nonspec_char.c \
-	 par.c quote.c quote2.c token.c operand.c operand2.c \
+	 par.c quote.c quote2.c quote3.c token.c operand.c operand2.c \
 	 engine.c redirect_parser.c redirect.c heredoc.c heredoc2.c \
 	 exp_common.c exp_preparation.c exp_assignment.c exp_argredir.c \
 	 exp_service.c exp_service2.c exp_service3.c \
@@ -56,7 +56,7 @@ OBJS=main.o \
 	 prompt_parser4.o prompt_parser5.o \
 	 prompt_parser_proc_spec_char.o prompt_parser_proc_spec_char2.o \
 	 prompt_parser_proc_nonspec_char.o \
-	 par.o quote.o quote2.o token.o operand.o operand2.o \
+	 par.o quote.o quote2.o quote3.o token.o operand.o operand2.o \
 	 engine.o redirect_parser.o redirect.o heredoc.o heredoc2.o \
 	 exp_common.o exp_preparation.o exp_assignment.o exp_argredir.o \
 	 exp_service.o exp_service2.o exp_service3.o \
@@ -328,6 +328,11 @@ quote2.o : quote2.c prompt_parser.h quote.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c quote2.c
+
+quote3.o : quote3.c quote.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c quote3.c
 
 token.o : token.c token.h prompt_parser.h \
 	libft.h error.h
