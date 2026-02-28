@@ -64,6 +64,8 @@
 # define MAX_ARGC_NUM_ERR_MSG	"Too many arguments were passed"
 # define MAX_ARGV_LEN_ERR_MSG	"Argument's value is too long"
 # define MAX_HIST_LNUM_ERR_MSG	"Too many history lines were read"
+# define MAX_PAR_NUM_ERR_MSG	"Too many parenthesis"
+# define MAX_QUOTES_NUM_ERR_MSG	"Too many quotes"
 
 /* Our system calls implementations errors */
 # define GETPID_ERR_MSG			"Could not get my PID"

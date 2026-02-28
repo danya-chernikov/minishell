@@ -42,6 +42,11 @@ int	shell_engine(t_shell *msh, char *prompt, int *ret_code)
 		// May be launched only after quote intervals will be parsed
 		fres = comments_parser(pdata);
 
+		if (open_par_init(pdata) == COMMON_FAILURE)
+			return (COMMON_FAILURE);
+		if (close_par_init(pdata) == COMMON_FAILURE)
+			return (COMMON_FAILURE);
+
 		fres = check_empty_par(pdata);
 		if (fres != COMMON_SUCCESS)
 			break ;

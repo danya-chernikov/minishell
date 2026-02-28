@@ -1,5 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   operand.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 19:33:10 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:44:58 by jhvalenc         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "operand.h"
 #include "env.h"
+
 #include "libft.h"
 #include "error.h"
 
@@ -8,7 +21,7 @@
 
 /* Assign the default value to
  * the pipes of all operators */
-int		ops_init(t_operand *ops)
+int	ops_init(t_operand *ops)
 {
 	int	i;
 	int	j;
@@ -41,7 +54,7 @@ int	op_token_init(t_operand *op)
 {
 	size_t	i;
 
-	op->tokens = malloc(MAX_OP_TOKENS_NUM * sizeof *op->tokens);
+	op->tokens = malloc(MAX_OP_TOKENS_NUM * sizeof (t_op_token));
 	if (!op->tokens)
 	{
 		perror("malloc");
@@ -61,7 +74,7 @@ int	op_env_init(t_operand *op)
 {
 	int	fres;
 
-	op->my_env = malloc(1 * sizeof *op->my_env);
+	op->my_env = malloc(1 * sizeof (t_env));
 	if (!op->my_env)
 		return (COMMON_SYS_ERR);
 	fres = env_init(op->my_env, NULL);
@@ -72,71 +85,4 @@ int	op_env_init(t_operand *op)
 		return (fres);
 	}
 	return (COMMON_SUCCESS);
-}
-
-void	ops_free(t_operand *ops)
-{
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	while (i < MAX_OPS_NUM)
-	{
-		// Free operand's string
-		if (ops[i].name)
-		{
-			free(ops[i].name);
-			ops[i].name = NULL;
-		}
-
-		// Free operand's environment
-		if (ops[i].my_env)
-		{
-			env_free(ops[i].my_env);
-			free(ops[i].my_env);
-			ops[i].my_env = NULL;
-		}
-
-		// Free operand's tokens
-		if (ops[i].tokens)
-		{
-			j = 0;
-			while (j < MAX_OP_TOKENS_NUM)
-			{
-				if (ops[i].tokens[j].cnt)
-				{
-					free(ops[i].tokens[j].cnt);
-					ops[i].tokens[j].cnt = NULL;
-				}
-				++j;
-			}
-			free(ops[i].tokens);
-			ops[i].tokens = NULL;
-		}
-		// Free operands's redirections
-		j = 0;
-		while (j < MAX_REDIRS_NUM)
-		{
-			if (ops[i].redirs[j].path)
-			{
-				free(ops[i].redirs[j].path);
-				ops[i].redirs[j].path = NULL;
-			}
-			if (ops[i].redirs[j].hd.content)
-			{
-				free(ops[i].redirs[j].hd.content);
-				ops[i].redirs[j].hd.content = NULL;
-			}
-			if (ops[i].redirs[j].hd.delim)
-			{
-				free(ops[i].redirs[j].hd.delim);
-				ops[i].redirs[j].hd.delim = NULL;
-			}
-			++j;
-		}
-		ops[i].red_cnt = 0;
-		ops[i].token_cnt = 0;
-		ops[i].argc = 0;
-		++i;
-	}
 }

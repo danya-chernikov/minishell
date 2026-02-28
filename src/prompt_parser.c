@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 12:43:58 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 03:15:11 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/02/28 05:38:09 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ int	parser_init(t_parser_data *d, char *rline_buf)
 	fret = ops_init(d->ops);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
-	open_par_init(d);
-	close_par_init(d);
 	tokens_init(d);
 	pars_init(d->pars);
 	return (fret);
@@ -48,11 +46,11 @@ void	parser_free(t_parser_data *d)
  * when encountering '(' or ')' parentheses, respectively.
  *     opar_ind - prompt index of the open-parenthesis
  *				  that goes after pipe */
-int parser_engine(t_parser_data *d)
+int	parser_engine(t_parser_data *d)
 {
-	size_t prompt_len;
-	int fret;
-	int opar_ind;
+	size_t	prompt_len;
+	int		fret;
+	int		opar_ind;
 
 	fret = COMMON_SUCCESS;
 	if (!d->prompt)
@@ -74,7 +72,7 @@ int parser_engine(t_parser_data *d)
 	return (COMMON_SUCCESS);
 }
 
-int parser_engine_loop_body(t_parser_data *d, int *opar_ind, size_t prompt_len)
+int	parser_engine_loop_body(t_parser_data *d, int *opar_ind, size_t prompt_len)
 {
 	if (d->prompt[d->pi] == ' ')
 		skip_spaces(d->prompt, &d->pi);
