@@ -108,8 +108,19 @@ Building a functional UNIX shell from scratch requires a deep understanding of s
 - **Efficient Linux at the Command Line** by Daniel J. Barrett
 - *GNU Bash Reference Manual* (Official Documentation)
 
+* **Project page in Figma** - [Figma](https://www.figma.com/design/KPBjqRNlFC41i06Imw68zt/minishell?node-id=0-1&p=f&t=dNtM5ddpFGK17vNe-0) / Figma
+
+* **Stack overflow question** - [StackOverflow](https://stackoverflow.com/questions/79851187/parsing-pipes-with-boolean-logic-operators-in-bash) / StackOverflow
+
 ### AI Usage Declaration
 
+THIS PROJECT WAS DONE MANUALLY.
+So-called 'AI' helped us a bit at the final normalization stage (normalizing 17000 lines
+of code is not easy, though we were trying to normalize things on development stage, there
+were some real challanges during normalization process). We also used it to resolve some
+theoretical questions (as well as asking questions on forums) and to correct grammar errors
+when writing commit messages. I strongly believe that extensive use of AI when studying
+something kills the educational process. The brain MUST SUFFER to learn anything.
 
 ## Authors
 
