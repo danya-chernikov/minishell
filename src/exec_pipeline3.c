@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 03:04:14 by dchernik          #+#    #+#             */
-/*   Updated: 2026/03/01 03:04:14 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:00:10 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,20 @@ int	pl_alloc(t_pipeline *pl)
 void	pl_free(t_pipeline *pl)
 {
 	if (pl->pipes)
+	{
 		free(pl->pipes);
+		pl->pipes = NULL;
+	}
 	if (pl->pids)
+	{
 		free(pl->pids);
+		pl->pids = NULL;
+	}
 	if (pl->stages)
+	{
 		free(pl->stages);
+		pl->stages = NULL;
+	}
 }
 
 int	pl_close_all_pipes(t_pipeline *pl)

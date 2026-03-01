@@ -6,12 +6,13 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 19:33:07 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 04:37:59 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:23:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "operand.h"
 #include "env.h"
+#include "expansion.h"
 
 #include "libft.h"
 #include "error.h"
@@ -48,6 +49,14 @@ void	ops_free(t_operand *ops)
 		ops[i].argc = 0;
 		++i;
 	}
+}
+
+void	operand_push_cleanup(t_operand *op)
+{
+	free(op->tokens);
+	op->tokens = NULL;
+	free(op->name);
+	op->name = NULL;
 }
 
 static void	free_tokens_loop(t_operand *ops, size_t i)

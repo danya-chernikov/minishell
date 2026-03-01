@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 02:36:02 by dchernik          #+#    #+#             */
-/*   Updated: 2026/03/01 02:36:22 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:23:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,6 @@ int		op_env_init(t_operand *op);
 
 /* operand2.c */
 void	ops_free(t_operand *ops);
+void	operand_push_cleanup(t_operand *op);
 
 #endif

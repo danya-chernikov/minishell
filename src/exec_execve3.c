@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 02:37:26 by dchernik          #+#    #+#             */
-/*   Updated: 2026/03/01 02:49:32 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:12:42 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,7 @@ char	*resolve_cmd_path(t_shell *msh, char *cmd)
 	if (has_slash(cmd))
 	{
 		fret = get_full_path_from_cwd(cmd);
-		if (!fret)
-			free(str);
+		free(str);
 		return (fret);
 	}
 	fret = resolve_in_path(msh, cmd);
