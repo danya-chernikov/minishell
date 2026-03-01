@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector_main.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 20:48:21 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:48:22 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "vector.h"
 
 static void	set_bcap1(t_vector *v);
@@ -29,7 +41,7 @@ int	vector_init(t_vector *v, t_data_type dtype, size_t cap)
 /* The same as previous but fills all the
  * elements with `filler` On success returns 1 */
 int	vector_finit(t_vector *v, t_data_type dtype, size_t cap, int filler)
-{	
+{
 	if (cap == 0)
 		return (0);
 	v->capacity = cap;
@@ -69,7 +81,7 @@ int	vector_minit(t_vector *v, t_data_type dtype, size_t row_n, size_t col_n)
 	return (1);
 }
 
-static void set_bcap1(t_vector *v)
+static void	set_bcap1(t_vector *v)
 {
 	if (v->data_type == CHAR)
 		v->bcapacity = v->capacity * sizeof (char);
@@ -89,7 +101,7 @@ static void set_bcap1(t_vector *v)
 		v->bcapacity = v->capacity * sizeof (t_ul);
 }
 
-static void set_bcap2(t_vector *v)
+static void	set_bcap2(t_vector *v)
 {
 	if (v->data_type == SIZE_T)
 		v->bcapacity = v->capacity * sizeof (size_t);

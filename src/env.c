@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:23:13 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:12:34 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 #include "error.h"
 
@@ -26,7 +38,7 @@ int	env_init(t_env *env, char **inh_env)
 		return (COMMON_SUCCESS);
 	env->vars_num = 0;
 	env->inh_env = inh_env;
-	env->vars = malloc(MAX_TOTAL_VARS_NUM * sizeof *env->vars);
+	env->vars = malloc(MAX_TOTAL_VARS_NUM * sizeof (t_env_var));
 	if (!env->vars)
 	{
 		perror("malloc");
@@ -48,26 +60,30 @@ void	env_free(t_env *env)
 
 	if (!env)
 		return ;
+	if (!env->vars)
+	{
+		env->vars_num = 0;
+		env->inh_env = NULL;
+		return ;
+	}
 	i = 0;
 	while (i < MAX_TOTAL_VARS_NUM)
 	{
-		if (env->vars[i].name)
-		{
-			free(env->vars[i].name);
-			env->vars[i].name = NULL;
-		}
-		if (env->vars[i].value)
-		{
-			free(env->vars[i].value);
-			env->vars[i].value = NULL;
-		}
+		free(env->vars[i].name);
+		env->vars[i].name = NULL;
+		free(env->vars[i].value);
+		env->vars[i].value = NULL;
 		++i;
 	}
-	if (env->vars)
-	{
-		free(env->vars);
-		env->vars = NULL;
-	}
+	free(env->vars);
+	env->vars = NULL;
 	env->vars_num = 0;
 	env->inh_env = NULL;
+}
+
+/* Just to pass the Norm */
+char	*env_get_def_path(void)
+{
+	return ("/usr/local/sbin:/usr/local/bin:"
+		"/usr/sbin:/usr/bin:/sbin:/bin");
 }

@@ -1,12 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve3.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:37:26 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:49:32 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "builtin.h"
-#include "aux_common.h"
 
 #include "error.h"
 #include "libft.h"
 
 #include <stdlib.h>
+
+void	go_to_next_path_comp(char *path, size_t *i)
+{
+	if (path[*i] == ':')
+		++(*i);
+}
 
 int	map_exec_errno(int errnum)
 {
@@ -69,8 +86,7 @@ char	*resolve_in_path(t_shell *msh, const char *cmd)
 		free(dir);
 		if (try)
 			return (try);
-		if (path[i] == ':')
-			++i;
+		go_to_next_path_comp(path, &i);
 	}
 	return (NULL);
 }

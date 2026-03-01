@@ -1,7 +1,18 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   config.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:29:09 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:29:49 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// Where to put it if not here?
+#ifndef CONFIG_H
+# define CONFIG_H
+
 # define HOSTNAME_PATH					"/etc/hostname"
 
 /* LOGIN SHELL*/
@@ -51,12 +62,10 @@ typedef enum s_conf_type
 {
 	LOGIN_CONF,
 	NONLOGIN_CONF
-
 }	t_conf_type;
 
 typedef struct s_configs
 {
-	// Login
 	char	*etc_prof_path;
 	char	*home_prof_path;
 	char	*home_login_path;
@@ -64,12 +73,12 @@ typedef struct s_configs
 	char	*home_logout_path;
 	char	*etc_logout_path;
 	char	*login[LOGIN_CONFIGS_NUM];
-	// Non-login
 	char	*etc_rc_path;
 	char	*home_rc_path;
 	char	*nonlogin[NONLOGIN_CONFIGS_NUM];
 }	t_configs;
 
+/* config.c */
 void	configs_init(t_configs *cnf);
 void	configs_free(t_configs *cnf);
 

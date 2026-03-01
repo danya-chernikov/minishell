@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_getpid.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 20:46:49 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:46:51 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <stdio.h> /* for perror() */
+#include <stdio.h>
 #include <stdlib.h>
 
 static int	alg(int fd, pid_t *pid);
@@ -62,10 +74,10 @@ static int	alg(int fd, pid_t *pid)
 	if (!line && err)
 	{
 		write(STDERR_FILENO, GNL_ERR_MSG, ft_strlen(GNL_ERR_MSG));
-		gnl_finish(fd); // I guess we need it also here
+		gnl_finish(fd);
 		return (0);
 	}
-	gnl_finish(fd); // And here
+	gnl_finish(fd);
 	return (1);
 }
 
@@ -75,16 +87,16 @@ static int	check_token(char *line, pid_t *pid)
 	char	**ptokens;
 	size_t	tlen;
 
-	ptokens	= ft_split(line, ':');
+	ptokens = ft_split(line, ':');
 	if (!ptokens)
 	{
 		write(STDERR_FILENO, SPLIT_ERR_MSG, ft_strlen(SPLIT_ERR_MSG));
 		return (0);
 	}
 	tlen = ft_strlen(PROC_PID_TOKEN);
-	if (split_size(ptokens) > 1 &&
-		!ft_strncmp(ptokens[0], PROC_PID_TOKEN, tlen) &&
-		ft_strlen(ptokens[0]) == tlen)
+	if (split_size(ptokens) > 1
+		&& !ft_strncmp(ptokens[0], PROC_PID_TOKEN, tlen)
+		&& ft_strlen(ptokens[0]) == tlen)
 	{
 		*pid = ft_atoi(ptokens[1]);
 	}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_pipeline3.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:04:14 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:04:14 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "operand.h"
 #include "aux_common.h"
@@ -13,10 +25,10 @@
 
 int	pl_alloc(t_pipeline *pl)
 {
-	pl->stages = malloc(pl->stages_num * sizeof *pl->stages);
+	pl->stages = malloc(pl->stages_num * sizeof (*pl->stages));
 	if (!pl->stages)
 		return (perror_and_return("malloc", COMMON_SYS_ERR));
-	pl->pids = malloc(pl->stages_num * sizeof *pl->pids);
+	pl->pids = malloc(pl->stages_num * sizeof (*pl->pids));
 	if (!pl->pids)
 	{
 		free(pl->stages);
@@ -26,7 +38,7 @@ int	pl_alloc(t_pipeline *pl)
 	pl->pipes = NULL;
 	if (pl->stages_num > 1)
 	{
-		pl->pipes = malloc((pl->stages_num - 1) * sizeof *pl->pipes);
+		pl->pipes = malloc((pl->stages_num - 1) * sizeof (*pl->pipes));
 		if (!pl->pipes)
 		{
 			free(pl->stages);
@@ -77,7 +89,7 @@ int	pl_close_all_pipes(t_pipeline *pl)
 	return (COMMON_SUCCESS);
 }
 
-int		pl_wait(t_pipeline *pl)
+int	pl_wait(t_pipeline *pl)
 {
 	int	pid_i;
 	int	ws;
@@ -91,12 +103,12 @@ int		pl_wait(t_pipeline *pl)
 			return (COMMON_SYS_ERR);
 		if (pid_i == pl->stages_num - 1)
 			last = pl_wait_status(ws);
-		++pid_i;		
+		++pid_i;
 	}
 	return (last);
 }
 
-int		pl_wait_status(int ws)
+int	pl_wait_status(int ws)
 {
 	int	signum;
 

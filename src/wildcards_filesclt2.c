@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards_filesclt2.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 12:42:06 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 12:42:16 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wildcards.h"
 
 #include "libft.h"
@@ -6,7 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int	wc_add_curdir_file(DIR *dir, struct dirent *entry, char *files[], size_t *file_cnt)
+int	wc_add_curdir_file(DIR *dir, struct dirent *entry, char *files[],
+		size_t *file_cnt)
 {
 	size_t	i;
 	size_t	dname_len;

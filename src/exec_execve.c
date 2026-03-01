@@ -1,18 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:37:33 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:37:34 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "env.h"
 #include "token.h"
 #include "operand.h"
 #include "builtin.h"
 #include "expansion.h"
-#include "aux_common.h"
 
 #include "error.h"
 
 #include <stdio.h>
-
-int		parent_run_with_redirs(t_shell *msh, t_token *token);
-int		save_stdio(int *save_in, int *save_out);
-void	restore_stdio(int save_in, int save_out);
 
 int	parent_run_with_redirs(t_shell *msh, t_token *token)
 {
@@ -70,46 +77,28 @@ void	restore_stdio(int save_in, int save_out)
 	}
 }
 
-int	prepare_operand(t_shell *msh, t_token *token)
+int	prep_reset_operand(t_operand *op)
 {
-	t_operand	*op;
-	int			fres;
-
-	if (!token || token->type != OPERAND || !token->op)
-		return (COMMON_FAILURE);
-	op = token->op;
 	exp_free_argv(op);
 	exp_free_op_tokens(op);
 	op->f_per_cmd = false;
 	if (op->my_env)
 	{
 		env_free(op->my_env);
-		fres = env_init(op->my_env, NULL);
-		if (fres != COMMON_SUCCESS)
-			return (fres);
+		return (env_init(op->my_env, NULL));
 	}
-	else
-	{
-		fres = op_env_init(op);
-		if (fres != COMMON_SUCCESS)
-			return (fres);
-	}
-	fres = exp_alloc_argv(token->op);
-	if (fres != COMMON_SUCCESS)
-		return (fres);
-	fres = do_all_expansions_assignments(msh, token);
-	if (fres != COMMON_SUCCESS)
-	{
-		exp_free_argv(token->op);
-		exp_free_op_tokens(op);
-		op->f_per_cmd = false;
-		if (op->my_env)
-		{
-			env_free(op->my_env);
-			op->my_env = NULL;
-			env_init(op->my_env, NULL);
-		}
-		return (fres);
-	}
-	return (COMMON_SUCCESS);
+	return (op_env_init(op));
+}
+
+int	prep_cleanup_failed_expand(t_operand *op, int err)
+{
+	exp_free_argv(op);
+	exp_free_op_tokens(op);
+	op->f_per_cmd = false;
+	if (!op->my_env)
+		return (err);
+	env_free(op->my_env);
+	if (env_init(op->my_env, NULL) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
+	return (err);
 }

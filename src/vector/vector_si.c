@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector_si.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 20:48:48 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/25 20:48:49 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "vector.h"
 
 static void	vector_si1(t_vector *v, size_t ind, void *val);
@@ -8,7 +20,7 @@ static void	vector_si2(t_vector *v, size_t ind, void *val);
 void	vector_si(t_vector *v, size_t ind, void *val)
 {
 	if (ind >= v->size)
-		return;
+		return ;
 	vector_si1(v, ind, val);
 	vector_si2(v, ind, val);
 }

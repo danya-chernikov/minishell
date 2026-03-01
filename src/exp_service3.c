@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exp_service3.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 13:37:40 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 13:37:41 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "expansion.h"
 #include "operand.h"
 #include "prompt_parser.h"
@@ -7,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int		exp_alloc_argv(t_operand *op)
+int	exp_alloc_argv(t_operand *op)
 {
 	op->argv = (char **)ft_calloc(MAX_ARGC_NUM, sizeof (char *));
 	if (!op->argv)

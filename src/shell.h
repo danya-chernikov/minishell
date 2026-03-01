@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:06:46 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:06:47 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SHELL_H
 # define SHELL_H
 
@@ -25,7 +37,8 @@
 # define VERBOSE_SHORT_OPT	"-v"
 # define C_SHORT_OPT		"-c"
 
-# define PROMPT_INV_LEN		512	// Maximum length of user's prompt invitation string
+# define MUST_EXIT			-7
+# define PROMPT_INV_LEN		512
 # define MAX_SUBDOMAIN_LEN	64
 
 typedef struct s_parser_data	t_parser_data;
@@ -41,16 +54,14 @@ typedef struct s_options
 	bool	f_verbose;
 	bool	f_norc;
 	bool	f_c;
-
 }	t_options;
 
 typedef enum e_shell_mode
 {
-	NONINT_SCRIPT_MODE,	// ./minishell script.sh arg1 arg2
-	NONINT_CMD_MODE,	// ./minishell -c 'command' OR ./minishell -c "command"
-	NONINT_STDIN_MODE,	// echo "ls -la" | ./minishell OR ./minishell < commands_file
-	INT_MODE,			// ./minishell --login OR ./minishell -l OR ./minishell
-
+	NONINT_SCRIPT_MODE,
+	NONINT_CMD_MODE,
+	NONINT_STDIN_MODE,
+	INT_MODE,
 }	t_shell_mode;
 
 typedef struct s_shell
@@ -63,10 +74,9 @@ typedef struct s_shell
 	t_env			env;
 	int				argc;
 	char			**argv;
-	char			*prompt_inv;	// on heap
-	char			*script;		// on stack
-	char			*c_cmd;			// on stack
-
+	char			*prompt_inv;
+	char			*script;
+	char			*c_cmd;
 }	t_shell;
 
 /* shell.c */
@@ -75,18 +85,30 @@ void	msh_free(t_shell *msh);
 
 /* shell_launcher.c */
 int		msh_launch(t_shell *msh, int *ret_code);
-int		launch_script(t_shell *msh, int *ret_code);
 int		launch_cmd(t_shell *msh, int *ret_code);
 int		launch_stdin_cmd(t_shell *msh, int *ret_code);
+
+/* shell_launch_int.c */
 int		launch_int_session(t_shell *msh, int *ret_code);
+
+/* shell_launch_script.c */
+int		launch_script(t_shell *msh, int *ret_code);
 
 /* aux_shell.c */
 int		gen_prompt_inv(t_shell *msh);
+
+/* aux_shell2.c */
 void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */
 int		msh_load_configs(t_shell *msh);
+int		init_login_configs(t_shell *msh, t_configs *c, char *home);
+int		init_nonlogin_configs(t_shell *msh, t_configs *c, char *home);
+
+/* shell_login_configs.c */
 int		load_login_configs(t_shell *msh);
+
+/* shell_nonlogin_configs.c */
 int		load_nonlogin_configs(t_shell *msh);
 
 /* shell_history.c */
@@ -130,15 +152,15 @@ int		set_local_ps4(t_env *env);
 int		msh_set_env_vars(t_env *env);
 
 /* init_envars2.c */
-void	set_env_path(t_env *env);
-void	set_env_shelevel(t_env *env);
+int		set_env_path(t_env *env);
+int		set_env_shelevel(t_env *env);
 int		set_env_pwd(t_env *env);
-void	set_env_oldpwd(t_env *env);
-int		set_env_pwd_user_data(t_env *env);
+int		set_env_oldpwd(t_env *env);
 
 /* init_envars3.c */
-void	set_env_logname(t_env *env);
+int		set_env_logname(t_env *env);
 int		set_rest_env_vars(t_env *env);
+int		set_env_pwd_user_data(t_env *env);
 
 /* NONINT_SCRIPT_MODE - non-interactive script executing:
  * In this mode we do NOT read any configs (check this)

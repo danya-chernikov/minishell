@@ -1,16 +1,109 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:17:50 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 01:10:07 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "shell.h"
 #include "cmdargs_parser.h"
 #include "prompt_parser.h"
 #include "expansion.h"
 
-#include "debug.h"
 #include "error.h"
 #include "libft.h"
 
 #include <stdlib.h>
 
+static int	environment_and_history_init(t_shell *msh, char **env);
 static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
 
+int	msh_init(t_shell *msh, int argc, char **argv, char **env)
+{
+	int		fres;
+	bool	f_exit;
+
+	f_exit = false;
+	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
+		return (COMMON_SYS_ERR);
+	if (environment_and_history_init(msh, env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	fres = cmdargs_parser(msh, &f_exit);
+	if (fres != COMMON_SUCCESS)
+		return (fres);
+	if (f_exit)
+		return (MUST_EXIT);
+	if (!isatty(STDIN_FILENO))
+		if (msh->mode != NONINT_SCRIPT_MODE && msh->mode != NONINT_CMD_MODE)
+			msh->mode = NONINT_STDIN_MODE;
+	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	fres = msh_set_env_vars(&msh->env);
+	if (fres != COMMON_SUCCESS)
+		return (fres);
+	if (msh_load_configs(msh) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	return (COMMON_SUCCESS);
+}
+
+void	msh_free(t_shell *msh)
+{
+	if (msh->pd)
+	{
+		exp_free_all_ops_argv(msh->pd);
+		parser_free(msh->pd);
+		free(msh->pd);
+	}
+	if (msh->prompt_inv)
+		free(msh->prompt_inv);
+	env_free(&msh->env);
+	history_free(&msh->history);
+	configs_free(&msh->configs);
+}
+
+static int	environment_and_history_init(t_shell *msh, char **env)
+{
+	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (history_init(&msh->history) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	if (msh_init_param_vars(&msh->env) == COMMON_SYS_ERR)
+		return (COMMON_SYS_ERR);
+	return (COMMON_SUCCESS);
+}
+
+/* Initialize shell options, configs and parser data  */
+static int	prelim_struct_init(t_shell *msh, int argc, char **argv)
+{
+	msh->mode = INT_MODE;
+	msh->env.vars = NULL;
+	msh->history.lines = NULL;
+	msh->prompt_inv = NULL;
+	msh->script = NULL;
+	msh->c_cmd = NULL;
+	msh->argc = argc;
+	msh->argv = argv;
+	msh->opts.f_login = false;
+	msh->opts.f_verbose = false;
+	msh->opts.f_norc = false;
+	msh->opts.f_c = false;
+	msh->history.lines_num = 0;
+	msh->history.lines = NULL;
+	msh->history.histfile_path = NULL;
+	configs_init(&msh->configs);
+	msh->pd = (t_parser_data *)ft_calloc(1, sizeof(t_parser_data));
+	if (!msh->pd)
+	{
+		perror("malloc");
+		return (COMMON_SYS_ERR);
+	}
+	return (COMMON_SUCCESS);
+}
 /* Initializes the `t_shell` structure, which represents our
  * minishell and stores all its settings.
  * When we
@@ -34,100 +127,3 @@ static int	prelim_struct_init(t_shell *msh, int argc, char **argv);
  *
  * In all these cases the parent shell who launches
  * bash will handle pipes and redirections! */
-int	msh_init(t_shell *msh, int argc, char **argv, char **env)
-{
-	int	fres;
-
-	if (prelim_struct_init(msh, argc, argv) != COMMON_SUCCESS)
-		return (COMMON_SYS_ERR);
-
-	// Allocate environmental variables
-	if (env_init(&msh->env, env) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-
-	// Init history	
-	if (history_init(&msh->history) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-
-	// Initialize shell parameters
-	if (msh_init_param_vars(&msh->env) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-
-	// Parsing the command-line arguments
-	// of our shell. At this stage, we can
-	// determine the shell's mode and set
-	// some parameter variables
-	fres = cmdargs_parser(msh);
-	if (fres != COMMON_SUCCESS) // The code we should transfer to the caller
-		return (fres);
-
-	if (!isatty(STDIN_FILENO)) // If shell is not connected to any terminal
-	{
-		if (msh->mode != NONINT_SCRIPT_MODE && msh->mode != NONINT_CMD_MODE)
-			msh->mode = NONINT_STDIN_MODE; // We do not have to print prompt!
-	}
-
-	/* Set local and environment variables */
-	if (msh_set_local_vars(&msh->env, argv) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-	fres = msh_set_env_vars(&msh->env);
-	if (fres != COMMON_SUCCESS)
-		return (fres);
-
-#if DEBUG == 1
-	printf("Local variables:\n");
-	env_print_locals(&msh->env);
-	printf("\n");
-	printf("Environment variables:\n");
-	env_print_env(&msh->env);
-#endif
-
-	// Read configs
-	if (msh_load_configs(msh) == COMMON_SYS_ERR)
-		return (COMMON_SYS_ERR);
-		
-	return (COMMON_SUCCESS);
-}
-
-void	msh_free(t_shell *msh)
-{
-	exp_free_all_ops_argv(msh->pd); // TO CORRECT LEAK
-	parser_free(msh->pd); // TO CORRECT LEAK
-	if (msh->pd)
-		free(msh->pd);
-	if (msh->prompt_inv)
-		free(msh->prompt_inv);
-	env_free(&msh->env);
-	history_free(&msh->history);
-	configs_free(&msh->configs);
-}
-
-static int	prelim_struct_init(t_shell *msh, int argc, char **argv)
-{
-	// By default, let's think our
-	// shell will be interactive
-	msh->mode = INT_MODE;
-	msh->env.vars = NULL;
-	msh->history.lines = NULL;
-	msh->prompt_inv = NULL;
-	msh->script = NULL;
-	msh->c_cmd = NULL;
-	// Assign arguments of main()
-	msh->argc = argc;
-	msh->argv = argv;
-	// Init shell options
-	msh->opts.f_login = false;
-	msh->opts.f_verbose = false;
-	msh->opts.f_norc = false;
-	msh->opts.f_c = false;
-	// Init configs
-	configs_init(&msh->configs);
-	// Init t_parser_data
-	msh->pd = (t_parser_data *)ft_calloc(1, sizeof(t_parser_data));
-	if (!msh->pd)
-	{
-		perror("malloc");
-		return (COMMON_SYS_ERR);
-	}
-	return (COMMON_SUCCESS);
-}

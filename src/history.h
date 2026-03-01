@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   history.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:06:58 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:06:59 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef HISTORY_H
 # define HISTORY_H
 
 # include <stddef.h>
 
-#include <readline/readline.h>
-#include <readline/history.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
 # include "error.h"
 
@@ -61,7 +73,7 @@ typedef struct e_history
 }	t_history;
 
 int		history_init(t_history *history);
-void	history_push(t_history *history, char *line, t_hist_type type);
+int		history_push(t_history *history, char *line, t_hist_type type);
 void	history_pop(t_history *history);
 void	history_free(t_history *history);
 

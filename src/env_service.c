@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_service.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/25 11:28:40 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:48:17 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "env.h"
 #include "error.h"
 
@@ -67,13 +79,30 @@ size_t	env_count_all_vars(t_env *env)
 	var_cnt = 0;
 	while (vi < env->vars_num)
 	{
-		if (env->vars[vi].name &&
-			env->vars[vi].value &&
-			env->vars[vi].type != PARAM)
+		if (env->vars[vi].name
+			&& env->vars[vi].value
+			&& env->vars[vi].type != PARAM)
 		{
 			++var_cnt;
 		}
 		++vi;
 	}
 	return (var_cnt);
+}
+
+/* I'm tired of creating new files. It looks
+ * messy.. so I just leave it here for now.
+ * This function is used by set_existing_var() */
+void	check_var_type(t_env_var *var, t_var_type type)
+{
+	if (type == ENV || var->type == ENV)
+	{
+		var->type = ENV;
+		var->f_inherit = true;
+	}
+	else if (var->type != PARAM)
+	{
+		var->type = LOCAL;
+		var->f_inherit = false;
+	}
 }

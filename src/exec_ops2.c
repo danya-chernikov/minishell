@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_ops2.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:39:30 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:39:31 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "prompt_parser.h"
 
@@ -26,8 +38,8 @@ int	skip_term(t_parser_data *pd, size_t s, size_t r)
 				return (j);
 			--d;
 		}
-		else if (d == 0 && (pd->tokens[j].type == AND ||
-				pd->tokens[j].type == OR))
+		else if (d == 0 && (pd->tokens[j].type == AND
+				|| pd->tokens[j].type == OR))
 			return (j);
 		++j;
 	}

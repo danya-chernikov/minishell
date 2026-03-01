@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_pipeline2.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:03:15 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:03:15 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "operand.h"
@@ -8,7 +20,7 @@
 
 #include <stdlib.h>
 
-int		pl_fork_one_stage(t_shell *msh, t_pipeline *pl, int st_i, int depth)
+int	pl_fork_one_stage(t_shell *msh, t_pipeline *pl, int st_i, int depth)
 {
 	int	in_fd;
 	int	out_fd;
@@ -47,7 +59,7 @@ void	pl_child_run_subshell(t_shell *msh, t_range stage, int depth)
 	exit(ret);
 }
 
-int		pl_count_stages(t_parser_data *pd, size_t l, size_t r)
+int	pl_count_stages(t_parser_data *pd, size_t l, size_t r)
 {
 	size_t	j;
 	int		st_cnt;
@@ -57,7 +69,7 @@ int		pl_count_stages(t_parser_data *pd, size_t l, size_t r)
 	st_cnt = 0;
 	while (j <= r)
 	{
-		if (pd->tokens[j].type == OPERAND) 
+		if (pd->tokens[j].type == OPERAND)
 		{
 			++st_cnt;
 			++j;
@@ -77,7 +89,7 @@ int		pl_count_stages(t_parser_data *pd, size_t l, size_t r)
 }
 
 /* d - parentheses depth */
-int		pl_find_close(t_parser_data *pd, size_t open_i, size_t r)
+int	pl_find_close(t_parser_data *pd, size_t open_i, size_t r)
 {
 	size_t	j;
 	int		d;
@@ -99,7 +111,7 @@ int		pl_find_close(t_parser_data *pd, size_t open_i, size_t r)
 	return (CLOSE_PAR_NOT_FOUND);
 }
 
-int		pl_make_pipes(t_pipeline *pl)
+int	pl_make_pipes(t_pipeline *pl)
 {
 	int	pi;
 

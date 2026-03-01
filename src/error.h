@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   error.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:27:51 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:28:44 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef ERROR_H
 # define ERROR_H
 
@@ -40,9 +52,10 @@
 # define PROMPT_TOO_LONG		"Prompt is too long"
 # define EXIT_NUM_ARG_REQ		"numeric argument required"
 # define EXIT_TOO_MANY_ARGS		"too many arguments"
+# define NOT_VALID_IDENTIFIER	"not a valid identifier"
 
 /* Redirection errors */
-# define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+# define REDIRECT_ERR_MSG		"syntax error near unexpected token"
 # define TOO_MANY_REDIRECTS		"too many redirections"
 # define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
 # define TOO_LONG_HD_DELIM		"heredoc's delimiter is too long"
@@ -62,12 +75,15 @@
 # define MAX_WC_FN_LEN_ERR_MSG	"Filename is too long"
 # define MAX_ARGC_NUM_ERR_MSG	"Too many arguments were passed"
 # define MAX_ARGV_LEN_ERR_MSG	"Argument's value is too long"
+# define MAX_HIST_LNUM_ERR_MSG	"Too many history lines were read"
+# define MAX_PAR_NUM_ERR_MSG	"Too many parenthesis"
+# define MAX_QUOTES_NUM_ERR_MSG	"Too many quotes"
 
 /* Our system calls implementations errors */
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
 # define GETUID_ERR_MSG			"Could not get my UID/EUID"
-# define GETPWUID_ERR_MSG		"Could not get info about the user who is running me"
+# define GETPWUID_ERR_MSG		"Could not get info about who is running me"
 
 /* Errors that should not occur in practice, but are still handled */
 # define OP_ARGV_IS_NULL		"Operand's argv is NULL"
@@ -87,7 +103,6 @@ typedef enum e_exit_code
 	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
 	CMD_NOT_LOCATED_ERR = 127,
 	SIGNALED_CODE = 128
-
 }	t_exit_code;
 
 void	print_sys_error(char *msg);

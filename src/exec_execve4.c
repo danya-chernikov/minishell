@@ -1,13 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve4.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:30:24 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:30:25 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "aux_io.h"
 #include "operand.h"
+#include "aux_common.h"
 
 #include "error.h"
 
 #include <unistd.h>
 #include <fcntl.h>
 
-static int	open_heredoc(t_redir *r, int *out_fd);
+#include <stdio.h>
+#include <stdlib.h>
 
 int	apply_redirs(t_operand *op)
 {
@@ -22,14 +36,16 @@ int	apply_redirs(t_operand *op)
 		if (fret == COMMON_SYS_ERR)
 			return (COMMON_SYS_ERR);
 		if (fret == COMMON_FAILURE)
-		{
-			print_sys_error(op->redirs[ri].path);
-			return (COMMON_FAILURE);
-		}
+			return (print_sys_error(op->redirs[ri].path), COMMON_FAILURE);
 		if (dup2(fd, op->redirs[ri].target_fd) == -1)
+		{
+			perror("dup2");
+			if (close(fd) == -1)
+				return (perror("close"), COMMON_SYS_ERR);
 			return (COMMON_SYS_ERR);
+		}
 		if (close(fd) == -1)
-			return (COMMON_SYS_ERR);
+			return (perror("close"), COMMON_SYS_ERR);
 		++ri;
 	}
 	return (COMMON_SUCCESS);
@@ -49,12 +65,12 @@ int	redir_open_fd(t_redir *redir, int *out_fd)
 	else if (redir->type == REDIR_HEREDOC)
 		return (open_heredoc(redir, out_fd));
 	if (fd == -1)
-		return (COMMON_SYS_ERR);
+		return (COMMON_FAILURE);
 	*out_fd = fd;
 	return (COMMON_SUCCESS);
 }
 
-static int	open_heredoc(t_redir *r, int *out_fd)
+int	open_heredoc(t_redir *r, int *out_fd)
 {
 	int	p[2];
 	int	fret;
@@ -78,4 +94,34 @@ static int	open_heredoc(t_redir *r, int *out_fd)
 	}
 	*out_fd = p[READ_END];
 	return (COMMON_SUCCESS);
+}
+
+bool	has_slash(const char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s && s[i])
+	{
+		if (s[i] == '/')
+			return (true);
+		++i;
+	}
+	return (false);
+}
+
+char	*get_full_path_from_cwd(const char *rel_path)
+{
+	char	cwd[PATH_MAX];
+	char	*dir;
+	char	*out;
+
+	if (!getcwd(cwd, sizeof (cwd)))
+		return (NULL);
+	dir = ft_strdup(cwd);
+	if (!dir)
+		return (NULL);
+	out = join_path(dir, rel_path);
+	free(dir);
+	return (out);
 }

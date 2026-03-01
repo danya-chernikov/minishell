@@ -1,5 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards_common.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/28 12:19:55 by dchernik          #+#    #+#             */
+/*   Updated: 2026/02/28 12:39:58 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "wildcards.h"
 #include "operand.h"
+#include "aux_common.h"
 
 #include "libft.h"
 #include "vector.h"
@@ -7,6 +20,9 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+
+static int	wc_collapse_conseq_asterisks_loop_body(t_vector *exp_res,
+				t_vector *qmask, size_t *rw_inds, bool *f_prev_ast);
 
 /* Collapse consequtive unquoted asterisks in `exp_res` and update `qmask`.
  * We traverse the original vector-string `exp_res` from left to right
@@ -16,40 +32,50 @@
  * `write_ind` writes only those we wanna keep. In the end, everything
  * that needs to be removed (extra *) is simply not written, and everything
  * we keep gets compacted toward the begining. It runs in O(n) btw.
- *     f_prev_ast - if true means prevoius symbol was asterisk out of quotes */
+ *     f_prev_ast - if true means prevoius symbol was asterisk out of quotes.
+ *     rw_inds[WC_READ_IND=0]	- read_ind
+ *     rw_inds[WC_WRITE_IND=1]	- write_ind */
 void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask)
 {
-	size_t	read_ind;
-	size_t	write_ind;
 	size_t	expres_len;
+	size_t	rw_inds[2];
 	bool	f_prev_ast;
 
-	read_ind = 0;
-	write_ind = 0;
+	rw_inds[WC_READ_IND] = 0;
+	rw_inds[WC_WRITE_IND] = 0;
 	expres_len = vector_strlen(exp_res);
 	f_prev_ast = false;
-	while (read_ind < expres_len)
+	while (rw_inds[WC_READ_IND] < expres_len)
 	{
-		char	expres_char;
-		char	qmask_char;
-
-		expres_char = *((char *)vector_at(exp_res, read_ind));
-		qmask_char = *((char *)vector_at(qmask, read_ind));
-		if (wc_is_asterisk(expres_char, qmask_char) && f_prev_ast)
-		{
-			++read_ind;
+		if (wc_collapse_conseq_asterisks_loop_body(exp_res,
+				qmask, rw_inds, &f_prev_ast) == CONTINUE)
 			continue ;
-		}
-		if (write_ind != read_ind)
-		{
-			vector_si(exp_res, write_ind, &expres_char);
-			vector_si(qmask, write_ind, &qmask_char);
-		}
-		f_prev_ast = wc_is_asterisk(expres_char, qmask_char);
-		++write_ind;
-		++read_ind;
+		++rw_inds[WC_WRITE_IND];
+		++rw_inds[WC_READ_IND];
 	}
-	wc_trim_vectors(exp_res, qmask, write_ind);
+	wc_trim_vectors(exp_res, qmask, rw_inds[WC_WRITE_IND]);
+}
+
+static int	wc_collapse_conseq_asterisks_loop_body(t_vector *exp_res,
+		t_vector *qmask, size_t *rw_inds, bool *f_prev_ast)
+{
+	char	expres_char;
+	char	qmask_char;
+
+	expres_char = *((char *)vector_at(exp_res, rw_inds[WC_READ_IND]));
+	qmask_char = *((char *)vector_at(qmask, rw_inds[WC_READ_IND]));
+	if (wc_is_asterisk(expres_char, qmask_char) && *f_prev_ast)
+	{
+		++rw_inds[WC_READ_IND];
+		return (CONTINUE);
+	}
+	if (rw_inds[WC_WRITE_IND] != rw_inds[WC_READ_IND])
+	{
+		vector_si(exp_res, rw_inds[WC_WRITE_IND], &expres_char);
+		vector_si(qmask, rw_inds[WC_WRITE_IND], &qmask_char);
+	}
+	*f_prev_ast = wc_is_asterisk(expres_char, qmask_char);
+	return (COMMON_SUCCESS);
 }
 
 bool	wc_is_asterisk(char expres_char, char qmask_char)
@@ -99,17 +125,4 @@ int	wc_alloc_res(char ***wc_res)
 		++i;
 	}
 	return (COMMON_SUCCESS);
-}
-
-void	wc_free_res(char ***wc_res)
-{
-	size_t	i;	
-
-	i = 0;
-	while (i < WC_MAX_FILES_NUM)
-	{
-		free((*wc_res)[i]);
-		++i;
-	}
-	free(*wc_res);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env.h                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/26 00:52:38 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:48:17 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef ENV_H
 # define ENV_H
 
@@ -15,7 +27,6 @@
  * it is currently read from `/etc/default/locale`
  * if it was not inherited. But let's implement
  * this later */
-# define DEF_PATH			"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 # define DEF_PS1			"\\s-\\v\\$"
 # define DEF_PS2			"> "
 # define DEF_PS4			"+ "
@@ -39,22 +50,21 @@
  * function for reference) */
 typedef enum e_paramvar
 {
-	PV_HOME = 0,// ~ (`cd` is working with this variable, NOT with $HOME!)
-	PV_RETCODE,	// $?
-	PV_PID,		// $$
-	PV_ARGNUM,	// $#
-	PV_ALLARGS,	// $* Accessible only in scripts!
-	PV_ARGV0,	// if Equals '-minishell' our shell was run as login-shell
-	PV_ARGV1,	// Only in scripts	
-	PV_ARGV2,	// ...
-	PV_ARGV3,	// ...
-	PV_ARGV4,	// ...
-	PV_ARGV5,	// ...
-	PV_ARGV6,	// ...
-	PV_ARGV7,	// ...
-	PV_ARGV8,	// ...
-	PV_ARGV9=14,// Only in scripts
-		
+	PV_HOME = 0,
+	PV_RETCODE,
+	PV_PID,
+	PV_ARGNUM,
+	PV_ALLARGS,
+	PV_ARGV0,
+	PV_ARGV1,
+	PV_ARGV2,
+	PV_ARGV3,
+	PV_ARGV4,
+	PV_ARGV5,
+	PV_ARGV6,
+	PV_ARGV7,
+	PV_ARGV8,
+	PV_ARGV9 = 14
 }	t_paramvar;
 
 /* Special local variables are set
@@ -68,24 +78,23 @@ typedef enum e_paramvar
  * function for reference) */
 typedef enum e_special_localvar
 {
-	SL_PPID=15,		// PPID 
-	SL_UID,			// UID
-	SL_EUID,		// EUID
-	SL_MSHPID,		// MSHPID
-	SL_MSHSUBSH,	// MSH_SUBSHELL	
-	SL_MSHVER,		// MSH_VERSION
-	SL_HFSIZE,		// HISTFILESIZE
-	SL_HFILE,		// HISTFILE
-	SL_HSIZE,		// HISTSIZE
-	SL_MSH,			// MSH
-	SL_HOSTNAME,	// HOSTNAME
-	SL_HOSTTYPE,	// (has default)
-	SL_OSTYPE,		// (has default)
-	SL_MACHTYPE,	// (has default)
-	SL_PS1,			// PS1
-	SL_PS2,			// PS2
-	SL_PS4=31,		// PS4
-
+	SL_PPID = 15,
+	SL_UID,
+	SL_EUID,
+	SL_MSHPID,
+	SL_MSHSUBSH,
+	SL_MSHVER,
+	SL_HFSIZE,
+	SL_HFILE,
+	SL_HSIZE,
+	SL_MSH,
+	SL_HOSTNAME,
+	SL_HOSTTYPE,
+	SL_OSTYPE,
+	SL_MACHTYPE,
+	SL_PS1,
+	SL_PS2,
+	SL_PS4 = 31
 }	t_slocalvar;
 
 /* These are important environment variables
@@ -93,54 +102,28 @@ typedef enum e_special_localvar
  * almoost*/
 typedef enum e_special_envar
 {
-	SE_PATH=32,
+	SE_PATH = 32,
 	SE_SHLVL,
 	SE_PWD,
 	SE_OLDPWD,
 	SE_HOME,
 	SE_SHELL,
 	SE_USER,
-	SE_LOGNAME=39
-
+	SE_LOGNAME = 39
 }	t_senvar;
 
 typedef enum e_var_type
 {
-	LOCAL,		// MINISHELL_VERSION, HISTFILESIZE, HISTFILE, HISTSIZE, UID, EUID and etc.
-	ENV,		// PATH, SHLVL, OLDPW, PWD, HOME, SHELL, USER and etc.
-	PARAM		// ~, $?, $$, $#, $*, $0, $1, $2, $3, $4, $5, $6, $7, $8, $9
+	LOCAL,
+	ENV,
+	PARAM
 }	t_var_type;
-
-/* If type is PARAM, value usually
- * (but not always.. this applies
- * to positional script parameters)
- * is a heap-allocated duplicate of
- * the corresponding argument in argv;
- *
- * If type is ENV, value points to a
- * heap-allocated duplicate of the
- * corresponding value in env (third
- * argument of main function); if it
- * was not inherited, it points to a
- * string determined internally (also
- * heap-allocated);
- *
- * If type is LOCAL, value points to a
- * heap-allocated string determined
- * internally.
- *
- * A variable is considered non-existent
- * when its name is NULL and/or its value
- * is NULL.
- *
- *     f_inherit - marks if a variable
- *				   may be exported or not */
 
 typedef struct s_env_var
 {
 	t_var_type	type;
 	bool		f_readonly;
-	bool		f_inherit; 
+	bool		f_inherit;
 	char		*name;
 	char		*value;
 
@@ -150,16 +133,16 @@ typedef struct s_env_var
  *			 parent (the third argument of
  *			 the main function) */
 typedef struct s_env
-{	
+{
 	size_t		vars_num;
 	char		**inh_env;
 	t_env_var	*vars;		// on heap
-
 }	t_env;
 
 /* env.c */
 int			env_init(t_env *env, char **inh_env);
 void		env_free(t_env *env);
+char		*env_get_def_path(void);
 
 /* env_setters.c */
 int			env_set(t_env *env, char *name, char *value, t_var_type type);
@@ -180,96 +163,10 @@ bool		env_exist(t_env *env, char *name);
 int			env_export(t_env *env, char *name);
 size_t		env_count_exported_vars(t_env *env);
 size_t		env_count_all_vars(t_env *env);
+void		check_var_type(t_env_var *var, t_var_type type);
 
 /* env_exec.c */
 int			env_apply_as_local(t_env *dst, t_env *src);
 int			env_apply_as_env(t_env *dst, t_env *src);
-
-/* Each variable's number here corresponds to its index in the `vars`
- * array of the `s_shell` structure. In our minishell, we have the
- * following kinds of variables:
- *
- *     SPECIAL PARAMETER VARIABLES:
- *         Shell parameter variables with special behavior.
- *         Netiher of these variables can be changed or deleted.
- *		       0.  ~
- *             1.  $?
- *             2.  $$
- *             3.  $#
- *             4.  $*
- *             5.  $0
- *             6.  $1
- *             7.  $2
- *             8.  $3
- *             9.  $4
- *             10. $5
- *             11. $6
- *             12. $7
- *             13. $8
- *             14. $9
- *
- *     SO-CALLED 'SPECIAL' LOCAL VARIABLES (`f_inherit` flag is cleared)
- *         Local variables that have a critical or near-critical role
- *         in the shell's operation. Some of them cannot be modified
- *         or deleted (`f_readonly` flag is set), while others can
- *         (`f_readonly` flag is cleared);
- *         The complete list of them:
- *			   15. PPID					(can't be changed/deleted)
- *			   16. UID					(can't be changed/deleted)
- *			   17. EUID					(can't be changed/deleted) the same as UID
- *             18. MSHPID				(can't be changed/deleted)
- *			   19. MSH_SUBSHELL			(has default)
- *			   20. MSH_VERSION			(has default)
- *			   21. HISTFILESIZE			(has default)
- *			   22. HISTFILE				(has default)
- *			   23. HISTSIZE				(has default)
- *			   24. MSH					(unknown)
- *			   25. HOSTNAME				(has default)
- *			   26. HOSTTYPE				(has default)
- *			   27. OSTYPE				(has default)
- *			   28. MACHTYPE				(has default)
- *			   29. PS1					(has default)
- *			   30. PS2					(has default)
- *			   31. PS4					(has default)
- *
- *         MINISHELLPID is an analogue of BASHPID. It is a special variable
- *         whose value is calculated at the moment a (sub)shell expands it.
- *
- *         MINISHELL_SUBSHELL is an analogue of BASH_SUBSHELL. It is similar to
- *         SHLVL, but it is local and specific to subshells. Using this variable,
- *         we can determine whether we are running inside a subshell. Its value
- *         is incremented each time a new shell is started.
- *
- *     CLASSICAL ENVIRONMENT VARIABLES (`f_inherit` flag is set)
- *         Variables inherited by child processes. Nothing special here.
- *         There are variables that were inherited. We can change the
- *         value of any of them. However, among these variables there
- *         are some special beasts that directly affect the shell's
- *         workflow and behavior. Changing or deleting them may somewhat
- *         'ruin' the current shell session as well as all its ancestors.
- *         Some of these variables are even managed dynamically by the
- *         shell itself, for example $SHLVL
- *         The complete list of them:
- *             32. PATH					(has default)
- *             33. SHLVL				(calculates during execution)
- *             34. PWD					(calculates during execution)
- *             35. OLDPWD				(calculates during execution)
- *             36. HOME					(finds in the system)
- *             37. SHELL				(finds in the system)
- *             38. USER					(finds in the system)
- *             39. LOGNAME
- *
- *         So yeah.. the first 37 indices in vars are reserved for easier
- *         access. After that, all newly added local or environment variables
- *         will have mixed indices
- *
- *     USER'S LOCAL VARIABLES 
- *         Created by the user. These variables may be exported
- *         and therefore inherited by child processes;
- *         Examples: 
- *             BLA='keke'
- *             LOL='azaza'*
- *
- * */
 
 #endif

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:02:41 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:02:41 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "builtin.h"
 #include "aux_common.h"
 #include "operand.h"
@@ -11,7 +23,7 @@
 
 static int	run_builtin_first_part(t_shell *msh, t_operand *op, char *prog);
 static int	run_builtin_second_part(t_shell *msh, t_operand *op,
-		bool f_in_parent, char *prog);
+				bool f_in_parent, char *prog);
 
 int	run_builtin(t_shell *msh, t_operand *op, bool f_in_parent)
 {

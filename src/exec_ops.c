@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_ops.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:31:15 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:31:15 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "redirect.h"
@@ -100,8 +112,8 @@ int	find_term_stop(t_parser_data *pd, size_t i, size_t r)
 				return ((int)j);
 			--d;
 		}
-		else if (d == 0 && (pd->tokens[j].type == AND ||
-				pd->tokens[j].type == OR))
+		else if (d == 0 && (pd->tokens[j].type == AND
+				|| pd->tokens[j].type == OR))
 			return ((int)j);
 		++j;
 	}
