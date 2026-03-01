@@ -38,9 +38,11 @@ SRCS=main.c \
 	 wildcards_sieve.c wildcards_sieve2.c \
 	 wildcards_common.c wildcards_common2.c \
 	 exec_expassign.c exec_ops.c exec_ops2.c \
-	 exec_pipeline.c exec_pipeline2.c exec_pipeline3.c exec_pipeline4.c \
+	 exec_pipeline.c exec_pipeline2.c exec_pipeline3.c \
+	 exec_pipeline4.c exec_pipeline5.c \
 	 exec_execve.c exec_execve2.c exec_execve3.c \
 	 exec_execve4.c exec_execve5.c exec_execve6.c \
+	 exec_execve7.c exec_execve8.c \
 	 builtin.c builtin_echo.c builtin_cd.c builtin_exit.c \
 	 builtin_export.c builtin_others.c \
 	 signals.c signals2.c \
@@ -77,9 +79,11 @@ OBJS=main.o \
 	 wildcards_sieve.o wildcards_sieve2.o \
 	 wildcards_common.o wildcards_common2.o \
 	 exec_expassign.o exec_ops.o exec_ops2.o \
-	 exec_pipeline.o exec_pipeline2.o exec_pipeline3.o exec_pipeline4.o \
+	 exec_pipeline.o exec_pipeline2.o exec_pipeline3.o \
+	 exec_pipeline4.o exec_pipeline5.o \
 	 exec_execve.o exec_execve2.o exec_execve3.o \
 	 exec_execve4.o exec_execve5.o exec_execve6.o \
+	 exec_execve7.o exec_execve8.o \
 	 builtin.o builtin_echo.o builtin_cd.o builtin_exit.o \
 	 builtin_export.o builtin_others.o \
 	 signals.o signals2.o \
@@ -565,8 +569,14 @@ exec_pipeline4.o : exec_pipeline4.c exec.h operand.h aux_common.h signals.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_pipeline4.c
 
+exec_pipeline5.o : exec_pipeline5.c exec.h shell.h builtin.h prompt_parser.h \
+	signals.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_pipeline5.c
+
 exec_execve.o : exec_execve.c exec.h env.h token.h operand.h builtin.h \
-	expansion.h aux_common.h \
+	expansion.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve.c
@@ -577,17 +587,17 @@ exec_execve2.o : exec_execve2.c exec.h token.h shell.h operand.h builtin.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve2.c
 
-exec_execve3.o : exec_execve3.c exec.h shell.h builtin.h aux_common.h \
+exec_execve3.o : exec_execve3.c exec.h shell.h builtin.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve3.c
 
-exec_execve4.o : exec_execve4.c exec.h aux_io.h operand.h \
+exec_execve4.o : exec_execve4.c exec.h aux_io.h operand.h aux_common.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve4.c
 
-exec_execve5.o : exec_execve5.c exec.h aux_common.h \
+exec_execve5.o : exec_execve5.c exec.h env.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve5.c
@@ -596,6 +606,17 @@ exec_execve6.o : exec_execve6.c exec.h builtin.h aux_common.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c exec_execve6.c
+
+exec_execve7.o : exec_execve7.c exec.h shell.h env.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve7.c
+
+exec_execve8.o : exec_execve8.c exec.h shell.h token.h operand.h builtin.h \
+	expansion.h \
+	libft.h vector.h error.h
+	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
+	-c exec_execve8.c
 
 
 # ================================ Built-ins =================================

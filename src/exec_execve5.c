@@ -1,5 +1,5 @@
 #include "exec.h"
-#include "aux_common.h"
+#include "env.h"
 
 #include "error.h"
 
@@ -7,36 +7,6 @@
 #include <linux/limits.h>
 
 #include <stdlib.h>
-
-bool	has_slash(const char *s)
-{
-	size_t	i;
-
-	i = 0;
-	while (s && s[i])
-	{
-		if (s[i] == '/')
-			return (true);
-		++i;
-	}
-	return (false);
-}
-
-char	*get_full_path_from_cwd(const char *rel_path)
-{
-	char	cwd[PATH_MAX];
-	char	*dir;
-	char	*out;
-
-	if (!getcwd(cwd, sizeof (cwd)))
-		return (NULL);
-	dir = ft_strdup(cwd);
-	if (!dir)
-		return (NULL);
-	out = join_path(dir, rel_path);
-	free(dir);
-	return (out);
-}
 
 /* Check whether the variable `name` exists among
  * the strings `envp` */
@@ -87,4 +57,34 @@ void	free_envp(char **envp)
 		++i;
 	}
 	free(envp);
+}
+
+void	child_set_default_signals(void)
+{
+	struct sigaction	sa;
+
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = SIG_DFL;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+size_t	count_operand_envp(t_env *env)
+{
+	size_t	i;
+	size_t	cnt;
+
+	if (!env)
+		return (0);
+	i = 0;
+	cnt = 0;
+	while (i < env->vars_num)
+	{
+		if (env->vars[i].name && env->vars[i].value &&
+			env->vars[i].type != PARAM)
+			++cnt;
+		++i;
+	}
+	return (cnt);
 }

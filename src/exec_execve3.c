@@ -1,14 +1,17 @@
 #include "exec.h"
 #include "shell.h"
 #include "builtin.h"
-#include "aux_common.h"
 
 #include "error.h"
 #include "libft.h"
 
 #include <stdlib.h>
 
-static void	go_to_next_path_comp(char *path, size_t *i);
+void	go_to_next_path_comp(char *path, size_t *i)
+{
+	if (path[*i] == ':')
+		++(*i);
+}
 
 int	map_exec_errno(int errnum)
 {
@@ -76,11 +79,6 @@ char	*resolve_in_path(t_shell *msh, const char *cmd)
 	return (NULL);
 }
 
-static void	go_to_next_path_comp(char *path, size_t *i)
-{
-	if (path[*i] == ':')
-		++(*i);
-}
 
 char	*try_path_dir(const char *dir, const char *cmd)
 {

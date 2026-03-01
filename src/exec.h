@@ -20,6 +20,7 @@ typedef struct s_shell			t_shell;
 typedef struct s_token			t_token;
 typedef struct s_operand		t_operand;
 typedef struct s_redir			t_redir;
+typedef struct s_env			t_env;
 typedef struct s_parser_data	t_parser_data;
 
 typedef struct s_range
@@ -55,7 +56,6 @@ int		skip_term(t_parser_data *pd, size_t s, size_t r);
 int		check_depth_limit(t_parser_data *pd, size_t l, size_t r, int base);
 
 /* exec_pipeline.c */
-int		pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth);
 int		pl_parent_single_try(t_shell *msh, t_token *token, int depth);
 int		pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth);
 
@@ -76,18 +76,26 @@ int		pl_wait_status(int ws);
 /* exec_pipeline4.c */
 int		pl_fill_stages(t_parser_data *pd, size_t l, size_t r, t_pipeline *pl);
 
+/* exec_pipeline5.c */
+int		pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth);
+
+
 /* exec_execve.c */
 int		parent_run_with_redirs(t_shell *msh, t_token *token);
 int		save_stdio(int *save_in, int *save_out);
 void	restore_stdio(int save_in, int save_out);
-int		prepare_operand(t_shell *msh, t_token *t);
+int		prep_reset_operand(t_operand *op);
+int		prep_cleanup_failed_expand(t_operand *op, int err);
 
 /* exec_execve2.c */
-void	child_exec_operand(t_shell *msh, t_token *token);
+int		prepare_operand(t_shell *msh, t_token *t);
 char	**build_envp_for_operand(t_shell *msh, t_operand *op);
-char	*key_value_to_str(const char *key, const char *value);
+void	free_envp_partial(char **envp, size_t n);
+int		copy_operand_env(t_operand *op, char **envp, size_t *ei);
+int		copy_shell_env(t_shell *msh, char **envp, size_t *ei);
 
 /* exec_execve3.c */
+void	go_to_next_path_comp(char *path, size_t *i);
 int		map_exec_errno(int errnum);
 char	*resolve_cmd_path(t_shell *msh, char *cmd);
 char	*resolve_in_path(t_shell *msh, const char *cmd);
@@ -96,17 +104,26 @@ char	*try_path_dir(const char *dir, const char *cmd);
 /* exec_execve4.c */
 int		apply_redirs(t_operand *op);
 int		redir_open_fd(t_redir *redir, int *out_fd);
-
-/* exec_execve5.c */
+int		open_heredoc(t_redir *r, int *out_fd);
 bool	has_slash(const char *s);
 char	*get_full_path_from_cwd(const char *rel_path);
+
+/* exec_execve5.c */
 bool	envp_has_name(char **envp, const char *name);
 bool	envp_name_eq(const char *envs, const char *name);
 void	free_envp(char **envp);
+void	child_set_default_signals(void);
+size_t	count_operand_envp(t_env *env);
 
 /* exec_execve6.c */
 bool	is_parent_builtin(const char *s);
 bool	is_any_builtin(const char *s);
-void	child_set_default_signals(void);
+
+/* exec_execve7.c */
+size_t	count_shell_envp(t_shell *msh, t_env *op_env);
+char	*key_value_to_str(const char *key, const char *value);
+
+/* exec_execve8.c */
+void	child_exec_operand(t_shell *msh, t_token *token);
 
 #endif

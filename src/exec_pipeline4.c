@@ -4,7 +4,6 @@
 #include "prompt_parser.h"
 
 #include "error.h"
-#include "libft.h"
 
 static void	save_operand(t_pipeline *pl, int *st_i, size_t *j);
 static void	save_open_par(t_pipeline *pl, int *st_i, size_t *j, int *close_i);

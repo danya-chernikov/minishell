@@ -11,47 +11,6 @@
 
 #include <stdlib.h>
 
-/* sig[0] - old_int
- * sig[1] - old_quit */
-int	pl_exec_pipeline(t_shell *msh, size_t l, size_t r, int depth)
-{
-	t_pipeline			pl;
-	t_parser_data		*pd;
-	int					status;
-	struct sigaction	sig[2];
-
-	pd = msh->pd;
-	ft_bzero(&pl, sizeof (pl));
-	pl.stages_num = pl_count_stages(pd, l, r);
-	if (pl.stages_num < 0)
-		return (RET_CMD_FAILURE);
-	if (pl.stages_num == 0)
-		return (RET_CMD_SUCCESS);
-	if (pl.stages_num == 1 && depth == 0 && l == r &&
-		pd->tokens[l].type == OPERAND)
-	{
-		status = pl_parent_single_try(msh, &pd->tokens[l], depth);
-		if (status != NOT_EXEC_IN_PARENT)
-			return (status);
-	}
-	if (pl_alloc(&pl) != COMMON_SUCCESS)
-		return (RET_CMD_FAILURE);
-	if (pl_fill_stages(pd, l, r, &pl) != COMMON_SUCCESS)
-		return (pl_free(&pl), RET_CMD_FAILURE);
-	if (pl_make_pipes(&pl) != COMMON_SUCCESS)
-		return (pl_free(&pl), RET_CMD_FAILURE);
-	parent_ignore_sigint_sigquit(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-	if (pl_spawn_all(msh, &pl, depth) != COMMON_SUCCESS)
-	{
-		parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-		return (pl_free(&pl), RET_CMD_FAILURE);
-	}
-	status = pl_wait(&pl);
-	parent_restore_signals(&sig[SIG_OLD_INT], &sig[SIG_OLD_QUIT]);
-	pl_free(&pl);
-	return (status);
-}
-
 int	pl_parent_single_try(t_shell *msh, t_token *token, int depth)
 {
 	int	status;
