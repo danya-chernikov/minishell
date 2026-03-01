@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve5.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:38:35 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:03:43 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "env.h"
 
@@ -81,8 +93,8 @@ size_t	count_operand_envp(t_env *env)
 	cnt = 0;
 	while (i < env->vars_num)
 	{
-		if (env->vars[i].name && env->vars[i].value &&
-			env->vars[i].type != PARAM)
+		if (env->vars[i].name && env->vars[i].value
+			&& env->vars[i].type != PARAM)
 			++cnt;
 		++i;
 	}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve7.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:02:13 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:12:48 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "env.h"
@@ -13,9 +25,9 @@ size_t	count_shell_envp(t_shell *msh, t_env *op_env)
 	cnt = 0;
 	while (i < msh->env.vars_num)
 	{
-		if (msh->env.vars[i].name &&
-			msh->env.vars[i].type == ENV &&
-			(!op_env || !env_exist(op_env, msh->env.vars[i].name)))
+		if (msh->env.vars[i].name
+			&& msh->env.vars[i].type == ENV
+			&& (!op_env || !env_exist(op_env, msh->env.vars[i].name)))
 			++cnt;
 		++i;
 	}
@@ -28,7 +40,7 @@ char	*key_value_to_str(const char *key, const char *value)
 	size_t	val_len;
 	size_t	total_len;
 	char	*str;
-	
+
 	key_len = ft_strlen(key);
 	val_len = 0;
 	if (value)

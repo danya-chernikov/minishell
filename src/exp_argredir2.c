@@ -1,11 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exp_argredir2.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:37:50 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:12:35 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "expansion.h"
 #include "shell.h"
 #include "operand.h"
 #include "wildcards.h"
 
-#include "libft.h"
 #include "vector.h"
 #include "error.h"
+
+static void	push_back_exp_qmask(t_vector *field_pair[],
+				t_vector *vec_pair[], size_t *i);
 
 int	expand_one_field(t_operand *op, t_vector *vec_pair[],
 		size_t start, size_t end)
@@ -21,13 +35,7 @@ int	expand_one_field(t_operand *op, t_vector *vec_pair[],
 		return (COMMON_SYS_ERR);
 	i = start;
 	while (i < end)
-	{
-		vector_push_back_char(field_pair[EXP_RES],
-			((char *)vec_pair[EXP_RES]->data)[i]);
-		vector_push_back_char(field_pair[QMASK],
-			((char *)vec_pair[QMASK]->data)[i]);
-		++i;
-	}
+		push_back_exp_qmask(field_pair, vec_pair, &i);
 	vector_push_back_char(field_pair[EXP_RES], '\0');
 	wc_collapse_conseq_asterisks(field_pair[EXP_RES], field_pair[QMASK]);
 	if (wc_alloc_res(&wc_res) != COMMON_SUCCESS)
@@ -39,6 +47,16 @@ int	expand_one_field(t_operand *op, t_vector *vec_pair[],
 	wc_free_res(&wc_res);
 	exp_vectors_free(field_pair);
 	return (fret);
+}
+
+static void	push_back_exp_qmask(t_vector *field_pair[],
+				t_vector *vec_pair[], size_t *i)
+{
+	vector_push_back_char(field_pair[EXP_RES],
+		((char *)vec_pair[EXP_RES]->data)[*i]);
+	vector_push_back_char(field_pair[QMASK],
+		((char *)vec_pair[QMASK]->data)[*i]);
+	++(*i);
 }
 
 int	append_split_fields(t_operand *op, t_vector *vec_pair[])
@@ -99,17 +117,4 @@ void	exp_push_arg_char(t_vector *vec_pair[],
 {
 	vector_push_back_char(vec_pair[EXP_RES], c);
 	vector_push_back_char(vec_pair[QMASK], (char)state);
-}
-
-void	exp_argredir_handle_dollar(t_shell *msh,
-		t_vector *vec_pair[], t_exp_ar_loop *ctx)
-{
-	char	dlr_varname[MAX_ENV_VAL_LEN];
-
-	if (!exp_extract_dlr_varname(dlr_varname, ctx->tok_str, &ctx->i))
-	{
-		exp_push_arg_char(vec_pair, '$', ctx->state);
-		return ;
-	}
-	exp_expand_variable(msh, vec_pair, dlr_varname, ctx->state);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:32:11 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:32:48 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef TOKEN_H
 # define TOKEN_H
 
@@ -11,8 +23,8 @@
 # define TOKEN_AND			"&&"
 # define TOKEN_OR			"||"
 
-# define MAX_TOKEN_LEN		2048 // Maximum length of each token
-# define MAX_TOKENS_NUM		8192 // Maximum number of tokens
+# define MAX_TOKEN_LEN		2048
+# define MAX_TOKENS_NUM		8192
 
 typedef struct s_parser_data	t_parser_data;
 typedef struct s_operand		t_operand;
@@ -20,15 +32,14 @@ typedef struct s_operand		t_operand;
 /* Add T_ prefixes */
 typedef enum e_token_type
 {
-    OPERAND,
-    PIPE,
-    OPEN_PAR,
-    CLOSE_PAR,
+	OPERAND,
+	PIPE,
+	OPEN_PAR,
+	CLOSE_PAR,
 	AND,
 	OR,
-	NONE // No tokens were found yet
-	
-}   t_token_type;
+	NONE
+}	t_token_type;
 
 /* If this token's type is OPERAND we store
  * the pointer to the corresponding operand.

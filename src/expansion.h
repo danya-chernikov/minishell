@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expansion.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:10:03 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:10:05 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef EXPANSION_H
 # define EXPANSION_H
 
@@ -64,11 +76,10 @@ void	exp_expand_argredir_loop(t_shell *msh, char *tok_str,
 			t_vector *vec_pair[]);
 void	exp_push_arg_char(t_vector *vec_pair[],
 			char c, t_ind_type state);
-void	exp_argredir_handle_dollar(t_shell *msh,
-			t_vector *vec_pair[], t_exp_ar_loop *ctx);
 
 /* exp_argredir3.c */
-
+void	exp_argredir_handle_dollar(t_shell *msh,
+			t_vector *vec_pair[], t_exp_ar_loop *ctx);
 
 /* exp_preparation.c */
 int		exp_divide_op_str_on_tokens(t_operand *op);

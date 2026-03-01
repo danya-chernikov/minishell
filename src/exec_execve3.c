@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve3.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:37:26 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:49:32 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "builtin.h"
@@ -78,7 +90,6 @@ char	*resolve_in_path(t_shell *msh, const char *cmd)
 	}
 	return (NULL);
 }
-
 
 char	*try_path_dir(const char *dir, const char *cmd)
 {

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   signals2.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:02:47 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:02:48 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "signals.h"
 
 #include <unistd.h>
@@ -7,8 +19,10 @@ void	heredoc_sigint_handler(int signo)
 {
 	(void)signo;
 	g_got_sigint = 1;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
 	rl_done = 1;
-	write(1, "\n", 1);
 }
 
 void	child_set_heredoc_signals(void)

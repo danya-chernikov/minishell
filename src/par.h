@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   par.h                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:01:39 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:01:40 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PAR_H
 # define PAR_H
 
@@ -6,16 +18,15 @@
 typedef struct s_parser_data	t_parser_data;
 
 # define NONE_PAR_IND	-1
-# define NOT_CLOSED_PAR	0	// This parenthesis wasn't closed yet (We didn't pass it)
-# define CLOSED_PAR		1	// Thie parenthesis was already closed
-# define MAX_PAR_NUM	128	// Maximum parentheses number
+# define NOT_CLOSED_PAR	0
+# define CLOSED_PAR		1
+# define MAX_PAR_NUM	128
 
 /* Parenthesis type */
 typedef enum e_par_type
 {
 	OPENING_PAR,
 	CLOSING_PAR
-
 }	t_par_type;
 
 void	pars_init(t_pair *pars);

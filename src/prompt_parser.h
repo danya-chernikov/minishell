@@ -1,7 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   prompt_parser.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:34:39 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:34:46 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PROMPT_PARSER_H
 # define PROMPT_PARSER_H
 
-#include <stdlib.h>
+# include <stdlib.h>
 
 # include "par.h"
 # include "quote.h"
@@ -16,37 +28,43 @@
 # define NONE_INDEX			-1
 # define NONE_PIPE			-1
 
+/* Describes first-level token parser data.
+ * Main definitions:
+ *     prompt		- prompt string entered by user;
+ *     pi			- prompt index;
+ *     op_cnt		- operand counter;
+ *     ops			- operands (programs to launch);
+ *     token_cnt	- token counter;
+ *     tokens		- here we store all tokens we found during parsing;
+ *     quotes		- all quotes pairs found in the prompt;
+ *     qpair_cnt	- counter of quote pairs;
+ * Auxiliary definitions:
+ *     opar_num		- number of all opening-parentheses;
+ *	   all_open_pars- indexes of all opening-parentheses;
+ *	   opar_cnt		- opening-parentheses counter (must be signed type);
+ *	   open_par		- opening-parentheses indexes found and thier flags;
+ *	   cpar_cnt		- closing-parentheses counter (for now let it be int);
+ *     close_par	- closing-parentheses indexes found and their flags;
+ *     pars			- a member that represents each parentheses pair;
+ *     par_cnt		- parentheses pair counter */
 typedef struct s_parser_data
 {
-	char		*prompt;					// Prompt entered by user
-	size_t		pi;							// Prompt index
-
-	size_t		pipe_cnt;					// Pipe counter
-	int			pipes[MAX_PIPES_NUM][2];	// All pipes array
-	
-	size_t		op_cnt;						// Operand counter
-	t_operand	ops[MAX_OPS_NUM];			// Operands (programs to launch)
-	
-	size_t		token_cnt;					// Token counter
-	t_token		tokens[MAX_TOKENS_NUM];		// Here we store all tokens we found during parsing
-	
-	t_quote_int quotes[MAX_QUOTES_NUM];		// All quotes pairs found in the prompt
-	size_t		qpair_cnt;					// Counter of quote pairs
-
-
-	/* Auxiliary things */
-	size_t		opar_num;					// Number of all opening-parentheses
-	size_t		all_open_pars[MAX_PAR_NUM][2]; // Indexes of all opening-parentheses
-	
-	t_ll		opar_cnt;					// Opening-parentheses counter (must be int)
-	size_t		open_par[MAX_PAR_NUM];		// Opening-parentheses indexes found and thier flags
-	
-	t_ll		cpar_cnt;					// Closing-parentheses counter (for now let it be int)
-	size_t		close_par[MAX_PAR_NUM][2];	// Closing-parentheses indexes found and their flags
-	
-	t_pair		pars[MAX_PAR_NUM];			// A member that represents each parentheses pair
-	size_t		par_cnt;					// Parentheses pair counter
-
+	char		*prompt;
+	size_t		pi;
+	size_t		op_cnt;
+	t_operand	ops[MAX_OPS_NUM];
+	size_t		token_cnt;
+	t_token		tokens[MAX_TOKENS_NUM];
+	t_quote_int	quotes[MAX_QUOTES_NUM];
+	size_t		qpair_cnt;
+	size_t		opar_num;
+	size_t		all_open_pars[MAX_PAR_NUM][2];	
+	t_ll		opar_cnt;
+	size_t		open_par[MAX_PAR_NUM];	
+	t_ll		cpar_cnt;
+	size_t		close_par[MAX_PAR_NUM][2];
+	t_pair		pars[MAX_PAR_NUM];
+	size_t		par_cnt;
 }	t_parser_data;
 
 /* prompt_parser.c */

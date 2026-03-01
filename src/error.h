@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   error.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:27:51 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:28:44 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef ERROR_H
 # define ERROR_H
 
@@ -43,7 +55,7 @@
 # define NOT_VALID_IDENTIFIER	"not a valid identifier"
 
 /* Redirection errors */
-# define REDIRECT_ERR_MSG		"syntax error near unexpected token" // When: $ cat <<
+# define REDIRECT_ERR_MSG		"syntax error near unexpected token"
 # define TOO_MANY_REDIRECTS		"too many redirections"
 # define TOO_LONG_REDIRECT_PATH	"redirection's operand-path is too long"
 # define TOO_LONG_HD_DELIM		"heredoc's delimiter is too long"
@@ -71,7 +83,7 @@
 # define GETPID_ERR_MSG			"Could not get my PID"
 # define GETPPID_ERR_MSG		"Could not get my PPID"
 # define GETUID_ERR_MSG			"Could not get my UID/EUID"
-# define GETPWUID_ERR_MSG		"Could not get info about the user who is running me"
+# define GETPWUID_ERR_MSG		"Could not get info about who is running me"
 
 /* Errors that should not occur in practice, but are still handled */
 # define OP_ARGV_IS_NULL		"Operand's argv is NULL"
@@ -91,7 +103,6 @@ typedef enum e_exit_code
 	CMD_LOCATED_BUT_NOT_EXEC_ERR = 126,
 	CMD_NOT_LOCATED_ERR = 127,
 	SIGNALED_CODE = 128
-
 }	t_exit_code;
 
 void	print_sys_error(char *msg);

@@ -6,14 +6,14 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/28 13:01:16 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 13:26:21 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 02:31:40 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REDIRECT_PARSER_H
 # define REDIRECT_PARSER_H
 
-#include "prompt_parser.h"
+# include "prompt_parser.h"
 
 typedef struct s_operand	t_operand;
 
@@ -41,6 +41,5 @@ int		add_heredoc(t_operand *op, size_t *op_i);
 int		copy_hd_delim(t_operand *op, size_t *wi);
 int		alloc_quotes_buf(t_quote_int **quotes);
 int		get_hd_delimiter(t_operand *op, size_t *wi);
-
 
 #endif

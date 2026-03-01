@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_execve2.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:14:46 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:14:46 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "token.h"
@@ -40,7 +52,7 @@ char	**build_envp_for_operand(t_shell *msh, t_operand *op)
 	total = 0;
 	total += count_operand_envp(op->my_env);
 	total += count_shell_envp(msh, op->my_env);
-	envp = malloc((total + 1) * sizeof *envp);
+	envp = malloc((total + 1) * sizeof (*envp));
 	if (!envp)
 		return (NULL);
 	ei = 0;
@@ -71,8 +83,8 @@ int	copy_operand_env(t_operand *op, char **envp, size_t *ei)
 	mi = 0;
 	while (op->my_env && mi < op->my_env->vars_num)
 	{
-		if (op->my_env->vars[mi].name && op->my_env->vars[mi].value &&
-			op->my_env->vars[mi].type != PARAM)
+		if (op->my_env->vars[mi].name && op->my_env->vars[mi].value
+			&& op->my_env->vars[mi].type != PARAM)
 		{
 			envp[*ei] = key_value_to_str(op->my_env->vars[mi].name,
 					op->my_env->vars[mi].value);
@@ -93,8 +105,8 @@ int	copy_shell_env(t_shell *msh, char **envp, size_t *ei)
 	mi = 0;
 	while (mi < msh->env.vars_num)
 	{
-		if (msh->env.vars[mi].name && msh->env.vars[mi].type == ENV &&
-			!envp_has_name(envp, msh->env.vars[mi].name))
+		if (msh->env.vars[mi].name && msh->env.vars[mi].type == ENV
+			&& !envp_has_name(envp, msh->env.vars[mi].name))
 		{
 			envp[*ei] = key_value_to_str(msh->env.vars[mi].name,
 					msh->env.vars[mi].value);

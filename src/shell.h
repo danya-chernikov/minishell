@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   shell.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:06:46 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:06:47 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SHELL_H
 # define SHELL_H
 
@@ -26,7 +38,7 @@
 # define C_SHORT_OPT		"-c"
 
 # define MUST_EXIT			-7
-# define PROMPT_INV_LEN		512	// Maximum length of user's prompt invitation string
+# define PROMPT_INV_LEN		512
 # define MAX_SUBDOMAIN_LEN	64
 
 typedef struct s_parser_data	t_parser_data;
@@ -42,16 +54,14 @@ typedef struct s_options
 	bool	f_verbose;
 	bool	f_norc;
 	bool	f_c;
-
 }	t_options;
 
 typedef enum e_shell_mode
 {
-	NONINT_SCRIPT_MODE,	// ./minishell script.sh arg1 arg2
-	NONINT_CMD_MODE,	// ./minishell -c 'command' OR ./minishell -c "command"
-	NONINT_STDIN_MODE,	// echo "ls -la" | ./minishell OR ./minishell < commands_file
-	INT_MODE,			// ./minishell --login OR ./minishell -l OR ./minishell
-
+	NONINT_SCRIPT_MODE,
+	NONINT_CMD_MODE,
+	NONINT_STDIN_MODE,
+	INT_MODE,
 }	t_shell_mode;
 
 typedef struct s_shell
@@ -64,10 +74,9 @@ typedef struct s_shell
 	t_env			env;
 	int				argc;
 	char			**argv;
-	char			*prompt_inv;	// on heap
-	char			*script;		// on stack
-	char			*c_cmd;			// on stack
-
+	char			*prompt_inv;
+	char			*script;
+	char			*c_cmd;
 }	t_shell;
 
 /* shell.c */

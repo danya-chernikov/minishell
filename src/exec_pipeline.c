@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_pipeline.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:31:05 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 02:31:06 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec.h"
 #include "shell.h"
 #include "builtin.h"
@@ -41,7 +53,7 @@ int	pl_spawn_all(t_shell *msh, t_pipeline *pl, int depth)
 {
 	int	fret;
 	int	st_i;
-	
+
 	st_i = 0;
 	while (st_i < pl->stages_num)
 	{

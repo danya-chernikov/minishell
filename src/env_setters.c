@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:29:26 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 03:50:59 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 02:47:55 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,16 +104,7 @@ static int	set_existing_var(t_env_var *var, char *name, char *value,
 		if (var->value)
 			free(var->value);
 		var->value = value;
-		if (type == ENV || var->type == ENV)
-		{
-			var->type = ENV;
-			var->f_inherit = true;
-		}
-		else if (var->type != PARAM)
-		{
-			var->type = LOCAL;
-			var->f_inherit = false;
-		}
+		check_var_type(var, type);
 		free(name);
 	}
 	else

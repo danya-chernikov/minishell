@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirect.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:05:10 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:05:31 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef REDIRECT_H
 # define REDIRECT_H
 
 # include "heredoc.h"
 
 # define MAX_REDIRS_NUM		256
-# define MAX_REDIR_PATH_LEN	4096 // The same as PATH_MAX
+# define MAX_REDIR_PATH_LEN	4096
 # define TOKEN_REDIR_IN		"<"
 # define TOKEN_REDIR_OUT	">"
 # define TOKEN_REDIR_APP	">>"
@@ -18,7 +30,6 @@ typedef enum e_redir_type
 	REDIR_OUT,
 	REDIR_APP,
 	REDIR_HEREDOC
-
 }	t_redir_type;
 
 /* In case if the redirection is heredoc
@@ -30,10 +41,9 @@ typedef struct s_redir
 {
 	int				tok_ind;
 	t_redir_type	type;
-	int				target_fd; // 0 for < and <<, and 1 for > and >>
+	int				target_fd;
 	char			*path;
 	t_heredoc		hd;
-
 }	t_redir;
 
 bool	is_redir_in(t_operand *op, size_t op_i);

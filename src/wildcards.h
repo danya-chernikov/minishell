@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wildcards.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 02:36:59 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:14:00 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef WILDCARDS_H
 # define WILDCARDS_H
 
@@ -10,8 +22,8 @@
 # include <stddef.h>
 # include <stdbool.h>
 
-#include <dirent.h>
-#include <sys/types.h>
+# include <dirent.h>
+# include <sys/types.h>
 
 typedef struct s_vector	t_vector;
 
@@ -39,21 +51,25 @@ int		expand_wildcards(char **res_files, char *mask, t_vector *qmask);
 /* wildcards_filesclt.c */
 int		wc_get_curdir_files(char *files[], size_t *file_cnt);
 int		wc_init_dir(DIR **dir, struct dirent **entry, char *cwd);
-int		wc_get_curdir_files_loop(DIR *dir, struct dirent *entry, char *files[], size_t *file_cnt);
+int		wc_get_curdir_files_loop(DIR *dir, struct dirent *entry,
+			char *files[], size_t *file_cnt);
 
 /* wildcards_filesclt2.c */
-int		wc_add_curdir_file(DIR *dir, struct dirent *entry, char *files[], size_t *file_cnt);
+int		wc_add_curdir_file(DIR *dir, struct dirent *entry, char *files[],
+			size_t *file_cnt);
 void	wc_free_curdir_files(char *files[], size_t file_cnt);
 
 /* wildcards_sieve.c */
-int		wc_sift_files_by_mask(t_wc_data *wcd, char **res_files, char *files[], size_t file_cnt);
+int		wc_sift_files_by_mask(t_wc_data *wcd, char **res_files,
+			char *files[], size_t file_cnt);
 int		wc_check_file(t_wc_data	*wcd, char **res_files, size_t *resf_cnt);
 void	wc_check_file_loop(t_wc_data *wcd, bool *f_cancel);
 int		wc_match_asterisk(t_wc_data *wcd);
 int		wc_match_regular_symbol(t_wc_data *wcd, bool *f_cancel);
 
 /* wildcards_sieve2.c */
-int		wc_check_zero_matches(t_wc_data *wcd, char **res_files, size_t *resf_cnt);
+int		wc_check_zero_matches(t_wc_data *wcd, char **res_files,
+			size_t *resf_cnt);
 
 /* wildcards_common.c */
 void	wc_collapse_conseq_asterisks(t_vector *exp_res, t_vector *qmask);

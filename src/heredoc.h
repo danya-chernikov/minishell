@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/01 03:02:30 by dchernik          #+#    #+#             */
+/*   Updated: 2026/03/01 03:02:31 by dchernik         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef HEREDOC_H
 # define HEREDOC_H
 
@@ -39,7 +51,6 @@ typedef struct s_heredoc
 	char	*delim;
 	size_t	cnt_len;
 	bool	f_expand_body;
-
 }	t_heredoc;
 
 /* heredoc.c */
