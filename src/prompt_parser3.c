@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 15:52:24 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/28 03:10:54 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:23:12 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,25 +46,27 @@ void	token_push(t_parser_data *d, t_token_type type)
  *     pi	- prompt index */
 int	operand_push(t_parser_data *d, size_t plen)
 {
-	int		fret;
-	size_t	opname_len;
-	char	opname[MAX_OP_LEN];
+	int			fret;
+	size_t		opname_len;
+	t_operand	*op;
+	char		opname[MAX_OP_LEN];
 
 	fret = copy_operand(d, opname, plen);
 	if (fret != COMMON_SUCCESS)
 		return (fret);
 	remove_right_spaces(opname);
 	opname_len = ft_strlen(opname);
-	d->ops[d->op_cnt].name = (char *)malloc((opname_len + 1) * sizeof (char));
-	if (!d->ops[d->op_cnt].name)
+	op = &d->ops[d->op_cnt];
+	op->name = (char *)malloc((opname_len + 1) * sizeof (char));
+	if (!op->name)
 		return (perror("malloc"), COMMON_SYS_ERR);
-	ft_strlcpy(d->ops[d->op_cnt].name, opname, opname_len + 1);
-	fret = op_token_init(&d->ops[d->op_cnt]);
+	ft_strlcpy(op->name, opname, opname_len + 1);
+	fret = op_token_init(op);
 	if (fret != COMMON_SUCCESS)
-		return (fret);
-	fret = op_env_init(&d->ops[d->op_cnt]);
+		return (free(op->name), op->name = NULL, fret);
+	fret = op_env_init(op);
 	if (fret != COMMON_SUCCESS)
-		return (fret);
+		return (operand_push_cleanup(op), fret);
 	++d->op_cnt;
 	return (COMMON_SUCCESS);
 }
@@ -76,12 +78,12 @@ static int	copy_operand(t_parser_data *d, char *opname, size_t plen)
 	i = 0;
 	while (d->pi < plen && !is_special_char_outside_quotes(d, d->pi))
 	{
-		if (i > MAX_OP_LEN - 1)
+		if (i >= MAX_OP_LEN - 1)
 		{
 			print_shell_error(NULL, TOO_LONG_OP_ERR_MSG);
 			return (COMMON_FAILURE);
 		}
-		if (d->op_cnt > MAX_OPS_NUM - 1)
+		if (d->op_cnt >= MAX_OPS_NUM - 1)
 		{
 			print_shell_error(NULL, TOO_MANY_OPS_ERR_MSG);
 			return (COMMON_FAILURE);
