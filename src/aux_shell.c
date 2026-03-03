@@ -6,12 +6,13 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 00:48:27 by dchernik          #+#    #+#             */
-/*   Updated: 2026/02/27 02:00:44 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/03 18:56:54 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 #include "aux_common.h"
+#include "colors.h"
 
 #include <stdlib.h>
 
@@ -117,18 +118,16 @@ static int	form_invitation(t_shell *msh, char *subdomain,
 	size_t	inv_len;
 	char	*new_prompt;
 
-	inv_len = ft_strlen(username) + ft_strlen(subdomain) + ft_strlen(pwd) + 5;
+	inv_len = ft_strlen(username) + ft_strlen(subdomain) + ft_strlen(pwd) + 5
+		+ ft_strlen(CL_GREEN) + 2 * ft_strlen(CL_RESET) + 2 * ft_strlen(CL_BOLD)
+		+ ft_strlen(CL_BLUE);
 	if (inv_len > PROMPT_INV_LEN - 1)
 		return (print_shell_error(NULL, DOM_TOO_LONG_ERR_MSG), COMMON_FAILURE);
 	new_prompt = (char *)malloc(inv_len * sizeof(char));
 	if (!new_prompt)
 		return (perror_and_return("malloc", COMMON_SYS_ERR));
-	ft_strlcpy(new_prompt, username, inv_len);
-	ft_strlcat(new_prompt, "@", inv_len);
-	ft_strlcat(new_prompt, subdomain, inv_len);
-	ft_strlcat(new_prompt, ":", inv_len);
-	ft_strlcat(new_prompt, pwd, inv_len);
-	ft_strlcat(new_prompt, "$ ", inv_len);
+	concat_prompt_comps_first(new_prompt, username, subdomain, inv_len);
+	concat_prompt_comps_second(new_prompt, pwd, inv_len);
 	if (msh->prompt_inv)
 		free(msh->prompt_inv);
 	msh->prompt_inv = new_prompt;

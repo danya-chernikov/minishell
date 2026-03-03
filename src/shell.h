@@ -6,7 +6,7 @@
 /*   By: dchernik <dchernik@student.42urduliz.com>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/01 03:06:46 by dchernik          #+#    #+#             */
-/*   Updated: 2026/03/01 03:06:47 by dchernik         ###   ########.fr       */
+/*   Updated: 2026/03/03 18:53:26 by dchernik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,10 @@ int		launch_script(t_shell *msh, int *ret_code);
 int		gen_prompt_inv(t_shell *msh);
 
 /* aux_shell2.c */
+void	concat_prompt_comps_first(char *new_prompt, char *username,
+			char *subdomain, size_t inv_len);
+void	concat_prompt_comps_second(char *new_prompt, char *pwd,
+			size_t inv_len);
 void	msh_update_retcode(t_shell *msh, int status);
 
 /* shell_configs.c */

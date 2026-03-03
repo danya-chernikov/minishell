@@ -139,12 +139,12 @@ shell_launch_script.o : shell_launch_script.o engine.h shell.h \
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c shell_launch_script.c
 
-aux_shell.o : aux_shell.c shell.h aux_common.h \
+aux_shell.o : aux_shell.c shell.h aux_common.h colors.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell.c
 
-aux_shell2.o : aux_shell2.c shell.h \
+aux_shell2.o : aux_shell2.c shell.h colors.h \
 	libft.h vector.h error.h
 	$(CC) $(CFLAGS) -I$(LIBFT_PATH) -I$(LIBVECTOR_PATH) -DDEBUG=$(DEBUG_LVL) \
 	-c aux_shell2.c
